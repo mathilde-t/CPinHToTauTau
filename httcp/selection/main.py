@@ -36,8 +36,6 @@ from httcp.selection.higgscand import higgscand, higgscandprod
 #from httcp.production.main import cutflow_features
 from httcp.production.dilepton_features import hcand_mass, mT, rel_charge #TODO: rename mutau_vars -> dilepton_vars
 
-from IPython import embed
-
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
 coffea = maybe_import("coffea")
@@ -253,8 +251,6 @@ def main(
     mutau_pair = ak.concatenate([events.Muon[mutau_indices_pair[:,0:1]], 
                                  events.Tau[mutau_indices_pair[:,1:2]]],
                                 axis=1)
-
-    #embed()
     # tau-tau pair i.e. hcand selection
     # e.g. [ [], [tau1, tau2], [], [], [] ]
     tautau_results, tautau_indices_pair = self[tautau_selection](events,
@@ -304,8 +300,6 @@ def main(
             #print("hcand-gentau matching")
             events, gentau_results = self[gentau_selection](events, True)
             results += gentau_results
-
-    #from IPython import embed; embed()
     #1/0
 
     # create process ids
@@ -369,5 +363,4 @@ def main(
         stats,
     )
     """
-    #from IPython import embed; embed()
     return events, results

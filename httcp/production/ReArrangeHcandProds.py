@@ -192,7 +192,6 @@ def reArrangeDecayProducts(
     hcand1AndProds = ak.concatenate([p4_hcand1, p4_hcand1_pi, p4_hcand1_pi0], axis=1)
     hcand2AndProds = ak.concatenate([p4_hcand2, p4_hcand2_pi, p4_hcand2_pi0], axis=1)
 
-    #from IPython import embed; embed()
 
     return events, {"p4h1"       : p4_hcand1, 
                     "p4h1pi"     : p4_hcand1_pi, 
@@ -219,7 +218,6 @@ def reArrangeGenDecayProducts(
 ) -> tuple[ak.Array, dict] :
     ghcand       = events.GenTau
     ghcandprod   = events.GenTauProd
-    #from IPython import embed; embed()
     #ghcandprod_indices = ghcand.distinctChildrenIdxG
     #ghcandprod         = events.GenPart._apply_global_index(ghcandprod_indices)
 
@@ -250,7 +248,6 @@ def reArrangeGenDecayProducts(
     hcand1AndProds = ak.concatenate([p4_hcand1, p4_hcand1_pi, p4_hcand1_pi0], axis=1)
     hcand2AndProds = ak.concatenate([p4_hcand2, p4_hcand2_pi, p4_hcand2_pi0], axis=1)
 
-    #from IPython import embed; embed()
 
     return events, {"p4h1"        : p4_hcand1, 
                     "p4h1pi"      : p4_hcand1_pi, 

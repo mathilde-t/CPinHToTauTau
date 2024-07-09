@@ -20,7 +20,6 @@ from columnflow.columnar_util import optional_column as optional
 #from httcp.production.PhiCPNeutralPion import PhiCPNPMethod
 from httcp.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
 from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
-from IPython import embed
 
 
 from httcp.production.dilepton_features import hcand_mass, mT, rel_charge #TODO: rename mutau_vars -> dilepton_vars
@@ -113,7 +112,6 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         #events = self[split_dy](events, **kwargs)
         events = self[pu_weight](events, **kwargs)
         events = self[muon_weight](events, **kwargs)
-        #from IPython import embed; embed()
         events = self[tau_weight](events, **kwargs) 
     
     events = self[hcand_features](events, **kwargs)       

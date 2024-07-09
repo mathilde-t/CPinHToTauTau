@@ -392,7 +392,6 @@ def jet_selection(
 
     # bjet veto
     bjet_veto = ak.sum(b_jet_mask, axis=1) == 0
-    #from IPython import embed; embed()
 
     return events, SelectionResult(
         steps = {
@@ -513,7 +512,6 @@ def gentau_selection(
         _hcands_dm    = ak.where(has_2, hcands.decayMode, hcands.decayMode[:,:0])
         dm_match_mask = _hcands_dm == _gentaus_dm
         dm_match_evt_mask = ak.sum(dm_match_mask, axis=1) == 2
-    #from IPython import embed; embed()
     #1/0
     
 
@@ -537,7 +535,6 @@ def gentau_selection(
                                                                          0)))
     events = set_ak_column(events, "GenTauProd",       ak.Array(ak.to_list(decay_gentaus)))
 
-    #from IPython import embed; embed()
     #1/0
 
     return events, SelectionResult(

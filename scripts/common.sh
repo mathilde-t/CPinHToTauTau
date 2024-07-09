@@ -17,11 +17,11 @@ case $1 in
     ;;
     "run3lim")
         config="run3_2022_preEE_nano_tau_v12_limited"
-        datasets='data_mu_c,wj_incl'
+        datasets='data_mu_c' #,wj_incl'
         #'st_t_bbarq,st_tbar_bq,'`
         #`'st_t_wminus_to_lnu2q,st_t_wminus_to_2l2nu,'`
         #`'st_tbar_wplus_to_lnu2q,st_tbar_wplus_to_2l2nu'
-        processes='data,wj'
+        processes='data' #,wj'
     ;;
     "run3")
         config="run3_2022_preEE_nano_tau_v12"

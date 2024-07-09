@@ -18,23 +18,21 @@ ak = maybe_import("awkward")
 ### Function that stores the trigger.id of the objects (e, mu, and tau) ###
 
 def hlt_path_fired(dictionary):
-    assert len(dictionary) > 0, "Empty dictionaly, babushcha alert !!! check triggers !!!"
+    if len(dictionary) > 0:# "Empty dictionary, babushcha alert !!! check triggers !!!"
+        max_length = 0
+        for key in dictionary.keys():
+            temp_length = ak.max(ak.num(dictionary[key], axis=1))
+            if temp_length > max_length: max_length = temp_length
 
-    max_length = 0
-    for key in dictionary.keys():
-        temp_length = ak.max(ak.num(dictionary[key], axis=1))
-        if temp_length > max_length: max_length = temp_length
+        hlt_condition = {}
+        for key in dictionary.keys():
+            hlt_condition[key] = ak.pad_none(dictionary[key], target=max_length)
+            hlt_condition[key] = ak.fill_none(hlt_condition[key],-1)[:,:,None]
 
-    hlt_condition = {}
-    for key in dictionary.keys():
-        hlt_condition[key] = ak.pad_none(dictionary[key], target=max_length)
-        hlt_condition[key] = ak.fill_none(hlt_condition[key],-1)[:,:,None]
-
-    hlt_condition_values = list(hlt_condition.values())
-    hlt_condition_values_concat = ak.concatenate(hlt_condition_values, axis=-1)
-    HLT_path_fired = ak.max(hlt_condition_values_concat, axis=-1)
-
-    return HLT_path_fired 
+        hlt_condition_values = list(hlt_condition.values())
+        hlt_condition_values_concat = ak.concatenate(hlt_condition_values, axis=-1)
+        HLT_path_fired = ak.max(hlt_condition_values_concat, axis=-1)
+        return HLT_path_fired 
 
 @selector(
     uses={
@@ -73,12 +71,6 @@ def match_trigobj(
     muon_indices_dummy     = muon_indices[:,:0]
     tau_indices_dummy      = tau_indices[:,:0]
     
-    # matched_idx_e = electron_indices[:,:0]
-    # matched_idx_mu = muon_indices[:,:0]
-    # matched_idx_tau = tau_indices[:,:0]
-    # matched_triggerID_e = electron_indices[:,:0]
-    # matched_triggerID_mu = muon_indices[:,:0]
-    # matched_triggerID_tau = tau_indices[:,:0]
     matched_idx_e   = ak.values_astype(-1 * ak.ones_like(electron_indices), np.int32)
     matched_idx_mu  = ak.values_astype(-1 * ak.ones_like(muon_indices), np.int32)
     matched_idx_tau = ak.values_astype(-1 * ak.ones_like(tau_indices), np.int32)
@@ -175,12 +167,19 @@ def match_trigobj(
                     cross_tau_triggered = ak.where(trigger_fired & is_cross_tau, True, cross_tau_triggered)
                 hlt_path_fired_tau[trigger.hlt_field]= ak.where(tau_matches, trigger.id,-1)
 
-        #from IPython import embed; embed()
-    
-        triggerID_e = hlt_path_fired(hlt_path_fired_e)
-        triggerID_mu = hlt_path_fired(hlt_path_fired_mu)
-        triggerID_tau = hlt_path_fired(hlt_path_fired_tau)
-    
+        if len(hlt_path_fired_e) > 0 :
+            triggerID_e = hlt_path_fired(hlt_path_fired_e)
+        else :
+            triggerID_e = matched_triggerID_e
+        if len(hlt_path_fired_mu) > 0 :
+            triggerID_mu = hlt_path_fired(hlt_path_fired_mu)
+        else :
+            triggerID_mu = matched_triggerID_mu
+        if len(hlt_path_fired_tau) > 0 :
+            triggerID_tau = hlt_path_fired(hlt_path_fired_tau)
+        else :
+            triggerID_tau = matched_triggerID_tau
+            
         mask_triggerID_e = ak.fill_none(triggerID_e > 0, False)
         matched_idx_e = electron_indices[mask_triggerID_e]
         matched_triggerID_e = triggerID_e[mask_triggerID_e]
@@ -196,6 +195,7 @@ def match_trigobj(
         electron_indices = matched_idx_e
         muon_indices = matched_idx_mu
         tau_indices = matched_idx_tau
+
 
     sel_electron_indices = ak.values_astype(electron_indices, np.int32)
     sel_muon_indices = ak.values_astype(muon_indices, np.int32)

@@ -236,20 +236,22 @@ def add_run3_preEE (ana: od.Analysis,
         },
     )
     
+    import os
+    external_path = os.path.join(os.environ.get('HTTCP_BASE'), "httcp/data/corrections")
     cfg.x.external_files = DotDict.wrap({
         # lumi files
         "lumi": {
-            "golden": ("/eos/user/c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # noqa
-            "normtag": ("/afs/cern.ch/user/l/lumipro/public/Normtags/normtag_PHYSICS.json", "v1"),
+            "golden": (f"{external_path}/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt", "v1"),  # noqa
+            "normtag": (f"{external_path}/normtag_PHYSICS.json", "v1"),
         },
         "pileup":{
-            #"json": ("/eos/user/c/cmsdqm/www/CAF/certification/Collisions22/PileUp/EFG/pileup_JSON.txt", "v1")
-            "data" : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/Data_PileUp_2022_preEE.root", #TODO: make a link to the common correction repo
-            "mc"   : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/MC_PileUp_2022.root" #TODO: make a link to the common correction repo
+            "data" : f"{external_path}/Data_PileUp_2022_preEE.root", #TODO: make a link to the common correction repo
+            "mc"   : f"{external_path}/MC_PileUp_2022.root" #TODO: make a link to the common correction repo
         },
-        "muon_correction" : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/muon_SFs_2022_preEE.root", #TODO: make a link to the common correction repo
-        "tau_correction"  : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/tau_DeepTau2018v2p5_2022_preEE.json.gz" #TODO: make a link to the common correction repo
+        "muon_correction" : f"{external_path}/muon_SFs_2022_preEE.root", #TODO: make a link to the common correction repo
+        "tau_correction"  : f"{external_path}/tau_DeepTau2018v2p5_2022_preEE.json.gz", #TODO: make a link to the common correction repo
     })
+
 
     # target file size after MergeReducedEvents in MB
     cfg.x.reduced_file_size = 512.0

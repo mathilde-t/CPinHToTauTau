@@ -14,8 +14,6 @@ from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column, optional
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
 
-
-
 @producer(
     uses={
         "channel_id",

@@ -52,6 +52,7 @@ def trigger_selection(
         # get trigger objects for fired events per leg
         leg_masks = []
         all_legs_match = True
+        
         for leg in trigger.legs:
             # start with a True mask
             leg_mask = abs(events.TrigObj.id) >= 0
@@ -61,11 +62,14 @@ def trigger_selection(
             # pt cut
             if leg.min_pt is not None:
                 leg_mask = leg_mask & (events.TrigObj.pt >= leg.min_pt)
+            # pt eta
+            if leg.min_eta is not None:
+                leg_mask = leg_mask & (events.TrigObj.eta < abs(leg.min_eta))
             # trigger bits match
             if leg.trigger_bits is not None:
                 # OR across bits themselves, AND between all decision in the list
                 for bits in leg.trigger_bits:
-                    leg_mask = leg_mask & ((events.TrigObj.filterBits & bits) > 0)
+                    leg_mask = leg_mask & ((events.TrigObj.filterBits & bits) != 0)
             leg_masks.append(index[leg_mask])
             # at least one object must match this leg
             all_legs_match = all_legs_match & ak.any(leg_mask, axis=1)

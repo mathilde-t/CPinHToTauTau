@@ -95,8 +95,9 @@ def get_sorted_pair(
         # tau
         "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
         "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet",
+        #"Tau.idDeepTau2018v2p5VSjet", "Tau.idDeepTau2018v2p5VSe", "Tau.idDeepTau2018v2p5VSmu",
         # met
-        "MET.pt", "MET.phi",
+        "PuppiMET.pt", "PuppiMET.phi",
     },
     exposed=False,
 )
@@ -107,6 +108,15 @@ def mutau_selection(
         lep2_indices: ak.Array,
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult, ak.Array]:
+
+    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
+    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
+
+    good_selections = ((events.Tau[lep2_indices].idDeepTau2018v2p5VSjet>= deep_tau_vs_e_jet_wps["Medium"]) &  #vsJet
+                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"]) & #vsE
+                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Tight"]))      #vsMu
+    lep2_indices = lep2_indices[good_selections]
+
 
     # Sorting lep1 [Electron] by isolation [ascending]
     lep1_sort_key       = events.Muon[lep1_indices].pfRelIso03_all
@@ -129,7 +139,7 @@ def mutau_selection(
     preselection = {
         "mutau_is_os"         : (lep1.charge * lep2.charge) < 0,
         "mutau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  #deltaR(lep1, lep2) > 0.5,
-        "mutau_mT_50"         : transverse_mass(lep1, events.MET) < 50,
+        "mutau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50,
         "mutau_invmass_40"    : (1*lep1 + 1*lep2).mass > 40,  # invariant_mass(lep1, lep2) > 40
     }
 

@@ -192,7 +192,6 @@ def reArrangeDecayProducts(
     hcand1AndProds = ak.concatenate([p4_hcand1, p4_hcand1_pi, p4_hcand1_pi0], axis=1)
     hcand2AndProds = ak.concatenate([p4_hcand2, p4_hcand2_pi, p4_hcand2_pi0], axis=1)
 
-
     return events, {"p4h1"       : p4_hcand1, 
                     "p4h1pi"     : p4_hcand1_pi, 
                     "p4h1pi0"    : p4_hcand1_pi0, 
@@ -247,7 +246,6 @@ def reArrangeGenDecayProducts(
 
     hcand1AndProds = ak.concatenate([p4_hcand1, p4_hcand1_pi, p4_hcand1_pi0], axis=1)
     hcand2AndProds = ak.concatenate([p4_hcand2, p4_hcand2_pi, p4_hcand2_pi0], axis=1)
-
 
     return events, {"p4h1"        : p4_hcand1, 
                     "p4h1pi"      : p4_hcand1_pi, 

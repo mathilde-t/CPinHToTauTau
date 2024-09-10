@@ -93,9 +93,10 @@ def get_sorted_pair(
         "Electron.charge", "Electron.pfRelIso03_all", "Electron.rawIdx",
         # Tau
         "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
-        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet", "Tau.rawIdx",
+        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet", "Tau.rawIdx", 
+        #"Tau.idDeepTau2018v2p5VSjet", "Tau.idDeepTau2018v2p5VSe", "Tau.idDeepTau2018v2p5VSmu",
         # MET
-        "MET.pt", "MET.phi",
+        "PuppiMET.pt", "PuppiMET.phi",
     },
     exposed=False,
 )
@@ -106,6 +107,14 @@ def etau_selection(
         lep2_indices: ak.Array,
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult, ak.Array]:
+
+    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
+    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
+
+    good_selections = ((events.Tau[lep2_indices].idDeepTau2018v2p5VSjet>= deep_tau_vs_e_jet_wps["Tight"]) &  #vsJet
+                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"]) &  #vsE
+                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Loose"]))     #vsMu
+    lep2_indices = lep2_indices[good_selections]
 
     # lep1 and lep2 e.g.
     # lep1: [ [e1], [e1],    [e1,e2], [],   [e1,e2] ]
@@ -119,7 +128,7 @@ def etau_selection(
     lep2_sort_key       = events.Tau[lep2_indices].rawDeepTau2018v2p5VSjet
     lep2_sorted_indices = ak.argsort(lep2_sort_key, axis=-1, ascending=False)
     lep2_indices        = lep2_indices[lep2_sorted_indices]
-    # pair of leptons: probable higgs candidate -> leps_pair
+    
     # e.g. [ [(e1,t1)], [(e1,t1),(e1,t2)], [(e1,t1),(e2,t1)], [], [(e1,t1),(e1,t2),(e2,t1),(e2,t2)] ]
     # and their indices                         -> lep_indices_pair 
     leps_pair        = ak.cartesian([events.Electron[lep1_indices], 
@@ -136,7 +145,7 @@ def etau_selection(
     preselection = {
         "etau_is_os"         : (lep1.charge * lep2.charge) < 0,
         "etau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  # deltaR(lep1, lep2) > 0.5,
-        "etau_mT_50"         : transverse_mass(lep1, events.MET) < 50
+        "etau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50
     }
     # get preselected pairs
     good_pair_mask = lep1_idx >= 0

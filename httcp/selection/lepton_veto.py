@@ -29,10 +29,9 @@ def extra_lepton_veto(
         events: ak.Array,
         extra_electron_index: ak.Array,
         extra_muon_index: ak.Array,
-        # hcand_pair: ak.Array,
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult]:
- 
+
     #Selectin ALL leptons that pass extra lepton kinematic cuts
     extra_lep  = ak.Array(ak.concatenate([events.Muon[extra_muon_index],
                                           events.Electron[extra_electron_index]], axis=-1),

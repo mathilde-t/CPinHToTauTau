@@ -9,6 +9,8 @@ ak     = maybe_import("awkward")
 np     = maybe_import("numpy")
 coffea = maybe_import("coffea")
 cl = maybe_import("correctionlib")
+warn = maybe_import("warnings")
+
 # helper
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
@@ -139,8 +141,9 @@ def muon_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) -> a
     #Loop over the shifts and calculate for each shift muon scale factor
     for the_shift in shifts:
         sf_values[the_shift] = _sf.copy()
-        sf_values[the_shift][is_mutau] = self.muon_sf.evaluate(*mu_sf_args(the_shift))
-        
+        for the_sf in [self.muon_id, self.muon_iso, self.muon_trig]:
+            sf_values[the_shift][is_mutau] *= the_sf.evaluate(*mu_sf_args(the_shift))
+            
         events = set_ak_column_f32(events, f"muon_weight_{rename_systs[the_shift]}", sf_values[the_shift])
     return events
 
@@ -167,7 +170,9 @@ def muon_weight_setup(
         bundle.files.muon_correction.load(formatter="gzip").decode("utf-8"),
     )
    
-    self.muon_sf = correction_set["NUM_MediumID_DEN_TrackerMuons"]
+    self.muon_id = correction_set["NUM_MediumID_DEN_TrackerMuons"]
+    self.muon_iso = correction_set["NUM_TightPFIso_DEN_MediumID"]
+    self.muon_trig = correction_set["NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium"]
 
 # ### ELECTRON WEIGHT CALCULATOR ###
 
@@ -293,7 +298,7 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
     dm = flat_np_view(events.Tau.decayMode, axis=1)
     genmatch = flat_np_view(events.Tau.genPartFlav, axis=1)
 
-    if self.config_inst.campaign.x.year in [2016,2017,2018]: #Run2 scale factors have the input variables different from the Run3 ones.
+    if self.config_inst.x.year in [2016,2017,2018]: #Run2 scale factors have the input variables different from the Run3 ones.
 
         args_vs_e = lambda mask, syst : (eta[mask],
                                         genmatch[mask],
@@ -320,7 +325,6 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                                         self.config_inst.x.deep_tau.vs_e, 
                                         syst)   
         args_vs_mu = lambda mask, syst : (eta[mask],
-                                        dm[mask],
                                         genmatch[mask],
                                         self.config_inst.x.deep_tau.vs_mu, 
                                         syst)  
@@ -353,7 +357,7 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
 
         #Calculate scale factors for tau vs muon classifier 
         mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"]))
-        sf_values[the_shift][mu_mask] = self.id_vs_e_corrector.evaluate(*args_vs_mu(mu_mask,the_shift))
+        sf_values[the_shift][mu_mask] = self.id_vs_mu_corrector.evaluate(*args_vs_mu(mu_mask,the_shift))
          
         #Calculate scale factors for tau vs jet classifier 
         tau_mask = (genmatch == tau_part_flav["tau_had"]) 
@@ -395,3 +399,33 @@ def tau_weight_setup(
     self.id_vs_e_corrector      = correction_set[f"{tagger_name}VSe"]
     self.id_vs_mu_corrector     = correction_set[f"{tagger_name}VSmu"]
 
+@producer(
+    uses={
+        optional("TauSpinner*") 
+    },
+    produces={
+        "tauspinner_weight_up", "tauspinner_weight", "tauspinner_weight_down"
+    },
+    mc_only=True,
+)
+def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
+    """
+    A simple function that sets tauspinner_weight according to the cp_hypothesis
+    
+    """
+    names = ["_up", "", "_down"]
+    for the_name in names:
+        if  "TauSpinner" in list(events.fields):
+            if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
+            elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
+            elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
+            else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner weight producer!')   
+            buf = ak.to_numpy(the_weight)
+            if any(np.isnan(buf)):
+                warn.warn("tauspinner_weight contains NaNs. Imputing them with zeros.")
+                buf[np.isnan(buf)] = 0
+                the_weight = buf
+        else:
+            the_weight = np.ones_like(events.event, dtype=np.float32)  
+        events = set_ak_column_f32(events, f"tauspinner_weight{the_name}", the_weight)  
+    return events

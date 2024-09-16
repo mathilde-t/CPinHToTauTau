@@ -85,10 +85,11 @@ def get_sorted_pair(
 
 @selector(
     uses={
-        "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
-        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet",
-        #"Tau.idDeepTau2018v2p5VSjet", "Tau.idDeepTau2018v2p5VSe", "Tau.idDeepTau2018v2p5VSmu",
-    },
+            f"Tau.{var}" for var in [
+                "pt","eta","phi","mass","charge", 
+                "idDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSe","idDeepTau2018v2p5VSmu","rawDeepTau2018v2p5VSjet"
+            ] 
+        },
     exposed=False,
 )
 def tautau_selection(
@@ -123,7 +124,7 @@ def tautau_selection(
     preselection = {
         "tautau_is_pt_40"      : (lep1.pt > 40) & (lep2.pt > 40),
         "tautau_is_eta_2p1"    : (np.abs(lep1.eta) < 2.1) & (np.abs(lep2.eta) < 2.1),
-        "tautau_is_os"         : (lep1.charge * lep2.charge) < 0,
+        #"tautau_is_os"         : (lep1.charge * lep2.charge) < 0,
         "tautau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  #deltaR(lep1, lep2) > 0.5,
     }
 

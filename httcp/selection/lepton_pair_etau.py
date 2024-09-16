@@ -50,7 +50,7 @@ def get_sorted_pair(
         ==
         ak.firsts(dtrpairs["0"].pt[:,1:2], axis=1)
     )
-    # if so, sort the pairs with tau rawDeepTau2017v2p1VSjet
+    # if so, sort the pairs with tau rawDeepTau2018v2p5VSjet
     sorted_idx = ak.where(where_same_pt_1,
                           ak.argsort(dtrpairs["1"].rawDeepTau2018v2p5VSjet, ascending=False),
                           sorted_idx)
@@ -63,7 +63,7 @@ def get_sorted_pair(
         ==
         ak.firsts(dtrpairs["1"].rawDeepTau2018v2p5VSjet[:,1:2], axis=1)
     )
-    # Sort the pairs based on pt if rawDeepTau2017v2p1VSjet is the same for the first two objects
+    # Sort the pairs based on pt if rawDeepTau2018v2p5VSjet is the same for the first two objects
     sorted_idx = ak.where(where_same_iso_2,
                           ak.argsort(dtrpairs["1"].pt, ascending=False),
                           sorted_idx)
@@ -88,16 +88,14 @@ def get_sorted_pair(
 
 @selector(
     uses={
-        # Electron
-        "Electron.pt", "Electron.eta", "Electron.phi", "Electron.mass",
-        "Electron.charge", "Electron.pfRelIso03_all", "Electron.rawIdx",
-        # Tau
-        "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
-        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet", "Tau.rawIdx", 
-        #"Tau.idDeepTau2018v2p5VSjet", "Tau.idDeepTau2018v2p5VSe", "Tau.idDeepTau2018v2p5VSmu",
+		f"Electron.{var}" 
+			for var in ["pt", "eta", "phi", "mass","charge", "pfRelIso03_all", "rawIdx"]
+		}|{
+        f"Tau.{var}" for var in ["pt", "eta", "phi", "mass","charge", "rawIdx", "idDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSe","idDeepTau2018v2p5VSmu", "rawDeepTau2018v2p5VSjet"]
+		}|{
         # MET
-        "PuppiMET.pt", "PuppiMET.phi",
-    },
+        "PuppiMET.pt", "PuppiMET.phi"
+		},
     exposed=False,
 )
 def etau_selection(
@@ -111,7 +109,7 @@ def etau_selection(
     deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
     deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
 
-    good_selections = ((events.Tau[lep2_indices].idDeepTau2018v2p5VSjet>= deep_tau_vs_e_jet_wps["Tight"]) &  #vsJet
+    good_selections = ((events.Tau[lep2_indices].idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Tight"]) &  #vsJet
                        (events.Tau[lep2_indices].idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"]) &  #vsE
                        (events.Tau[lep2_indices].idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Loose"]))     #vsMu
     lep2_indices = lep2_indices[good_selections]
@@ -143,9 +141,9 @@ def etau_selection(
     lep1_idx, lep2_idx = ak.unzip(lep_indices_pair)
 
     preselection = {
-        "etau_is_os"         : (lep1.charge * lep2.charge) < 0,
+        #"etau_is_os"         : (lep1.charge * lep2.charge) < 0, #This selection is moved to categorisation
         "etau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  # deltaR(lep1, lep2) > 0.5,
-        "etau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50
+        #"etau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50 #This selection is moved to categorisation
     }
     # get preselected pairs
     good_pair_mask = lep1_idx >= 0

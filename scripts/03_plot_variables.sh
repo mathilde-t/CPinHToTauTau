@@ -4,13 +4,31 @@ source ./common.sh #to access set_common_vars() function
 set_common_vars "$1"
 args=(
         --config $config
-        --processes $processes
+        --processes 'dy_lep,vv,tt,st,wj,data'
+        #--datasets $datasets
         --version $version
-        --categories incl
-        --variables tau_1_pt #,hcand_mass #,mutau_mass_no_tes,muon_pt,muon_eta,muon_phi,tau_pt,tau_eta,tau_phi,muon_mT,mutau_mass,met_pt,met_phi
-        #--variables muon_iso #,muon_eta_1bin,mutau_mass_1bin
+        --categories 'mutau_signal_reg,mutau_signal_reg_no_mt' #tautau_signal_reg
+        --cf.CalibrateEvents-workflow $workflow
+        --cf.SelectEvents-workflow $workflow
+        --cf.ReduceEvents-workflow $workflow
+        --cf.MergeReducedEvents-workflow local
+        --variables 'puppi_met_phi,puppi_met_pt,mT,hcand_mass,hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta,hcand_leg1_mass,hcand_leg2_mass,hcand_leg2_decayModePNet,hcand_leg2_decayMode,'`
+        `'phi_cp_mu_pi,phi_cp_mu_rho,'`
+        `'phi_cp_mu_pi_reg1,phi_cp_mu_pi_reg2,phi_cp_mu_rho_reg1,phi_cp_mu_rho_reg2,'`
+        `'hcand_leg1_ip_sig,hcand_leg2_ip_sig,alpha_mu_rho,alpha_mu_pi,'`
+        `'phi_cp_mu_pi_2bin,phi_cp_mu_pi_reg1_2bin,phi_cp_mu_pi_reg2_2bin,'`
+        `'phi_cp_mu_rho_2bin,phi_cp_mu_rho_reg1_2bin,phi_cp_mu_rho_reg2_2bin,'`
+        `'hcand_leg1_ip_x,hcand_leg2_ip_x,hcand_leg1_ip_y,hcand_leg2_ip_y,hcand_leg1_ip_z,hcand_leg2_ip_z'
+        #'phi_cp_rho_rho,phi_cp_rho_rho_reg1,phi_cp_rho_rho_reg2,'`
+        #`'phi_cp_rho_rho_2bin,phi_cp_rho_rho_reg1_2bin,phi_cp_rho_rho_reg2_2bin'
+
+        #'puppi_met_phi,puppi_met_pt,mT,hcand_mass,hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta,hcand_leg1_mass,hcand_leg2_mass,hcand_leg2_decayModePNet,hcand_leg2_decayMode'
+        #'mc_weight,pu_weight,tau_weight,muon_weight'
+        #'mT,hcand_mass,hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta,hcand_leg1_mass,hcand_leg2_mass,hcand_leg2_decayModePNet,hcand_leg2_decayMode,mc_weight,pu_weight,tau_weight,muon_weight'
+        
+        
         --general-settings "cms-label=pw"
         "${@:2}"
     )
-#echo law run cf.PlotVariables1D "${args[@]}"
+echo law run cf.PlotVariables1D "${args[@]}"
 law run cf.PlotVariables1D "${args[@]}"

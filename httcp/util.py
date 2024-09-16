@@ -51,7 +51,6 @@ def trigger_object_matching(
     dr = vectors1.metric_table(vectors2)
     # check per element in vectors1 if there is at least one matching element in vectors2
     any_match = (dr < threshold)
-    #ak.any(, axis=axis)
     return any_match
 
 # def hlt_path_fired(dictionary):

@@ -84,18 +84,18 @@ def get_sorted_pair(
 
     return dtrpairidx
 
-
-
-
 @selector(
-    uses={
-        # muon
-        "Muon.pt", "Muon.eta", "Muon.phi", "Muon.mass",
-        "Muon.charge", "Muon.pfRelIso03_all",
-        # tau
-        "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
-        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet",
-        #"Tau.idDeepTau2018v2p5VSjet", "Tau.idDeepTau2018v2p5VSe", "Tau.idDeepTau2018v2p5VSmu",
+    uses=
+        {
+            f"Muon.{var}" for var in [
+                "pt","eta","phi","mass", "charge", "pfRelIso03_all"
+            ] 
+        } | {
+            f"Tau.{var}" for var in [
+                "pt","eta","phi","mass","charge", 
+                "idDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSe","idDeepTau2018v2p5VSmu","rawDeepTau2018v2p5VSjet"
+            ] 
+        } | {   
         # met
         "PuppiMET.pt", "PuppiMET.phi",
     },
@@ -137,9 +137,9 @@ def mutau_selection(
     lep1_idx, lep2_idx = ak.unzip(lep_indices_pair)
 
     preselection = {
-        "mutau_is_os"         : (lep1.charge * lep2.charge) < 0,
+        #"mutau_is_os"         : (lep1.charge * lep2.charge) < 0, #This selection is moved to categorisation
         "mutau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  #deltaR(lep1, lep2) > 0.5,
-        "mutau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50,
+        #"mutau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50, #This selection is moved to categorisation
         "mutau_invmass_40"    : (1*lep1 + 1*lep2).mass > 40,  # invariant_mass(lep1, lep2) > 40
     }
 

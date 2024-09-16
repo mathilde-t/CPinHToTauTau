@@ -8,6 +8,8 @@ args=(
         --version $version
         --datasets $datasets
         --workflow local
-        --selector-steps "trigger,b_veto,multiple_leptons,has_higgs_cand,extra_lepton_veto,dilepton_veto"  
+        --selector-steps trigger,met_filter,b_veto,selected_hcand,selected_hcand_trigmatch,dilepton_veto,extra_lepton_veto,single_hcand,decay_prods_are_ok
+        "${@:2}"
     )
+echo run cf.PlotCutflow "${args[@]}"
 law run cf.PlotCutflow "${args[@]}"

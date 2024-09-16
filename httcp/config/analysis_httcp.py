@@ -39,46 +39,38 @@ ana.x.config_groups = {}
 # setup configs #
 # ------------- #
 
-# ------------------------ Run2 UL 2017 ----------------------- #
-# from httcp.config.configs_run2ul_SR import add_config as add_config_run2ul_SR
-# from cmsdb.campaigns.run2_2017_nano_local_v10 import campaign_run2_2017_nano_local_v10
-# add_config_run2ul_SR(
-#     analysis_httcp,
-#     campaign_run2_2017_nano_local_v10.copy(),
-#     config_name=f"{campaign_run2_2017_nano_local_v10.name}_GS",
-#     config_id=1,
-# )
-# add_config_run2ul_SR(
-#     analysis_httcp,
-#     campaign_run2_2017_nano_local_v10.copy(),
-#     config_name=f"{campaign_run2_2017_nano_local_v10.name}_limited",
-#     config_id=2,
-#     limit_dataset_files=1,
-# )
-# # ------------------------------------------------------------- #
+#------------------------ Run3 2022 preEE signal samples with TauSpinner weights ----------------------- #
+from httcp.config.run3_2022_preEE_tau_spinner import add_run3_2022_preEE_tau_spinner
+from cmsdb.campaigns.run3_2022_preEE_tau_spinner import campaign_run3_2022_preEE_tau_spinner
 
-# # ------------------------ Run2 UL 2017 ----------------------- #
-# from httcp.config.run2_UL2017 import add_run2_UL2017
-# from cmsdb.campaigns.run2_UL2017_nano_tau_v10 import campaign_run2_UL2017_nano_tau_v10
-# add_run2_UL2017(
-#     analysis_httcp,
-#     campaign_run2_UL2017_nano_tau_v10.copy(),
-#     config_name=f"{campaign_run2_UL2017_nano_tau_v10.name}_limited",
-#     config_id=3,
-#     limit_dataset_files=1)
+add_run3_2022_preEE_tau_spinner(
+    analysis_httcp,
+    campaign_run3_2022_preEE_tau_spinner.copy(),
+    config_name=f"{campaign_run3_2022_preEE_tau_spinner.name}_limited",
+    config_id=4,
+    limit_dataset_files=1)
+
+add_run3_2022_preEE_tau_spinner(
+    analysis_httcp,
+    campaign_run3_2022_preEE_tau_spinner.copy(),
+    config_name=f"{campaign_run3_2022_preEE_tau_spinner.name}",
+    config_id=5,)
 # ------------------------------------------------------------- #
 
-# -------------------------- Run3 2022 ------------------------ #
-from httcp.config.run3_preEE import add_run3_preEE
+#------------------------ Run3 2022 preEE samples without TauSpinner weights ----------------------- #
+from httcp.config.run3_preEE import add_run3_2022_preEE
 from cmsdb.campaigns.run3_2022_preEE_nano_tau_v12 import campaign_run3_2022_preEE_nano_tau_v12
+add_run3_2022_preEE(
+    analysis_httcp,
+    campaign_run3_2022_preEE_nano_tau_v12.copy(),
+    config_name=f"run3_2022_preEE_limited",
+    config_id=6,
+    limit_dataset_files=1)
 
-add_run3_preEE(analysis_httcp,
-               campaign_run3_2022_preEE_nano_tau_v12.copy(),
-               config_name=f"{campaign_run3_2022_preEE_nano_tau_v12.name}",
-               config_id = 4)
-add_run3_preEE(analysis_httcp,
-                  campaign_run3_2022_preEE_nano_tau_v12.copy(),
-                  config_name=f"{campaign_run3_2022_preEE_nano_tau_v12.name}_limited",
-                  config_id = 5,
-                  limit_dataset_files=1)
+add_run3_2022_preEE(
+    analysis_httcp,
+    campaign_run3_2022_preEE_nano_tau_v12.copy(),
+    config_name=f"run3_2022_preEE",
+    config_id=7,)
 # ------------------------------------------------------------- #
+

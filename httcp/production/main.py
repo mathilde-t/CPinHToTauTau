@@ -21,9 +21,11 @@ from columnflow.columnar_util import optional_column as optional
 from httcp.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
 from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
-from httcp.production.weights import muon_weight, tau_weight, get_mc_weight
+from httcp.production.weights import muon_weight, tau_weight, get_mc_weight,tauspinner_weight
 from httcp.production.sample_split import split_dy
 from httcp.production.dilepton_features import hcand_mass, mT, rel_charge 
+from httcp.production.phi_cp import phi_cp
+
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -86,6 +88,10 @@ def hcand_features(
         get_mc_weight,
         hcand_features,
         hcand_mass,
+        tauspinner_weight,
+        phi_cp,
+        category_ids,
+        mT,
     },
     produces={
         normalization_weights,
@@ -96,10 +102,18 @@ def hcand_features(
         tau_weight,
         hcand_features,
         hcand_mass,
+        tauspinner_weight,
+        phi_cp,
+        category_ids,
+        mT,
     },
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-
+    print("Producing Hcand features...")
+    events = self[hcand_features](events, **kwargs)       
+    events = self[hcand_mass](events, **kwargs)
+    events = self[mT](events, **kwargs)
+    events = self[category_ids](events, **kwargs)
     if self.dataset_inst.is_mc:
         events = self[get_mc_weight](events, **kwargs)
         print("Producing Normalization weights...")
@@ -114,6 +128,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[muon_weight](events,do_syst = True, **kwargs)
         print("Producing Tau weights...")
         events = self[tau_weight](events,do_syst = True, **kwargs)
+        print("Producing Tauspinner weights...")
+        events = self[tauspinner_weight](events, **kwargs)
         # if (ak.max(events.mc_weight) > 1 or 
         #     ak.max(events.pu_weight) > 1 or 
         #     ak.max(events.normalization_weight) > 1 or 
@@ -126,11 +142,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             #     file.write(f"Max normalization_weight: {ak.max(events.normalization_weight)}\n")
             #     file.write(f"Max muon_weight_nom: {ak.max(events.muon_weight_nom)}\n")
             #     file.write(f"Max tau_weight_nom: {ak.max(events.tau_weight_nom)}\n")        
-    print("Producing Hcand features...")
-    events = self[hcand_features](events, **kwargs)       
-    # features
-    events = self[hcand_mass](events, **kwargs) 
-
-
-
+    
+    print("Producing phi_cp...") 
+    events = self[phi_cp](events, **kwargs) 
     return events

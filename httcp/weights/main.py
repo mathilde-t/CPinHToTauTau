@@ -36,7 +36,7 @@ def main_init(self: WeightProducer) -> None:
         "pu_weight",
         "muon_weight_nom",
         "tau_weight_nom",
-        "tauspinner_weight_nom"
+        "tauspinner_weight"
     }
     self.uses |= self.weight_columns
 

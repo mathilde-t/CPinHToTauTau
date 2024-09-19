@@ -81,6 +81,8 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
     cfg.x.default_calibrator = "main"
     cfg.x.default_selector = "main"
     cfg.x.default_producer = "main"
+    cfg.x.default_weight_producer = "main"
+
     cfg.x.default_ml_model = None
     cfg.x.default_inference_model = "example"
     cfg.x.default_categories = ("incl",)
@@ -215,8 +217,7 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
     
     from httcp.config.variables import keep_columns
     keep_columns(cfg)
-    
-    # register shifts
+ 
     cfg.add_shift(name="nominal", id=0)
 
     cfg.add_shift(name="tau_up", id=1, type="shape")
@@ -231,20 +232,9 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
     cfg.add_shift(name="tauspinner_up", id=5, type="shape") #cp-even
     cfg.add_shift(name="tauspinner_down", id=6, type="shape") #cp-odd
     add_shift_aliases(cfg, "tauspinner", {"tauspinner_weight": "tauspinner_weight_{direction}"})
-    
     # event weight columns as keys in an OrderedDict, mapped to shift instances they depend on
     get_shifts = functools.partial(get_shifts_from_sources, cfg)
-    cfg.x.event_weights = DotDict({
-        "normalization_weight"  : [],
-        "pu_weight"             : [],
-        "muon_weight_nom"       : [],
-        "tau_weight_nom"        : [],
-        "tauspinner_weight"     : get_shifts("tauspinner"),
-    })
-    cfg.x.cp_hypo = "even"
-    cfg.x.default_weight_producer = "all_weights"
-
-
+    
     # versions per task family, either referring to strings or to callables receving the invoking
     # task instance and parameters to be passed to the task family
     def set_version(cls, inst, params):
@@ -265,6 +255,7 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
     # channels
     cfg.add_channel(name="etau",   id=1)
     cfg.add_channel(name="mutau",  id=2)
+    #cfg.add_channel(name="emu"  ,  id=3)
     cfg.add_channel(name="tautau", id=4)
     
     if cfg.campaign.x("custom").get("creator") == "desy":  

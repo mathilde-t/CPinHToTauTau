@@ -193,19 +193,20 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
         elif tag == "postVFP"   : out_tag = "postVFP_UL"
         return out_tag
     
+    import os
     tag = tag_caster(campaign)
-    
-    corr_dir = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/httcp/corrections"
+    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
+    jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
     cfg.x.external_files = DotDict.wrap({
         # lumi files
         "lumi": {
-            "golden": (f"{corr_dir}/Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
-            "normtag": (f"{corr_dir}/normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
+            "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+            "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
-        "pu_sf": (f"{corr_dir}/jsonpog-integration/POG/LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"{corr_dir}/jsonpog-integration/POG/MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
-        #"tau_correction"  : f"{corr_dir}/jsonpog-integration/POG/TAU/{cfg.x.year}{tag}/tau.json.gz", 
-        "tau_correction"  : f"{corr_dir}/tau_DeepTau2018v2p5_2022_preEE.json.gz" #FIXME: this sf json is not from the jsonpog-integration dir!
+        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
+        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
+        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
+        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz" #FIXME: this sf json is not from the jsonpog-integration dir!
         
     })
 

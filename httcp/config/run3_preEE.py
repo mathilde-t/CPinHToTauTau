@@ -79,6 +79,10 @@ def add_run3_2022_preEE (ana: od.Analysis,
     for process_name in process_names:
         # add the process
         proc = cfg.add_process(procs.get(process_name))
+        #for signal datasets create special tag
+        if process_name.startswith("h_"):
+            proc.add_tag("signal")
+            
         if proc.is_mc:
             # Updated color mapping to avoid repetition and ensure unique colors
             if proc.name == "st"                  : proc.color1 = (63, 144, 218)  # Sky Blue
@@ -120,7 +124,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # add datasets we need to study
     dataset_names = [
         #data
-		"data_e_C",
+        "data_e_C",
         "data_e_D",
         "data_mu_C",
         "data_mu_D",
@@ -154,7 +158,8 @@ def add_run3_2022_preEE (ana: od.Analysis,
     for dataset_name in dataset_names:
         # add the dataset
         dataset = cfg.add_dataset(campaign.get_dataset(dataset_name))
-
+        if dataset_name.startswith("h_"):
+            dataset.add_tag("signal")
         # for testing purposes, limit the number of files to 1
         for info in dataset.info.values():
             if limit_dataset_files:
@@ -293,37 +298,19 @@ def add_run3_2022_preEE (ana: od.Analysis,
         return out_tag
 
     import os
-    external_path = os.path.join(os.environ.get('HTTCP_BASE'), "httcp/data/corrections")
-    # cfg.x.external_files = DotDict.wrap({
-    #     # lumi files
-    #     "lumi": {
-    #         "golden": ("/afs/cern.ch/user/j/jmalvaso/public/Cert_Collisions2022_355100_362760_GoldenJSON.txt", "v1"),  # noqa
-    #         "normtag": ("/afs/cern.ch/user/j/jmalvaso/public/normtag_PHYSICSJSON.txt", "v1"),
-    #         # "golden": (f"{external_path}/Cert_Collisions2022_355100_362760_GoldenJSON.txt", "v1"),  # noqa
-    #         # "normtag": (f"{external_path}/normtag_PHYSICS.json", "v1"),
-    #     },
-    #     "pileup":{
-    #         #"json": ("/eos/user/c/cmsdqm/www/CAF/certification/Collisions22/PileUp/EFG/pileup_JSON.txt", "v1")
-    #         # "data" : "/afs/cern.ch/work/d/dwinterb/public/Run3_corrections/pu_data_2022_preEE.root",
-    #         # "mc"   : "/afs/cern.ch/work/d/dwinterb/public/Run3_corrections/pu_mc_2022.root"         
-    #         "data" : "/afs/cern.ch/user/j/jmalvaso/public/Data_PileUp_2022_preEE.root",
-    #         "mc"   : "/afs/cern.ch/user/j/jmalvaso/public/MC_PileUp_2022.root",
-    #     },
     tag = tag_caster(campaign)
-    #corr_dir = "/afs/cern.ch/user/j/jmalvaso/CP_personal/httcp/corrections"
-    print("Please remember to change corr dir to your local correction directory")	
-    corr_dir = "/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/"
-    local_dir = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/httcp/corrections/"
+    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
+    jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
     cfg.x.external_files = DotDict.wrap({
         # lumi files
         "lumi": {
-            "golden": (f"{local_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
-            "normtag": (f"{local_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
+            "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+            "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
-        "pu_sf": (f"LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
-        #"tau_correction"  : f"TAU/{cfg.x.year}{tag}/tau.json.gz", 
-        "tau_correction"  : f"{local_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz" #FIXME: this sf json is not from the jsonpog-integration dir!
+        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
+        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
+        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
+        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz" #FIXME: this sf json is not from the jsonpog-integration dir!
         
     })
 
@@ -345,9 +332,9 @@ def add_run3_2022_preEE (ana: od.Analysis,
     add_shift_aliases(cfg, "mu", {"muon_weight": "muon_weight_{direction}"})
     
     
-    #cfg.add_shift(name="tauspinner_up", id=5, type="shape") #cp-even
-    #cfg.add_shift(name="tauspinner_down", id=6, type="shape") #cp-odd
-    #add_shift_aliases(cfg, "tauspinner", {"tauspinner_weight": "tauspinner_weight_{direction}"})
+    cfg.add_shift(name="tauspinner_up", id=5, type="shape") #cp-even
+    cfg.add_shift(name="tauspinner_down", id=6, type="shape") #cp-odd
+    add_shift_aliases(cfg, "tauspinner", {"tauspinner_weight": "tauspinner_weight_{direction}"})
     
     # versions per task family, either referring to strings or to callables receving the invoking
     # task instance and parameters to be passed to the task family

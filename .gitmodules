@@ -8,3 +8,6 @@
 [submodule "httcp/corrections/jsonpog-integration"]
 	path = httcp/corrections/jsonpog-integration
 	url = https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration
+[submodule "modules/jsonpog-integration"]
+	path = modules/jsonpog-integration
+	url = https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration.git

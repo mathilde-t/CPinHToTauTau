@@ -7,7 +7,10 @@ args=(
         --processes $processes
         --version $version
         --datasets $datasets
-        --workflow local
+        --cf.CalibrateEvents-workflow $workflow
+        --cf.SelectEvents-workflow $workflow
+        --cf.ReduceEvents-workflow $workflow
+        --cf.MergeSelectionMasks-workflow local
         --selector-steps trigger,met_filter,b_veto,selected_hcand,selected_hcand_trigmatch,dilepton_veto,extra_lepton_veto,single_hcand,decay_prods_are_ok
         "${@:2}"
     )

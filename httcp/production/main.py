@@ -130,18 +130,6 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-        # if (ak.max(events.mc_weight) > 1 or 
-        #     ak.max(events.pu_weight) > 1 or 
-        #     ak.max(events.normalization_weight) > 1 or 
-        #     ak.max(events.muon_weight_nom) > 1 or 
-        #     ak.max(events.tau_weight_nom) > 3):
-            
-            # with open("Check_weights.txt", "a") as file:
-            #     file.write(f"Max mc_weight: {ak.max(events.mc_weight)}\n")
-            #     file.write(f"Max pu_weight: {ak.max(events.pu_weight)}\n")
-            #     file.write(f"Max normalization_weight: {ak.max(events.normalization_weight)}\n")
-            #     file.write(f"Max muon_weight_nom: {ak.max(events.muon_weight_nom)}\n")
-            #     file.write(f"Max tau_weight_nom: {ak.max(events.tau_weight_nom)}\n")        
     
     print("Producing phi_cp...") 
     events = self[phi_cp](events, **kwargs) 

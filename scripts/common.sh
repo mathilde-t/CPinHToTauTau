@@ -2,7 +2,7 @@
 
 set_common_vars() {
 
-version="trig_bug_fix"
+version="trig_bug"
 case $1 in
     "run3ts_lim")
         config="run3_2022_preEE_tau_spinner_limited"
@@ -14,12 +14,12 @@ case $1 in
         config="run3_2022_preEE_tau_spinner"
         datasets='h_ggf_htt_filtered' #,h_ggf_htt_unfiltered,zh_htt_unfiltered'
         processes='h_ggf_htt' #,zh_htt'
-        workflow='local'
+        workflow='htcondor'
     ;;
     "run3_lim")
         config="run3_2022_preEE_limited"
-        datasets='dy_incl' #,h_ggf_htt_unfiltered,zh_htt_unfiltered'
-        processes='dy_lep' #,zh_htt'
+        datasets='data_e_C' 
+        processes='data_e' 
         workflow='local'
     ;;
     "run3")

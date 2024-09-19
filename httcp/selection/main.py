@@ -287,10 +287,8 @@ def main(
         events = self[mc_weight](events, **kwargs)
 
     events = self[rel_charge](events, **kwargs)
-    #print("Pair relative charge production successfully completed")
     events = self[process_ids](events, **kwargs)
     events = set_ak_column(events, 'category_ids', ak.ones_like(events.event, dtype=np.uint8))
-    #events = self[category_ids](events, **kwargs)
 
   
 

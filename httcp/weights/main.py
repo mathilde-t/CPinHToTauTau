@@ -42,6 +42,6 @@ def main_init(self: WeightProducer) -> None:
 
     # declare shifts that the produced event weight depends on
     shift_sources = {
-       "tauspinner_weight",
+       "tauspinner",
     }
     self.shifts |= set(get_shifts_from_sources(self.config_inst, *shift_sources))

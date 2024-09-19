@@ -363,7 +363,6 @@ def phi_cp(
             events, f'alpha_{the_ch}', ak.fill_none(alpha, EMPTY_FLOAT))
         events = set_ak_column_f32(
             events, f"phi_cp_{the_ch}",  ak.fill_none(phi_cp, EMPTY_FLOAT))
-    from IPython import embed; embed()
     return events
 
 

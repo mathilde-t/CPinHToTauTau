@@ -338,14 +338,13 @@ def higgscandprod(
     events   = self[assign_tauprod_mass_charge](events)
 
     tauprods = events.TauProd
-
     tau_mask = events.hcand.decayMode >=0
-    tau_idx = events.hcand.rawIdx[tau_mask]
-
+    tau_idx = ak.mask(events.hcand.rawIdx,tau_mask)
+    
     tauprods_mask = tauprods.tauIdx
     idx_pairs = ak.cartesian([tau_idx,tauprods.tauIdx], axis=1, nested=True)
     tau_idx_b, tau_prod_idx_b = ak.unzip(idx_pairs)
-    prod_mask = tau_idx_b == tau_prod_idx_b
+    prod_mask = ak.fill_none(tau_idx_b == tau_prod_idx_b, False)
     evt_masks = []
     evt_dm_only_masks = []
     tau_prods = []

@@ -83,7 +83,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "pt", "eta", "phi", "mass", "charge",
                 "pdgId", "tauIdx"
             ]
-        } | {ColumnCollection.ALL_FROM_SELECTOR},
+        } | {"is_b_vetoed","channel_id"} | {ColumnCollection.ALL_FROM_SELECTOR},
         "cf.MergeSelectionMasks": {
             "normalization_weight", 
             "cutflow.*", "process_id", "category_ids",

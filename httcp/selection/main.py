@@ -18,7 +18,6 @@ from columnflow.selection.cms.met_filters import met_filters
 from columnflow.production.processes import process_ids
 from columnflow.production.cms.mc_weight import mc_weight
 from columnflow.production.util import attach_coffea_behavior
-from columnflow.production.categories import category_ids
 
 from columnflow.util import maybe_import
 from columnflow.columnar_util import optional_column as optional
@@ -34,11 +33,9 @@ from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from httcp.selection.higgscand import higgscand, higgscandprod
 
-from columnflow.production.categories import category_ids
-
 # TODO: rename mutau_vars -> dilepton_vars
 from httcp.production.dilepton_features import rel_charge
-from httcp.production.channel_id import channel_id
+from httcp.production.aux_columns import channel_id, jet_veto
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -61,6 +58,7 @@ coffea = maybe_import("coffea")
         electron_selection,
         tau_selection,
         jet_selection,
+        jet_veto,
         etau_selection,
         mutau_selection,
         tautau_selection,
@@ -86,6 +84,7 @@ coffea = maybe_import("coffea")
         electron_selection,
         tau_selection,
         jet_selection,
+        jet_veto,
         etau_selection,
         mutau_selection,
         tautau_selection,
@@ -128,11 +127,11 @@ def main(
     events, met_filter_results = self[met_filters](events, **kwargs)
     results += met_filter_results
 
-    # jet selection
-    events, bjet_veto_result = self[jet_selection](events,
-                                                   call_force=True,
-                                                   **kwargs)
-    results += bjet_veto_result
+    # # jet veto
+    # events, bjet_veto_result = self[jet_selection](events,
+    #                                                call_force=True,
+    #                                                **kwargs)
+    # results += bjet_veto_result
 
     # muon selection
     # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]
@@ -232,7 +231,11 @@ def main(
     )
     results += match_res
     results += hcand_results
+    
+    #produce is_b_vetoed columnd
+    events = self[jet_veto](events, **kwargs)
 
+    #produce channels
     events = self[channel_id](events,
                               etau_channel_mask,
                               mutau_channel_mask,

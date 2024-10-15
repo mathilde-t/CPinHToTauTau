@@ -10,7 +10,7 @@ from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.util import DotDict
 
-from httcp.util import enforce_hcand_type, enforce_tauprods_type, trigger_object_matching, hlt_path_fired, has_pt_greater_equal, has_delta_r_less_equal, HLT_path_matching
+from httcp.util import enforce_hcand_type, enforce_tauprods_type, hlt_path_matching
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -22,10 +22,76 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
 
 @selector(
     uses={
-        "Tau.decayModePNet",
+        "Tau.decayModePNet", "Tau.idDeepTau2018v2p5VSjet",
     } | {f"{part}.IP{par}"
          for part in ["Electron", "Muon", "Tau"]
-         for par in ["x", "y", "z"]} | {f"{part}.ip_sig" for part in ["Electron", "Muon", "Tau"]},
+         for par in ["x", "y", "z"]
+    } | {f"{part}.ip_sig" for part in ["Electron", "Muon", "Tau"]
+    },
+    produces={
+        'hcand_*'
+    },
+    exposed=False,
+)
+def new_higgscand(
+        self: Selector,
+        events: ak.Array,
+        trigger_results: SelectionResult,
+        pair_idxs: dict,
+        domatch: Optional[bool] = False,
+        **kwargs
+) -> tuple[ak.Array, SelectionResult]:
+    channels = self.config_inst.channels.names()
+    
+    ch_objects = DotDict.wrap({
+        'etau'   : {'lep0' : 'Electron',
+                    'lep1' : 'Tau'},
+        'mutau'  : {'lep0' : 'Muon',
+                    'lep1' : 'Tau'},
+        'tautau' : {'lep0' : 'Tau',
+                    'lep1' : 'Tau'},
+    })
+    steps = {}
+    pair_objects = {}
+    n_pairs_prematch = ak.zeros_like(events.event)
+    for the_ch in channels:
+        obj_idx = pair_idxs[the_ch]
+        pair_objects[the_ch] = {}
+        for idx in range(2): 
+            pair_objects[the_ch][f'lep{idx}'] = events[ch_objects[the_ch][f'lep{idx}']][obj_idx[:,idx:idx+1]]
+        n_pairs_prematch = n_pairs_prematch + ak.num(pair_objects[the_ch]['lep0'].pt>0, axis = 1)
+    steps['selected_hcand'] = n_pairs_prematch > 0
+    pair_objects = DotDict.wrap(pair_objects)
+    
+    if domatch: 
+        n_pairs_postmatch = ak.zeros_like(events.event)
+        matched_masks = hlt_path_matching(events, trigger_results, pair_objects)
+        hcands = {}
+        for the_ch in channels:
+            matched_pairs = {}
+            for lep_idx in range(2):
+                the_lep = pair_objects[the_ch][f'lep{lep_idx}']
+                matched_pairs[f'lep{lep_idx}'] = ak.where(matched_masks[the_ch], the_lep, the_lep[:,:0])
+            events = set_ak_column(events, f"hcand_{the_ch}",  ak.zip(matched_pairs))
+            n_pairs_postmatch =  n_pairs_postmatch + ak.num(events[f"hcand_{the_ch}"].lep0.pt>0, axis = 1)
+        steps['selected_hcand_trigmatch'] = n_pairs_postmatch > 0
+        steps['single_hcand'] = n_pairs_postmatch == 1
+    else:
+        for the_ch in channels:
+            events = set_ak_column(events, f"hcand_{the_ch}",  ak.zip(pair_objects[the_ch]))
+            steps['single_hcand'] = n_pairs_prematch == 1
+    return events, SelectionResult(steps=steps)
+
+
+
+@selector(
+ uses={
+        "Tau.decayModePNet", "Tau.idDeepTau2018v2p5VSjet",
+    } | {f"{part}.IP{par}"
+         for part in ["Electron", "Muon", "Tau"]
+         for par in ["x", "y", "z"]
+    } | {f"{part}.ip_sig" for part in ["Electron", "Muon", "Tau"]
+    },
     produces={
         "hcand.pt", "hcand.eta", "hcand.phi", "hcand.mass", "hcand.charge", "hcand.rawIdx", "hcand.decayMode",  "hcand.decayModePNet",
         "hcand.IPx", "hcand.IPy", "hcand.IPz", "hcand.ip_sig"
@@ -89,6 +155,8 @@ def higgscand(
             "IPz"           : "float64",
             "ip_sig"        : "float64",
             }
+    
+    
     hcand_array_type_fix = enforce_hcand_type(hcand_array, var_dict)
 
     # Extraction of the indices from Hcand_pair after matching
@@ -130,7 +198,6 @@ def higgscand(
     if ak.any(np.isnan(hcand_array_One_Higgs_cand.IPx)) :
         hcand_array_One_Higgs_cand = ak.where(ak.any(np.isnan(hcand_array_One_Higgs_cand.IPx),axis = 1),hcand_array_One_Higgs_cand, hcand_array_One_Higgs_cand[..., :0])
     events = set_ak_column(events, "hcand", hcand_array_One_Higgs_cand)
-
     return events, hcand_muon_indices, hcand_electron_indices, hcand_tau_indices, etau_channel_mask, mutau_channel_mask, tautau_channel_mask, hcand_array_One_Higgs_cand, SelectionResult(
         steps={
             "single_hcand": sel_hcand,

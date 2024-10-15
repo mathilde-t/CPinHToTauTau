@@ -52,7 +52,7 @@ def channel_id(
         [
             "pt", "eta", "phi", "mass",
             "jetId", "btagDeepFlavB"
-        ]} | {"hcand.*"},
+        ]} | {"hcand_*"},
     produces={"is_b_vetoed"},
     exposed=False,
 )
@@ -79,12 +79,14 @@ def jet_veto(
     presel_jet = ak.drop_none(ak.mask(events.Jet, jet_obj_mask))
     
     leg_masks = []
-    for idx in range(2): #iteate over taus
-        tau = ak.firsts(events.hcand[:,idx:idx+1])
-        jet_tau_pairs = ak.cartesian([presel_jet,tau], axis=1)
-        jet_br, tau_br = ak.unzip(jet_tau_pairs)
-        delta_r = jet_br.delta_r(tau_br)
-        leg_masks.append(ak.any(delta_r < 0.4, axis=1))
-    event_mask = leg_masks[0] | leg_masks[1] #make joint mask for first and second tau.
+    event_mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for the_ch in self.config_inst.channels.names(): 
+        hcand = events[f'hcand_{the_ch}']
+        for idx in range(2): #iteate over taus
+            lep = ak.firsts(hcand[f'lep{idx}'])
+            jet_tau_pairs = ak.cartesian([presel_jet,lep], axis=1)
+            jet_br, lep_br = ak.unzip(jet_tau_pairs)
+            delta_r = jet_br.delta_r(lep_br)
+            event_mask = event_mask | ak.any(delta_r < 0.4, axis=1)  #make joint mask for first and second tau.
     events = set_ak_column(events, "is_b_vetoed", event_mask)
     return events 

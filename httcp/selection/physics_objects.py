@@ -37,7 +37,7 @@ ak = maybe_import("awkward")
     },
     produces={
         f"Muon.{var}" for var in [
-            "rawIdx", "decayMode", "decayModePNet","ip_sig"
+            "rawIdx","ip_sig"
         ]
     },
     exposed=False,
@@ -56,8 +56,6 @@ def muon_selection(
     """
     # setting two new columns for the muons
     events = set_ak_column(events, "Muon.rawIdx",    ak.local_index(events.Muon))
-    events = set_ak_column(events, "Muon.decayMode", -2)
-    events = set_ak_column(events, "Muon.decayModePNet", -2)
     events = set_ak_column(events, "Muon.ip_sig", events.Muon.sip3d)
 
     good_selections = {
@@ -148,7 +146,7 @@ def muon_selection(
     },
     produces={
         f"Electron.{var}" for var in [
-            "rawIdx", "decayMode","decayModePNet","ip_sig"
+            "rawIdx", "ip_sig"
         ]
     },
     exposed=False,
@@ -166,8 +164,6 @@ def electron_selection(
     """
     # adding two new fields
     events = set_ak_column(events, "Electron.rawIdx",    ak.local_index(events.Electron))
-    events = set_ak_column(events, "Electron.decayMode", -1)
-    events = set_ak_column(events, "Electron.decayModePNet", -1)
     events = set_ak_column(events, "Electron.ip_sig", events.Electron.sip3d)
 
     # >= nano v10
@@ -258,7 +254,7 @@ def electron_selection(
         f"Tau.{var}" for var in [
             "pt", "eta", "phi", "dz",
             "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu", "idDeepTau2018v2p5VSjet",
-            "decayMode","decayModePNet", 'ipLengthSig'
+            "decayMode","decayModePNet", 'ipLengthSig', "genPartFlav"
         ]
     },
     produces={
@@ -284,6 +280,7 @@ def tau_selection(
     tau_local_indices = ak.local_index(events.Tau)
     events = set_ak_column(events, "Tau.rawIdx", tau_local_indices)
     events = set_ak_column(events, "Tau.ip_sig", events.Tau.ipLengthSig)
+   
 
     # https://cms-nanoaod-integration.web.cern.ch/integration/cms-swmaster/data106Xul17v2_v10_doc.html#Tau
     
@@ -295,15 +292,13 @@ def tau_selection(
         "tau_pt_40"     : events.Tau.pt > 40,
         "tau_eta_2p1"   : abs(events.Tau.eta) < 2.1,
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
-        "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"], 
+        "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
         "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"],
         "DeepTauVSmu"   : events.Tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"],
         "DecayMode"     : ((events.Tau.decayMode == 0) 
                            | (events.Tau.decayMode == 1)
                            | (events.Tau.decayMode == 10)
                            | (events.Tau.decayMode == 11))
-        #"CleanFromEle"  : ak.all(events.Tau.metric_table(events.Electron[electron_indices]) > 0.5, axis=2),
-        #"CleanFromMu"   : ak.all(events.Tau.metric_table(events.Muon[muon_indices]) > 0.5, axis=2),
     }
 
     # pt sorted indices for converting masks to indices
@@ -311,20 +306,20 @@ def tau_selection(
     tau_mask  = ak.local_index(events.Tau.pt) >= 0
 
     good_tau_mask = tau_mask
-    selection_steps = {}
+    #selection_steps = {}
 
-    selection_steps = {"Starts with": good_tau_mask}
-    for cut in good_selections.keys():
-        good_tau_mask = good_tau_mask & ak.fill_none(good_selections[cut], False)
-        selection_steps[cut] = good_tau_mask
+    # selection_steps = {"Starts with": good_tau_mask}
+    # for cut in good_selections.keys():
+    #     good_tau_mask = good_tau_mask & ak.fill_none(good_selections[cut], False)
+    #     selection_steps[cut] = good_tau_mask
         
-    if electron_indices is not None:
-        good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Electron[electron_indices]) > 0.2, axis=2)
-        selection_steps["clean_against_electrons"] = good_tau_mask 
+    # if electron_indices is not None:
+    #     good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Electron[electron_indices]) > 0.2, axis=2)
+    #     selection_steps["clean_against_electrons"] = good_tau_mask 
 
-    if muon_indices is not None:
-        good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Muon[muon_indices]) > 0.2, axis=2)
-        selection_steps["clean_against_muons"] = good_tau_mask
+    # if muon_indices is not None:
+    #     good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Muon[muon_indices]) > 0.2, axis=2)
+    #     selection_steps["clean_against_muons"] = good_tau_mask
 
     # convert to sorted indices
     good_tau_indices = sorted_indices[good_tau_mask[sorted_indices]]
@@ -336,7 +331,7 @@ def tau_selection(
                 "Tau": good_tau_indices,
             },
         },
-        aux=selection_steps,
+        #aux=selection_steps,
     ), good_tau_indices
 
 

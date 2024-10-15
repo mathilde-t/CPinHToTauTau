@@ -19,7 +19,7 @@ from columnflow.production.processes import process_ids
 from columnflow.production.cms.mc_weight import mc_weight
 from columnflow.production.util import attach_coffea_behavior
 
-from columnflow.util import maybe_import
+from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import optional_column as optional
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
@@ -31,7 +31,7 @@ from httcp.selection.lepton_pair_tautau import tautau_selection
 from httcp.selection.lepton_pair_emu import emu_selection
 from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
-from httcp.selection.higgscand import higgscand, higgscandprod
+from httcp.selection.higgscand import higgscand, higgscandprod, new_higgscand
 
 # TODO: rename mutau_vars -> dilepton_vars
 from httcp.production.dilepton_features import rel_charge
@@ -67,7 +67,7 @@ coffea = maybe_import("coffea")
         double_lepton_veto,
         match_trigobj,
         increment_stats,
-        higgscand,
+        new_higgscand,
         gentau_selection,
         higgscandprod,
         rel_charge,
@@ -93,7 +93,7 @@ coffea = maybe_import("coffea")
         double_lepton_veto,
         match_trigobj,
         increment_stats,
-        higgscand,
+        new_higgscand,
         gentau_selection,
         higgscandprod,
         rel_charge,
@@ -167,10 +167,10 @@ def main(
                                                            good_tau_indices,
                                                            call_force=True,
                                                            **kwargs)
-    results += etau_results
-    etau_pair = ak.concatenate([events.Electron[etau_indices_pair[:, 0:1]],
-                                events.Tau[etau_indices_pair[:, 1:2]]],
-                               axis=1)
+    #results += etau_results
+    # etau_pair = ak.concatenate([events.Electron[etau_indices_pair[:, 0:1]],
+    #                             events.Tau[etau_indices_pair[:, 1:2]]],
+    #                            axis=1)
 
     # mu-tau pair i.e. hcand selection
     # e.g. [ [mu1, tau1], [], [mu1, tau2], [], [] ]
@@ -179,10 +179,10 @@ def main(
                                                               good_tau_indices,
                                                               call_force=True,
                                                               **kwargs)
-    results += mutau_results
-    mutau_pair = ak.concatenate([events.Muon[mutau_indices_pair[:, 0:1]],
-                                 events.Tau[mutau_indices_pair[:, 1:2]]],
-                                axis=1)
+    #results += mutau_results
+    # mutau_pair = ak.concatenate([events.Muon[mutau_indices_pair[:, 0:1]],
+    #                              events.Tau[mutau_indices_pair[:, 1:2]]],
+    #                             axis=1)
 
     # tau-tau pair i.e. hcand selection
     # e.g. [ [], [tau1, tau2], [], [], [] ]
@@ -190,11 +190,11 @@ def main(
                                                                  good_tau_indices,
                                                                  call_force=True,
                                                                  **kwargs)
-    results += tautau_results
+    #results += tautau_results
 
-    tautau_pair = ak.concatenate([events.Tau[tautau_indices_pair[:, 0:1]],
-                                  events.Tau[tautau_indices_pair[:, 1:2]]],
-                                 axis=1)
+    # tautau_pair = ak.concatenate([events.Tau[tautau_indices_pair[:, 0:1]],
+    #                               events.Tau[tautau_indices_pair[:, 1:2]]],
+    #                              axis=1)
 
     # # e-mu pair i.e. hcand selection
     # # e.g. [ [], [e1, mu2], [], [], [] ]
@@ -211,27 +211,27 @@ def main(
 
     # make sure events have at least one lepton pair
     # hcand pair: [ [[e1,tau1]], [[mu1,tau1],[tau1,tau2]], [[e1,tau2]], [[mu1,tau2]], [] ]
-    hcand_pairs = ak.concatenate(
-        [etau_pair[:, None], mutau_pair[:, None], tautau_pair[:, None]], axis=1)
-    at_least_one_hcand = ak.num(hcand_pairs, axis=-1) > 0
+    # hcand_pairs = ak.concatenate(
+    #     [etau_pair[:, None], mutau_pair[:, None], tautau_pair[:, None]], axis=1)
+    # at_least_one_hcand = ak.num(hcand_pairs, axis=-1) > 0
 
     # check if there are at least one hcand [before trigger obj matching]
-    prematch_mask = ak.sum(ak.num(hcand_pairs, axis=-1) > 0, axis=1) > 0
-   
-    events, good_muon_indices, good_ele_indices, good_tau_indices, etau_channel_mask, mutau_channel_mask, tautau_channel_mask, hcand_array, hcand_results = self[higgscand](
-        events, trigger_results, hcand_pairs, domatch=True)
-
-    # check if there are at least two leptons with at least one tau [after trigger obj matching]
-    postmatch_mask = ak.num(hcand_array, axis=-1) == 2
-    match_res = SelectionResult(
-        steps={
-            "selected_hcand": prematch_mask,
-            "selected_hcand_trigmatch": postmatch_mask
-        },
-    )
-    results += match_res
-    results += hcand_results
+    # prematch_mask = ak.sum(ak.num(hcand_pairs, axis=-1) > 0, axis=1) > 0
     
+    pair_idxs = DotDict.wrap({
+        'etau' : etau_indices_pair,
+        'mutau' : mutau_indices_pair,
+        'tautau' : tautau_indices_pair
+    })
+   
+    #events, good_muon_indices, good_ele_indices, good_tau_indices, etau_channel_mask, mutau_channel_mask, tautau_channel_mask, hcand_array, hcand_results = self[higgscand](
+    #    events, trigger_results, hcand_pairs, domatch=True)
+    
+    events, hcand_res = self[new_higgscand](events,
+                                 trigger_results,
+                                 pair_idxs,
+                                 domatch=True)
+    results += hcand_res
     #produce is_b_vetoed columnd
     events = self[jet_veto](events, **kwargs)
 
@@ -260,19 +260,6 @@ def main(
     #         events, gentau_results = self[gentau_selection](events, True)
     #         results += gentau_results
 
-    selected_objects = SelectionResult(
-        objects={
-            "Muon": {
-                "Muon": good_muon_indices,
-            },
-            "Electron": {
-                "Electron": good_ele_indices,
-            },
-            "Tau": {
-                "Tau": good_tau_indices,
-            },
-        },
-    )
     results += selected_objects
 
     # combined event selection after all steps

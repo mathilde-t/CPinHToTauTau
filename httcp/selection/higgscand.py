@@ -43,14 +43,7 @@ def new_higgscand(
 ) -> tuple[ak.Array, SelectionResult]:
     channels = self.config_inst.channels.names()
     
-    ch_objects = DotDict.wrap({
-        'etau'   : {'lep0' : 'Electron',
-                    'lep1' : 'Tau'},
-        'mutau'  : {'lep0' : 'Muon',
-                    'lep1' : 'Tau'},
-        'tautau' : {'lep0' : 'Tau',
-                    'lep1' : 'Tau'},
-    })
+    ch_objects = self.config_inst.x.ch_objects
     steps = {}
     pair_objects = {}
     n_pairs_prematch = ak.zeros_like(events.event)

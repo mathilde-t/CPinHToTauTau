@@ -31,48 +31,37 @@ def extra_lepton_veto(
         extra_muon_index: ak.Array,
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult]:
-
     #Selectin ALL leptons that pass extra lepton kinematic cuts
+    
     extra_lep  = ak.Array(ak.concatenate([events.Muon[extra_muon_index],
                                           events.Electron[extra_electron_index]], axis=-1),
                           behavior=coffea.nanoevents.methods.nanoaod.behavior)
     extra_lep  = ak.with_name(extra_lep, "PtEtaPhiMLorentzVector")
-
-    '''
-    hcand_pair array has the following layout: [[[Electron, Tau], [Muon,Tau], [Tau,Tau]], ...] 
-    First we need to identify the channel by counting number of objects along the axis=2
-    Then check the channel by Comparing the indices 
-    #hcand_pair 
-    '''
-    ch_mask={}
-    for the_ch in ["etau","mutau", "tautau"]: ch_mask[the_ch] = events.channel_id == self.config_inst.get_channel(the_ch).id
- 
+    
     #check if the events contain a single pair i.e. number of rawIdxs in the hcand object is equal to 2
     # has_single_pair = ak.sum(ak.num(hcand_pair.rawIdx, axis=2),axis=1) == 2 ATTENTION: hcand has a single pair by construction 
-    
-    lep1 = events.hcand[:,0:1]
-    lep2 = events.hcand[:,1:2]
-    #Calculate dR between first lepton and electrons or muons from loose selection list
-    #Attention: this list also contains dR between lep1 and itself, so all entries have at least one dR that is 0 or a tiny number
-    dr_lep1_ext = extra_lep.metric_table(lep1)
-    
-    #Calculate dR between first lepton and electrons or muons from loose selection list
-    #Since lep2 can be only tau, here we expect one number to be > 0.5 that is the first lepton. Everything else will be treated as extra lepton
-    dr_lep2_ext = extra_lep.metric_table(lep2)
-    
-    #For the first lepton any other muon and lepton that is is located further than 0.5 from the lepton form the pair will be potential source of veto
-    lep1_mask = ak.num(ak.any(dr_lep1_ext > 0.5, axis=1),axis=1)>0
-    #For the second lepton one should check that the number of particles with dR > 0.5 is more than 1 (because lep1 is also present in the exra_lep)
-    lep2_mask = ak.fill_none(ak.firsts(ak.sum(dr_lep2_ext > 0.5,axis=1) > 1), False)
-    
-    #Unite the masks from the dR checks with respect to 1st and 2nd lepton, then reverse the result to use mask for selection
-    has_no_exra_lep = ~(lep1_mask & lep2_mask)
-    
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    has_no_exra_lep = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels: 
+        hcand = events[f'hcand_{ch_str}']
+        for lep_str in hcand.fields:
+            lep = hcand[lep_str]
+            #Calculate dR between first lepton and electrons or muons from loose selection list
+            #Attention: this list also contains dR between lep1 and itself, so all entries have at least one dR that is 0 or a tiny number
+            delta_r = ak.flatten(extra_lep.metric_table(lep),axis=2)
+            n_sep_leps = ak.sum(delta_r > 0.5, axis=1)
+            if ch_objects[ch_str][lep_str] == 'Tau':
+                 #For tau objects there also exists a lepton from the pair, so it will trigger delta_r cut, so to tirgger the veto there should be at least two particles
+                lep_mask = n_sep_leps > 1
+            else:
+                #For electrons and muons there we need to check if there exists a lepton, separated from the pair lepton
+                lep_mask = n_sep_leps > 0
+            from IPython import embed; embed()
+            has_no_exra_lep = has_no_exra_lep | lep_mask
     return events, SelectionResult(
-        steps={
-            "extra_lepton_veto": has_no_exra_lep
-               }
-        )
+        steps={"extra_lepton_veto": ~has_no_exra_lep #Since it's veto, this field shoud be reversed 
+               })
 
 
 

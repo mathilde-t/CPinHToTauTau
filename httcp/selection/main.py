@@ -236,10 +236,10 @@ def main(
     events = self[jet_veto](events, **kwargs)
 
     #produce channels
-    events = self[channel_id](events,
-                              etau_channel_mask,
-                              mutau_channel_mask,
-                              tautau_channel_mask)
+    # events = self[channel_id](events,
+    #                           etau_channel_mask,
+    #                           mutau_channel_mask,
+    #                           tautau_channel_mask)
 
     # extra lepton veto
     # it is only applied on the events with one higgs candidate only

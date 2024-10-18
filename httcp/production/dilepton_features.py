@@ -86,6 +86,13 @@ def mT(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     events = set_ak_column_f32(events,"mT", mT_values)
     return events
 
+
+def hcand_mt(lep: ak.Array, MET: ak.Array) -> ak.Array:
+    print("producing mT...")
+    cos_dphi = np.cos(lep.delta_phi(MET))
+    mT_values = np.sqrt(2*lep.pt*MET.pt * (1 - cos_dphi))
+    return ak.fill_none(mT_values, EMPTY_FLOAT)
+
 @producer(
     uses = 
     {

@@ -252,28 +252,6 @@ def assign_tauprod_mass_charge(
         events: ak.Array,
         **kwargs
 ) -> ak.Array:
-    # pionp = 211
-    # pionm = -211
-    # kaonp = 321
-    # kaonm = -321
-    # gamma = 22
-
-    # mass = ak.where(np.abs(events.TauProd.pdgId) == pionp,
-    #                 0.13957,
-    #                 ak.where(np.abs(events.TauProd.pdgId) == kaonp,
-    #                          0.493677,
-    #                          ak.where(events.TauProd.pdgId == gamma,
-    #                                   0.0, 0.0))
-    #                 )
-    # charge = ak.where(((events.TauProd.pdgId == pionp) | (events.TauProd.pdgId == kaonp)),
-    #                   1.0,
-    #                   ak.where(((events.TauProd.pdgId == pionm) | (events.TauProd.pdgId == kaonm)),
-    #                            -1.0,
-    #                            0.0)
-    #                   )
-
-    # events = set_ak_column(events, "TauProd.mass", mass)
-    # events = set_ak_column(events, "TauProd.charge", charge)
     
     #https://pdg.lbl.gov/2023/listings/particle_properties.html
     
@@ -461,3 +439,5 @@ def higgscandprod(
             "decay_prods_are_ok": joint_evt_mask,
         },
     )
+    
+    

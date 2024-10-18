@@ -840,3 +840,16 @@ def hlt_path_matching(events, triggers, pair_objects):
 
 #     return hcand_array, etau_channel_mask, mutau_channel_mask, tautau_channel_mask
 
+# lambda function to get 4-vector of a lepton
+def get_lep_p4(part): return ak.zip({f"{var}": part[var] for var in ['pt', 'eta', 'phi', 'mass']},
+                                    with_name="PtEtaPhiMLorentzVector",
+                                    behavior=coffea.nanoevents.methods.vector.behavior)
+
+# lambda function to get 4-vector of impact parameter from the particle objects
+# Zeroth component of IP vector is set to zero by definition that can be found here: https://www.mdpi.com/2218-1997/8/5/256
+def get_ip_p4(part): return ak.zip({f'{var}': part[f'IP{var}']for var in ['x', 'y', 'z']} | {'t': ak.zeros_like(part.IPx)},
+                                   with_name="LorentzVector",
+                                   behavior=coffea.nanoevents.methods.vector.behavior)# # lambda function to get 4-vector from the particle objects
+
+
+

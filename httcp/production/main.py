@@ -11,7 +11,6 @@ from columnflow.production.categories import category_ids
 from columnflow.production.normalization import normalization_weights
 from columnflow.production.cms.pileup import pu_weight
 from columnflow.production.cms.seeds import deterministic_seeds
-#from columnflow.production.cms.muon import muon_weights
 from columnflow.selection.util import create_collections_from_masks
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
@@ -23,9 +22,9 @@ from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
 from httcp.production.weights import muon_weight, tau_weight, get_mc_weight,tauspinner_weight
 from httcp.production.sample_split import split_dy
-from httcp.production.dilepton_features import hcand_mass, mT, rel_charge 
+from httcp.production.dilepton_features import hcand_mass, mT, rel_charge, hcand_mt
 from httcp.production.phi_cp import phi_cp
-
+from httcp.util import get_lep_p4
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -39,34 +38,34 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
 
 @producer(
     uses={
-        "hcand.*",
-        optional("GenTau.*"), optional("GenTauProd.*"),
-        reArrangeDecayProducts, reArrangeGenDecayProducts,
-        ProduceGenPhiCP, ProduceDetPhiCP,
+        'hcand_*', 'PuppiMET*'
     },
     produces={
-        # new columns
-        "hcand_invm", "hcand_dr",
-        ProduceGenPhiCP, ProduceDetPhiCP,
+        'hcand_*'
     },
 )
-def hcand_features(
+def hcand_fields(
         self: Producer, 
         events: ak.Array,
         **kwargs
 ) -> ak.Array:
-    events = ak.Array(events, behavior=coffea.nanoevents.methods.nanoaod.behavior)
-    hcand_ = ak.with_name(events.hcand, "PtEtaPhiMLorentzVector")
-    hcand1 = hcand_[:,0:1]
-    hcand2 = hcand_[:,1:2]
-    
-    mass = (hcand1 + hcand2).mass
-    dr = ak.firsts(hcand1.metric_table(hcand2), axis=1)
-    dr = ak.enforce_type(dr, "var * float32")
-
-    events = set_ak_column(events, "hcand_invm", mass)
-    events = set_ak_column(events, "hcand_dr",   dr)
-
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    for ch_str in channels:
+        hcand = events[f'hcand_{ch_str}']
+        p4 = {}
+        for the_lep in hcand.fields: p4[the_lep] = get_lep_p4(hcand[the_lep]) 
+        
+        mass = (p4['lep0'] + p4['lep1']).mass
+        hcand['mass'] = ak.where(mass > 0, mass , EMPTY_FLOAT)
+        
+        delta_r = ak.flatten(p4['lep0'].metric_table(hcand.lep1), axis=2)
+        hcand['delta_r'] = ak.where(delta_r > 0, delta_r , EMPTY_FLOAT)
+        hcand['rel_charge'] = hcand.lep0.charge * hcand.lep1.charge
+        if ch_str !=' tautau':
+            mt = hcand_mt(p4['lep0'], events.PuppiMET)
+            hcand['mt'] = ak.where(mt > 0, mt , EMPTY_FLOAT)   
+        events = set_ak_column(events, f'hcand_{ch_str}', hcand) 
     # events, P4_dict     = self[reArrangeDecayProducts](events)
     # events              = self[ProduceDetPhiCP](events, P4_dict)
 
@@ -74,7 +73,6 @@ def hcand_features(
     #     if self.dataset_inst.aux["is_signal"]:
     #         events, P4_gen_dict = self[reArrangeGenDecayProducts](events)
     #         events = self[ProduceGenPhiCP](events, P4_gen_dict)
-    
     return events
 
 
@@ -86,12 +84,10 @@ def hcand_features(
         muon_weight,
         tau_weight,
         get_mc_weight,
-        hcand_features,
-        hcand_mass,
+        hcand_fields,
         tauspinner_weight,
         phi_cp,
         category_ids,
-        mT,
     },
     produces={
         normalization_weights,
@@ -100,19 +96,15 @@ def hcand_features(
         muon_weight,
         get_mc_weight,
         tau_weight,
-        hcand_features,
-        hcand_mass,
+        hcand_fields,
         tauspinner_weight,
         phi_cp,
         category_ids,
-        mT,
     },
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     print("Producing Hcand features...")
-    events = self[hcand_features](events, **kwargs)       
-    events = self[hcand_mass](events, **kwargs)
-    events = self[mT](events, **kwargs)
+    events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
     if self.dataset_inst.is_mc:
         events = self[get_mc_weight](events, **kwargs)

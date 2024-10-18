@@ -35,7 +35,7 @@ from httcp.selection.higgscand import higgscand, higgscandprod, new_higgscand
 
 # TODO: rename mutau_vars -> dilepton_vars
 from httcp.production.dilepton_features import rel_charge
-from httcp.production.aux_columns import channel_id, jet_veto
+from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -70,6 +70,7 @@ coffea = maybe_import("coffea")
         new_higgscand,
         gentau_selection,
         higgscandprod,
+        add_tau_prods,
         rel_charge,
     },
     produces={
@@ -96,6 +97,7 @@ coffea = maybe_import("coffea")
         new_higgscand,
         gentau_selection,
         higgscandprod,
+        add_tau_prods,
         rel_charge,
         "category_ids"
     },
@@ -235,11 +237,8 @@ def main(
     #produce is_b_vetoed columnd
     events = self[jet_veto](events, **kwargs)
 
-    #produce channels
-    # events = self[channel_id](events,
-    #                           etau_channel_mask,
-    #                           mutau_channel_mask,
-    #                           tautau_channel_mask)
+    #produce channel id column (legacy)
+    events = self[channel_id](events)
 
     # extra lepton veto
     # it is only applied on the events with one higgs candidate only
@@ -248,9 +247,9 @@ def main(
                                                                 veto_muon_indices)
     results += extra_lepton_veto_results
 
-    # # hcand prod results
-    events, hcandprod_results = self[higgscandprod](events, hcand_array)
-    results += hcandprod_results
+    # Add tau decya products to the correspondent hcand_(channel) arrays
+    events, tau_prods_res = self[add_tau_prods](events)
+    results += tau_prods_res
 
     # gen particles info
     # hcand-gentau match = True/False
@@ -259,20 +258,14 @@ def main(
     #         # print("hcand-gentau matching")
     #         events, gentau_results = self[gentau_selection](events, True)
     #         results += gentau_results
-
-    results += selected_objects
-
+    
     # combined event selection after all steps
 
     event_sel = reduce(and_, results.steps.values())
-
     results.event = event_sel
-
     # add the mc weight
     if self.dataset_inst.is_mc:
         events = self[mc_weight](events, **kwargs)
-
-    events = self[rel_charge](events, **kwargs)
     events = self[process_ids](events, **kwargs)
     events = set_ak_column(events, 'category_ids', ak.ones_like(events.event, dtype=np.uint8))
 

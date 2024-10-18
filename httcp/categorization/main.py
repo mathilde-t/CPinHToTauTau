@@ -8,7 +8,7 @@ from columnflow.categorization import Categorizer, categorizer
 from columnflow.util import maybe_import
 
 ak = maybe_import("awkward")
-
+np = maybe_import("numpy")
 
 #
 # categorizer functions used by categories definitions
@@ -19,10 +19,12 @@ def cat_incl(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, a
     # fully inclusive selection
     return events, ak.ones_like(events.event) == 1
 
+#Three general categories: etau, mutau and tautau
 @categorizer(uses={"channel_id"})
 def etau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     mask = (events.channel_id ==  self.config_inst.get_channel("etau").id)
     return events, mask 
+
 @categorizer(uses={"channel_id"})
 def mutau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     mask = (events.channel_id ==  self.config_inst.get_channel("mutau").id)
@@ -33,33 +35,62 @@ def tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.
     mask = (events.channel_id ==  self.config_inst.get_channel("tautau").id)
     return events, mask
 
-@categorizer(uses={"hcand.charge"})
+#Helper categories rel.charge, mt, 
+@categorizer(uses={'event', 'hcand_*'})
 def os_charge(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.fill_none(ak.firsts((events.hcand.charge[:,0:1]  * events.hcand.charge[:,1:2] ) < 0, axis=1),False)  
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+        mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].rel_charge < 0), axis=1),False)
     return events, mask
 
-@categorizer(uses={"hcand.charge"})
+@categorizer(uses={'event', 'hcand_*'})
 def ss_charge(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.fill_none(ak.firsts((events.hcand.charge[:,0:1]  * events.hcand.charge[:,1:2] ) > 0, axis=1),False)  
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+        mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].rel_charge > 0), axis=1),False)
     return events, mask
 
-@categorizer(uses={"channel_id", "hcand.decayMode"})
-def sel_etau_pion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    ch = self.config_inst.get_channel("etau")
-    ch_mask = events["channel_id"] == ch.id
-    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 0), axis=1) == 1
-    return events, ch_mask & dm_mask
-
-@categorizer(uses={"mT"})
-def mt_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.fill_none(ak.firsts((events.mT < 50),axis=1),False)
-    return events, mask
-
-@categorizer(uses={"mT"})
+@categorizer(uses={'event', 'hcand_*'})
 def mt_inv_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.fill_none(ak.firsts((events.mT >= 50),axis=1),False)
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+        if ch_str != 'tautau':
+            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt > 50), axis=1),False)
     return events, mask
 
+@categorizer(uses={'event', 'hcand_*'})
+def mt_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+        if ch_str != 'tautau':
+            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt <= 50), axis=1),False)
+    return events, mask
+
+@categorizer(uses={"is_b_vetoed"})
+def b_veto(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = ~events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
+    return events, mask
+
+@categorizer(uses={"is_b_vetoed"})
+def b_veto_inv(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
+    return events, mask
+
+
+
+
+
+
+# @categorizer(uses={"channel_id", "hcand.decayMode"})
+# def sel_etau_pion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+#     ch = self.config_inst.get_channel("etau")
+#     ch_mask = events["channel_id"] == ch.id
+#     dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 0), axis=1) == 1
+#     return events, ch_mask & dm_mask
 
 
 ### Old categories

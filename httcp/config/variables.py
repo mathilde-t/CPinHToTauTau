@@ -45,7 +45,7 @@ def keep_columns(cfg: od.Config) -> None:
         } | {
             f"Muon.{var}" for var in [
                 "pt","eta","phi","mass","dxy","dz", "charge",
-		"decayMode", "pfRelIso04_all","mT", "rawIdx","IPx", "IPy", "IPz","ip_sig"
+                "decayMode", "pfRelIso04_all","mT", "rawIdx","IPx", "IPy", "IPz","ip_sig"
             ] 
         } | {
             f"Electron.{var}" for var in [

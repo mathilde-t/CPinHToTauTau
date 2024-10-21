@@ -72,23 +72,26 @@ def jet_veto(
     year = self.config_inst.x.year
     btag_wp = self.config_inst.x.btag_working_points[year].deepjet.medium
     # nominal jet selection
+    jet_pt_sorted_idx = ak.argsort(events.Jet.pt, axis=1, ascending=False)
+    sorted_jets = events.Jet[jet_pt_sorted_idx]
     jet_selections = {
-        "jet_pt_20"               : events.Jet.pt > 20.0,
-        "jet_eta_2.5"             : abs(events.Jet.eta) < 2.5,
-        "jet_id"                  : events.Jet.jetId & 0b10 == 0b10, 
-        "btag_wp_medium"          : events.Jet.btagDeepFlavB >= btag_wp
+        "jet_pt_20"               : sorted_jets.pt > 20.0,
+        "jet_eta_2.5"             : abs(sorted_jets.eta) < 2.5,
+        "jet_id"                  : sorted_jets.jetId & 0b10 == 0b10, 
+        "btag_wp_medium"          : sorted_jets.btagDeepFlavB >= btag_wp
     }
-    jet_obj_mask = ak.ones_like(ak.local_index(events.Jet.pt, axis=1), dtype=np.bool_)
+    jet_obj_mask = ak.ones_like(jet_pt_sorted_idx, dtype=np.bool_)
     for the_sel in jet_selections.values():
         jet_obj_mask = jet_obj_mask & the_sel
-    presel_jet = ak.drop_none(ak.mask(events.Jet, jet_obj_mask))
-    
     leg_masks = []
     event_mask = ak.zeros_like(events.event, dtype=np.bool_)
     for the_ch in self.config_inst.channels.names(): 
         hcand = events[f'hcand_{the_ch}']
-        for idx in range(2): #iteate over taus
-            lep = ak.firsts(hcand[f'lep{idx}'])
+        for lep_str in [field for field in hcand.fields if 'lep' in field]:
+            lep = ak.firsts(hcand[lep_str])
+            seed_idx = ak.fill_none(lep.jetIdx, -1) 
+            jet_obj_mask = jet_obj_mask & (jet_pt_sorted_idx != seed_idx)
+            presel_jet = ak.drop_none(ak.mask(sorted_jets, jet_obj_mask))
             jet_tau_pairs = ak.cartesian([presel_jet,lep], axis=1)
             jet_br, lep_br = ak.unzip(jet_tau_pairs)
             delta_r = jet_br.delta_r(lep_br)

@@ -22,15 +22,21 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
 
 @selector(
     uses={
-        f"Tau.{var}" for var in [
+            f"Tau.{var}" for var in [
                 "pt","eta","phi","mass","dxy","dz", "charge", 
-                "rawDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSjet", "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu", 
-                "decayMode", "decayModePNet", "rawIdx", "ip_sig", "jetIdx"]
-    } | {f"{part}.IP{par}"
-         for part in ["Electron", "Muon", "Tau"]
-         for par in ["x", "y", "z"]
-    } | {f"{part}.ip_sig" for part in ["Electron", "Muon", "Tau"]
-    } | {optional("Tau.genPartFlav")},
+                "rawDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSjet", "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu",
+                "rawIdx", "IPx", "IPy", "IPz", "ip_sig", "jetIdx"]
+    } | {
+            f"Muon.{var}" for var in [
+                "pt","eta","phi","mass","dxy","dz", "charge",
+                "rawIdx","IPx", "IPy", "IPz","ip_sig", "jetIdx"
+            ] 
+    } | {
+            f"Electron.{var}" for var in [
+                "pt","eta","phi","mass","dxy","dz", "charge", 
+                "pfRelIso03_all", "rawIdx", "IPx", "IPy", "IPz","ip_sig", "jetIdx"
+            ] 
+        } | {optional("Tau.genPartFlav")},
     produces={
         'hcand_*'
     },
@@ -45,7 +51,6 @@ def new_higgscand(
         **kwargs
 ) -> tuple[ak.Array, SelectionResult]:
     channels = self.config_inst.channels.names()
-    
     ch_objects = self.config_inst.x.ch_objects
     steps = {}
     pair_objects = {}

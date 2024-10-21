@@ -167,7 +167,6 @@ def assign_tauprod_mass_charge(
         "TauProd.*", assign_tauprod_mass_charge,
     },
     produces={
-        "hcand_*",
         "tau_decay_prods_*",
         assign_tauprod_mass_charge,
     },

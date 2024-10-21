@@ -31,10 +31,8 @@ from httcp.selection.lepton_pair_tautau import tautau_selection
 from httcp.selection.lepton_pair_emu import emu_selection
 from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
-from httcp.selection.higgscand import higgscand, higgscandprod, new_higgscand
+from httcp.selection.higgscand import new_higgscand, mask_nans
 
-# TODO: rename mutau_vars -> dilepton_vars
-from httcp.production.dilepton_features import rel_charge
 from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
 
 np = maybe_import("numpy")
@@ -69,9 +67,8 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         gentau_selection,
-        higgscandprod,
         add_tau_prods,
-        rel_charge,
+        mask_nans,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
@@ -96,9 +93,8 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         gentau_selection,
-        higgscandprod,
         add_tau_prods,
-        rel_charge,
+        mask_nans,
         "category_ids"
     },
     exposed=True,
@@ -250,7 +246,9 @@ def main(
     # Add tau decya products to the correspondent hcand_(channel) arrays
     events, tau_prods_res = self[add_tau_prods](events)
     results += tau_prods_res
-
+    #Check arrays for np.nan values and mask them
+    events, nan_mask_res = self[mask_nans](events)
+    results += nan_mask_res
     # gen particles info
     # hcand-gentau match = True/False
     # if "is_signal" in list(self.dataset_inst.aux.keys()):

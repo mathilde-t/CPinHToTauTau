@@ -118,7 +118,7 @@ def muon_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) -> a
     ch_objects = self.config_inst.x.ch_objects
     for ch_str in channels:
         hcand = events[f'hcand_{ch_str}']
-        for lep in ['lep0', 'lep1']:
+        for lep in [field for field in hcand.fields if 'lep' in field]:
             if ch_objects[ch_str][lep] == 'Muon':
                 muon = hcand[lep]
                 # Create sf array template to make copies and dict for finnal results of all systematics
@@ -291,7 +291,7 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
         sf_values = np.ones_like(events.event, dtype=np.float32)
         for ch_str in channels:
             hcand = events[f'hcand_{ch_str}']
-            for lep in ['lep0', 'lep1']:
+            for lep in [field for field in hcand.fields if 'lep' in field]:
                 if ch_objects[ch_str][lep]  == 'Tau':
                     tau = hcand[lep]
                     #Prepare flat arrays of the inputs to send into the 
@@ -353,8 +353,7 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                     #per_ch_sf[tau_mask] *= self.id_vs_jet_corrector.evaluate(*args_vs_jet(tau_mask,shift))
                     ch_mask = ak.num(tau, axis=1) > 0
                     shaped_sf = ak.unflatten(per_ch_sf, ak.num(tau.pt, axis=1))
-                    sf_values = sf_values * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)
-        from IPython import embed; embed()         
+                    sf_values = sf_values * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)       
         events = set_ak_column(events,f"tau_weight_{shift}",sf_values,value_type=np.float32)
                                     
     return events

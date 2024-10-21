@@ -7,7 +7,7 @@ import functools
 from typing import Optional
 from columnflow.selection import Selector, SelectionResult, selector
 from columnflow.util import maybe_import
-from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
+from columnflow.columnar_util import set_ak_column, has_ak_column, EMPTY_FLOAT, Route, flat_np_view, optional_column as optional
 from columnflow.util import DotDict
 
 from httcp.util import enforce_hcand_type, enforce_tauprods_type, hlt_path_matching
@@ -22,12 +22,15 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
 
 @selector(
     uses={
-        "Tau.decayModePNet", "Tau.idDeepTau2018v2p5VSjet",
+        f"Tau.{var}" for var in [
+                "pt","eta","phi","mass","dxy","dz", "charge", 
+                "rawDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSjet", "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu", 
+                "decayMode", "decayModePNet", "rawIdx", "ip_sig", "jetIdx"]
     } | {f"{part}.IP{par}"
          for part in ["Electron", "Muon", "Tau"]
          for par in ["x", "y", "z"]
     } | {f"{part}.ip_sig" for part in ["Electron", "Muon", "Tau"]
-    },
+    } | {optional("Tau.genPartFlav")},
     produces={
         'hcand_*'
     },
@@ -439,5 +442,38 @@ def higgscandprod(
             "decay_prods_are_ok": joint_evt_mask,
         },
     )
-    
+
+
+@selector(
+    uses={
+        'hcand_*'
+    },
+    exposed=False,
+)
+def mask_nans(
+        self: Selector,
+        events: ak.Array,
+        **kwargs
+) -> tuple[ak.Array, SelectionResult]:
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+       
+        hcand = events[f'hcand_{ch_str}']
+        for lep_str in [field for field in hcand.fields if 'lep' in field]:
+            lep = hcand[lep_str]
+            for field in lep.fields:
+                field_mask = (ak.any(np.isnan(lep[field]),axis=1))
+                mask = mask | field_mask
+                if ak.any(field_mask):
+                    evt_index = events.event[field_mask]
+                    print(f'Found nans:\n{ch_str}.{lep_str}.{field}:')
+                    for evt in evt_index:
+                        print(f'evt idx: {evt}')
+    return events, SelectionResult(
+        steps={
+            'nans_removed': ~mask
+        }
+        )
     

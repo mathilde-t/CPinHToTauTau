@@ -288,17 +288,86 @@ def add_run3_2022_preEE (ana: od.Analysis,
         year = campaign.x.year
         tag = campaign.x.tag
         out_tag = ''
-        if year in [2017,2018]  : out_tag = '_UL'
-        elif tag == "preEE"     : out_tag = "_Summer22"
-        elif tag == "postEE"    : out_tag = "_Summer22EE"
-        elif tag == "preBpix"   : out_tag = "_Summer23"
-        elif tag == "postBpix"  : out_tag = "_Summer23BPix"
+        if year in [2017,2018]  : out_tag = 'UL'
+        elif tag == "preEE"     : out_tag = "Summer22"
+        elif tag == "postEE"    : out_tag = "Summer22EE"
+        elif tag == "preBpix"   : out_tag = "Summer23"
+        elif tag == "postBpix"  : out_tag = "Summer23BPix"
         elif tag == "preVFP"    : out_tag = "preVFP_UL"
         elif tag == "postVFP"   : out_tag = "postVFP_UL"
         return out_tag
 
     import os
     tag = tag_caster(campaign)
+    ### Jet energy correction and resolution configuration ###
+    cfg.x.jec = DotDict.wrap({
+        "campaign": f"{tag}_22Sep2023",
+        "version":  "V2",
+        "jet_type": "AK4PFPuppi",
+        "levels": ["L1FastJet", "L2Relative", "L2L3Residual", "L3Absolute"],
+        "levels_for_type1_met": ["L1FastJet"],
+        "uncertainty_sources": [
+            # "AbsoluteStat",
+            # "AbsoluteScale",
+            # "AbsoluteSample",
+            # "AbsoluteFlavMap",
+            # "AbsoluteMPFBias",
+            # "Fragmentation",
+            # "SinglePionECAL",
+            # "SinglePionHCAL",
+            # "FlavorQCD",
+            # "TimePtEta",
+            # "RelativeJEREC1",
+            # "RelativeJEREC2",
+            # "RelativeJERHF",
+            # "RelativePtBB",
+            # "RelativePtEC1",
+            # "RelativePtEC2",
+            # "RelativePtHF",
+            # "RelativeBal",
+            # "RelativeSample",
+            # "RelativeFSR",
+            # "RelativeStatFSR",
+            # "RelativeStatEC",
+            # "RelativeStatHF",
+            # "PileUpDataMC",
+            # "PileUpPtRef",
+            # "PileUpPtBB",
+            # "PileUpPtEC1",
+            # "PileUpPtEC2",
+            # "PileUpPtHF",
+            # "PileUpMuZero",
+            # "PileUpEnvelope",
+            # "SubTotalPileUp",
+            # "SubTotalRelative",
+            # "SubTotalPt",
+            # "SubTotalScale",
+            # "SubTotalAbsolute",
+            # "SubTotalMC",
+            "Total",
+            # "TotalNoFlavor",
+            # "TotalNoTime",
+            # "TotalNoFlavorNoTime",
+            # "FlavorZJet",
+            # "FlavorPhotonJet",
+            # "FlavorPureGluon",
+            # "FlavorPureQuark",
+            # "FlavorPureCharm",
+            # "FlavorPureBottom",
+            "CorrelationGroupMPFInSitu",
+            "CorrelationGroupIntercalibration",
+            "CorrelationGroupbJES",
+            "CorrelationGroupFlavor",
+            "CorrelationGroupUncorrelated",
+        ],
+    })
+    
+    cfg.x.jer = DotDict.wrap({
+        "campaign": f"{tag}_22Sep2023",
+        "version": "JRV1",
+        "jet_type": "AK4PFPuppi",
+        })
+    
     corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
     cfg.x.external_files = DotDict.wrap({
@@ -307,11 +376,11 @@ def add_run3_2022_preEE (ana: od.Analysis,
             "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
             "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
-        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
-        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
-        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz" #FIXME: this sf json is not from the jsonpog-integration dir!
-        
+        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
+        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
+        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}_{tag}/tau.json.gz", 
+        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
+        "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
     })
 
     # target file size after MergeReducedEvents in MB
@@ -319,8 +388,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
     
     from httcp.config.variables import keep_columns
     keep_columns(cfg)
-    
-    # register shifts
+ 
     cfg.add_shift(name="nominal", id=0)
 
     cfg.add_shift(name="tau_up", id=1, type="shape")
@@ -332,9 +400,11 @@ def add_run3_2022_preEE (ana: od.Analysis,
     add_shift_aliases(cfg, "mu", {"muon_weight": "muon_weight_{direction}"})
     
     
-    cfg.add_shift(name="tauspinner_up", id=5, type="shape") #cp-even
-    cfg.add_shift(name="tauspinner_down", id=6, type="shape") #cp-odd
-    add_shift_aliases(cfg, "tauspinner", {"tauspinner_weight": "tauspinner_weight_{direction}"})
+    cfg.add_shift(name="ts_up", id=5, type="shape") #cp-even
+    cfg.add_shift(name="ts_down", id=7, type="shape") #cp-odd
+    add_shift_aliases(cfg, "ts", {"tauspinner_weight": "tauspinner_weight_{direction}"})
+    # event weight columns as keys in an OrderedDict, mapped to shift instances they depend on
+    get_shifts = functools.partial(get_shifts_from_sources, cfg)
     
     # versions per task family, either referring to strings or to callables receving the invoking
     # task instance and parameters to be passed to the task family
@@ -358,6 +428,15 @@ def add_run3_2022_preEE (ana: od.Analysis,
     cfg.add_channel(name="mutau",  id=2)
     #cfg.add_channel(name="emu"  ,  id=3)
     cfg.add_channel(name="tautau", id=4)
+    
+    cfg.x.ch_objects = DotDict.wrap({
+        'etau'   : {'lep0' : 'Electron',
+                    'lep1' : 'Tau'},
+        'mutau'  : {'lep0' : 'Muon',
+                    'lep1' : 'Tau'},
+        'tautau' : {'lep0' : 'Tau',
+                    'lep1' : 'Tau'},
+    })
     
     if cfg.campaign.x("custom").get("creator") == "desy":  
         def get_dataset_lfns(dataset_inst: od.Dataset, shift_inst: od.Shift, dataset_key: str) -> list[str]:
@@ -391,3 +470,5 @@ def add_run3_2022_preEE (ana: od.Analysis,
         
     from httcp.config.variables import add_variables
     add_variables(cfg)
+    
+    

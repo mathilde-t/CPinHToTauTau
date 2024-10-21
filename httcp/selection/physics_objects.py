@@ -254,7 +254,7 @@ def electron_selection(
         f"Tau.{var}" for var in [
             "pt", "eta", "phi", "dz",
             "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu", "idDeepTau2018v2p5VSjet",
-            "decayMode","decayModePNet", 'ipLengthSig', "genPartFlav"
+            "decayMode","decayModePNet", 'ipLengthSig'
         ]
     },
     produces={

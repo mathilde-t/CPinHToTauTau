@@ -7,13 +7,13 @@ args=(
         --processes $processes
         --datasets $datasets
         --version $version
-        --categories 'mutau_signal_reg,tautau_signal_reg'
+        --categories mutau #'mutau_signal_reg,tautau_signal_reg'
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
         --cf.MergeReducedEvents-workflow local
-        --variables phi_cp_mu_pi,phi_cp_mu_rho,phi_cp_mu_a1_1pr,phi_cp_rho_rho
-        --shift-sources tauspinner
+        --variables  puppi_met_pt,jets_pt,jet_1_pt #hcand_leg1_pt,hcand_leg2_pt #phi_cp_mu_pi,phi_cp_mu_rho,phi_cp_mu_a1_1pr,phi_cp_rho_rho
+        --shift-sources jer #tauspinner
         --general-settings "cms-label=simpw"
         --cf.PlotShiftedVariables1D-hide-errors True
         --hide-errors True

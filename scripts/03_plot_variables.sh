@@ -7,13 +7,13 @@ args=(
         --processes $processes #'dy_lep,vv,tt,st,wj,data'
         --datasets $datasets
         --version $version
-        --categories 'etau' #tautau_signal_reg
+        --categories 'mutau,etau' #tautau_signal_reg
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
-        --cf.MergeReducedEvents-workflow local
-        --variables 'hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta'
-        
+        --cf.MergeReducedEvents-workflow $workflow
+        --variables N_events #puppi_met_phi,puppi_met_pt,mT,hcand_mass,hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta,jet_1_pt,jet_2_pt,puppi_met_pt_no_jec,puppi_met_pt,jet_1_pt_no_jec,jet_2_pt_no_jec #'hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta'
+        --file-types png
         
         # --variables 'puppi_met_phi,puppi_met_pt,mT,hcand_mass,hcand_leg1_pt,hcand_leg2_pt,hcand_leg1_eta,hcand_leg2_phi,hcand_leg1_phi,hcand_leg2_eta,hcand_leg1_mass,hcand_leg2_mass,hcand_leg2_decayModePNet,hcand_leg2_decayMode,'`
         # `'phi_cp_mu_pi,phi_cp_mu_rho,'`

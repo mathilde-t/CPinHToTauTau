@@ -17,11 +17,11 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 @calibrator(
     uses={
-        jec, tau_energy_scale, deterministic_seeds,# met_phi,
+        jec, tau_energy_scale, deterministic_seeds, #met_phi,
     },
     produces={
         jec, tau_energy_scale, deterministic_seeds, "Jet.pt_no_jec", "Jet.eta_no_jec",
-        "Jet.phi_no_jec", "Jet.mass_no_jec", "PuppiMET.pt_no_jec", "PuppiMET.phi_no_jec", "nJet", # met_phi
+        "Jet.phi_no_jec", "Jet.mass_no_jec", "PuppiMET.pt_no_jec", "PuppiMET.phi_no_jec", "nJet", #met_phi
     },
 )
 def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:

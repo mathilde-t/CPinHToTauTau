@@ -1,5 +1,4 @@
-#
-#source $CF_BASE/sandboxes/venv_columnar_dev.sh
+# . $CF_BASE/sandboxes/venv_columnar_dev.sh
 import matplotlib.pyplot as plt
 import mplhep
 import pickle
@@ -47,8 +46,15 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
             x = cuts
             y = n_evt
         print(f'Event numbers:')
-        #ax.scatter(x, y , color=color[i], marker='o', alpha=0.8, label=f"Data {name}")
-        ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label='Data') #label=r"H$_\text{ggf}~$H$\rightarrow \tau \tau$")
+        #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Z $\rightarrow \ell \ell$")
+        #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"W $\rightarrow \ell \nu$")
+        #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"EGamma_2022C Data")
+        # ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"EGamma_2022D Data")
+        # ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Muon_2022C Data")
+        # ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Muon_2022D Data")
+        ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Tau_2022C Data")
+        # ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Tau_2022D Data")
+        #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"$H_{ggf} \rightarrow \tau\tau$")        
         for i, txt in enumerate(y):
             the_txt = f'{txt:.4f}' if rel else f'{txt:.0f}'
             ax.annotate(the_txt, (x[i], y[i]),
@@ -56,20 +62,12 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
                         xytext=(0,-20),
                         ha='center',
                         fontsize=10)
-            
-        for i, txt in enumerate(n_evt[1:]/n_evt[:-1]*100):
-            the_txt = f'{txt:.2f}%'
-            ax.annotate(the_txt, (x[i+1], y[i+1]),
-                        textcoords="offset points",
-                        xytext=(0,-40),
-                        ha='center',
-                        fontsize=10)
 
     if log:
         if rel: ax.set_ylim((1*10**-6,2*10**0))
         else: 
-            pow_nevt = int(np.log10(n_evt[0]))+1
-            ax.set_ylim((1,10**pow_nevt))
+            pow_nevt = int(np.log10(n_evt[0]))+1.1
+            ax.set_ylim((10**(2),10**pow_nevt))
     
     # Set labels and title
     ax.set_xlabel(xlabel)
@@ -131,16 +129,28 @@ def get_hist_values(pickle_file):
  
 
 
+#DY
+#path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/dy_incl/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+# #WJ
+#path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/wj_incl/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
 
-#path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12/data_mu_g/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/condor_production/cutflow_hist__event.pickle"
-#path22 = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_tau_spinner_limited/h_ggf_htt_filtered/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_trigobj_prematch_trigobj_postmatch_dilepton_veto_extra_lepton_veto_One_higgs_cand_per_event_has_proper_tau_decay_products/test/cutflow_hist__event.pickle"
-#path22 = "//afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_tau_spinner_limited/h_ggf_htt_filtered/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_trigobj_prematch_trigobj_postmatch_dilepton_veto_extra_lepton_veto_multiple_hcands_has_proper_tau_decay_products/test/cutflow_hist__event.pickle"
-path22 = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_limited/data_e_C/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_selected_hcand_selected_hcand_trigmatch_dilepton_veto_extra_lepton_veto_single_hcand_decay_prods_are_ok/trig_bug/cutflow_hist__event.pickle"
+# #Data
+# #mu_C
+#path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/data_mu_C/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+# #mu_D
+#path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/data_mu_D/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+# #e_C
+# path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/data_e_C/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+# #e_D
+#path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/data_e_D/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+# #tau_C
+path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/data_tau_C/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'
+
 cuts, values22 = get_hist_values(path22)
 
 create_cutflow_histogram(cuts, 
                          data={"2022 preEE": values22},
-                         save_path="cutflow_histogram_2022_preEE_full.pdf",
+                         save_path="cutflow_histogram_2022_preEE_Tau_C.png",
                          ylabel="N evt",
                          log=True,
                          rel=False)

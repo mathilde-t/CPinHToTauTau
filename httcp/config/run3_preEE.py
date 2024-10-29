@@ -320,7 +320,11 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # name of the MET phi correction set
     # (used in the met_phi calibrator)
     #cfg.x.met_phi_correction_set = r"{variable}_metphicorr_pfmet_{data_source}"
-
+    
+    ###############################################################################################
+    # JER settings
+    ################################################################################################
+    
     # # JER
     # # https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution?rev=107
     # # TODO: get jerc working for Run3
@@ -533,7 +537,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jetvetomaps.json.gz", "v2"),
-        #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"),
+        #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
 
     # target file size after MergeReducedEvents in MB

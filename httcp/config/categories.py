@@ -12,7 +12,11 @@ from columnflow.config_util import add_category
 def add_categories(config: od.Config) -> None:
     """
     Adds all categories to a *config*.
+    ids from 1 to 9 are reserved for channels
+    ids from 10 to 990 are reserved for helper categories like mt cut or same/opposite sign selection
+    ids from 1000 to 990000 are reserved for actual signal, application and determination regions
     """
+    
     add_category(
         config,
         name="incl",
@@ -20,34 +24,45 @@ def add_categories(config: od.Config) -> None:
         selection="cat_incl",
         label="inclusive",
     )
-    #Main categories for the three channels
+    
+    ##############################################
+    ### Main categories for the three channels ###
+    ##############################################
     mutau = add_category(
         config,
-        name="mutau",
+        name="cat_mutau",
         id=2,
-        selection="mutau",
+        selection="cat_mutau",
         label=r"$\mu\tau$ inclusive",
     )
     
     etau = add_category(
         config,
-        name="etau",
+        name="cat_etau",
         id=3,
-        selection="etau",
+        selection="cat_etau",
         label=r"$e\tau$ inclusive",
     )
     
     tautau = add_category(
         config,
-        name="tautau",
+        name="cat_tautau",
         id=4,
-        selection="tautau",
+        selection="cat_tautau",
         label=r"$\tau\tau$ inclusive",
     )
+    ##############################################
+    ### Main categories for the three channels ###
+    ##############################################
+    
+    #############################################
+    ### Categories for the Fake Factor method ###
+    #############################################
+    
     os_charge = add_category(
         config,
         name="os_charge",
-        id=5,
+        id=10,
         selection="os_charge",
         label=r"$q_1\cdot q_2 < 0$",
     )
@@ -55,7 +70,7 @@ def add_categories(config: od.Config) -> None:
     ss_charge = add_category(
         config,
         name="ss_charge",
-        id=6,
+        id=20,
         selection="ss_charge",
         label=r"$q_1\cdot q_2 > 0$",
     )
@@ -63,7 +78,7 @@ def add_categories(config: od.Config) -> None:
     mT_cut = add_category(
         config,
         name="mt_cut",
-        id=7,
+        id=30,
         selection="mt_cut",
         label=r"$mT < 50$ GeV",
     )
@@ -71,233 +86,101 @@ def add_categories(config: od.Config) -> None:
     mT_inv_cut = add_category(
         config,
         name="mt_inv_cut",
-        id=8,
+        id=40,
         selection="mt_inv_cut",
         label=r"$mT \geq 50$ GeV",
     )
     
-
-    # mu-tau categories
-    mutau_signal_reg = mutau.add_category(
+    deep_tau_wp = add_category(
+        config,
+        name="deep_tau_wp",
+        id=50,
+        selection="deep_tau_wp",
+        label="DeepTau wp",
+    )
+    deep_tau_inv_wp = add_category(
+        config,
+        name="deep_tau_inv_wp",
+        id=60,
+        selection="deep_tau_inv_wp",
+        label="inv DeepTau",
+    )
+    b_veto = add_category(
+        config,
+        name="b_veto",
+        id=70,
+        selection="b_veto",
+        label="b veto",
+    )
+    b_veto_inv = add_category(
+        config,
+        name="b_veto_inv",
+        id=80,
+        selection="b_veto_inv",
+        label="inv b veto",
+    )
+    #############################################
+    ### Categories for the Fake Factor method ###
+    #############################################
+    
+    #################################
+    ### mu-tau channel categories ###
+    #################################
+    
+    mutau_signal_reg = add_category(
+        config,
         name="mutau_signal_reg",
-        id=10 + mutau.id,
+        id=2000 + mutau.id,
         selection=[mutau.selection,
                    os_charge.selection,
-                   mT_cut.selection],
+                   mT_cut.selection,
+                   deep_tau_wp.selection,
+                   b_veto.selection],
         label=r"$\mu\tau$ signal region",
     )
-    
-    mutau_signal_reg_inv_mt = mutau.add_category(
-        name="mutau_signal_reg_inv_mt",
-        id=20 + mutau.id,
+    mutau_inv_deeptau = add_category(
+        config,
+        name="mutau_inv_deeptau",
+        id=1000 + mutau.id,
         selection=[mutau.selection,
                    os_charge.selection,
-                   mT_inv_cut.selection],
-        label=(r"$\mu\tau$ signal region"
-               r"$m_T > 50$ GeV"),
-    )
-    mutau_control_reg = mutau.add_category(
-        name="mutau_control_reg",
-        id=30 + mutau.id,
-        selection=[mutau.selection,
-                   ss_charge.selection,
-                   mT_cut.selection],
-        label=r"$\mu\tau$ control region",
-    )
-    mutau_control_reg_inv_mt = mutau.add_category(
-        name="mutau_control_reg_inv_mt",
-        id=40 + mutau.id,
-         selection=[mutau.selection,
-                   ss_charge.selection,
-                   mT_inv_cut.selection],
-        label=(r"$\mu\tau$ control region, $m_T > 50$ GeV"),
+                   mT_cut.selection,
+                   b_veto.selection,
+                   deep_tau_inv_wp.selection],
+        label=r"$\mu\tau$ inv DeepTau",
     )
     
-    mutau_signal_reg_no_mt = mutau.add_category(
-        name="mutau_signal_reg_no_mt",
-        id=50 + mutau.id,
-        selection=[mutau.selection,
-                   os_charge.selection],
-        label=r"$\mu\tau$ signal region, no mT cut",
-    )
+    #################################
+    ### mu-tau channel categories ###
+    #################################
     
-    # e-tau categories
-    etau_signal_reg = etau.add_category(
+    ################################
+    ### e-tau channel categories ###
+    ################################
+    
+    etau_signal_reg = add_category(
+        config,
         name="etau_signal_reg",
-        id=10 + etau.id,
+        id=3000 + etau.id,
         selection=[etau.selection,
                    os_charge.selection,
-                   mT_cut.selection],
+                   mT_cut.selection,
+                   deep_tau_wp.selection,
+                   b_veto.selection],
         label=r"$e\tau$ signal region",
     )
-    
-    etau_signal_reg_inv_mt = etau.add_category(
-        name="etau_signal_reg_inv_mt",
-        id=20 + etau.id,
+    etau_inv_deeptau = add_category(
+        config,
+        name="etau_inv_deeptau",
+        id=4000 + etau.id,
         selection=[etau.selection,
                    os_charge.selection,
-                   mT_inv_cut.selection],
-        label=(r"$e\tau$ signal region"
-               r"$m_T > 50$ GeV"),
-    )
-    etau_control_reg = etau.add_category(
-        name="etau_control_reg",
-        id=30 + etau.id,
-        selection=[etau.selection,
-                   ss_charge.selection,
-                   mT_cut.selection],
-        label=r"$e\tau$ control region",
-    )
-    etau_control_reg_inv_mt = etau.add_category(
-        name="etau_control_reg_inv_mt",
-        id=40 + etau.id,
-         selection=[etau.selection,
-                   ss_charge.selection,
-                   mT_inv_cut.selection],
-        label= (r"$e\tau$ control region"
-                r"$m_T > 50$ GeV"),
+                   mT_cut.selection,
+                   b_veto.selection,
+                   deep_tau_inv_wp.selection],
+        label=r"$e\tau$ inv DeepTau",
     )
     
-    # tau-tau categories
-    tautau_signal_reg = tautau.add_category(
-        name="tautau_signal_reg",
-        id=10 + tautau.id,
-        selection=[tautau.selection,
-                   os_charge.selection,
-                   mT_cut.selection],
-        label=r"$\tau\tau$ signal region",
-    )
-        
-    
-    
-
-    
-    
-    
-    
-    
-    
-    # add_category(
-    #     config,
-    #     name="2j",
-    #     id=100,
-    #     selection="cat_2j",
-    #     label="2 jets",
-    # )
-
-    # # ------------------------------- #
-    # #              e-tau              #
-    # # ------------------------------- #
-    # add_category(
-    #     config,
-    #     name="etau",
-    #     id=101,
-    #     selection="sel_etau",
-    #     label="etau_channel",
-    # )
-    # add_category(
-    #     config,
-    #     name="etau_pion",
-    #     id=102,
-    #     selection="sel_etau_pion",
-    #     label="etau_channel_pi",
-    # )
-    # add_category(
-    #     config,
-    #     name="etau_rho",
-    #     id=103,
-    #     selection="sel_etau_rho",
-    #     label="etau_channel_rho",
-    # )
-    # add_category(
-    #     config,
-    #     name="etau_a1",
-    #     id=104,
-    #     selection="sel_etau_a1",
-    #     label="etau_channel_a1",
-    # )
-
-    # # ------------------------------- #
-    # #              mu-tau             #
-    # # ------------------------------- #
-    # add_category(
-    #     config,
-    #     name="mutau",
-    #     id=201,
-    #     selection="sel_mutau",
-    #     label="mutau_channel",
-    # )
-    # add_category(
-    #     config,
-    #     name="mutau_pion",
-    #     id=202,
-    #     selection="sel_mutau_pion",
-    #     label="mutau_channel_pi",
-    # )
-    # add_category(
-    #     config,
-    #     name="mutau_rho",
-    #     id=203,
-    #     selection="sel_mutau_rho",
-    #     label="mutau_channel_rho",
-    # )
-    # add_category(
-    #     config,
-    #     name="mutau_a1",
-    #     id=204,
-    #     selection="sel_mutau_a1",
-    #     label="mutau_channel_a1",
-    # )
-
-    # # ------------------------------- #
-    # #             tau-tau             #
-    # # ------------------------------- #
-    # add_category(
-    #     config,
-    #     name="tautau",
-    #     id=301,
-    #     selection="sel_tautau",
-    #     label="tautau_channel",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_pionpion",
-    #     id=302,
-    #     selection="sel_tautau_pionpion",
-    #     label="tautau_channel_pi_pi",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_rhorho",
-    #     id=303,
-    #     selection="sel_tautau_rhorho",
-    #     label="tautau_channel_rho_rho",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_a1a1",
-    #     id=304,
-    #     selection="sel_tautau_a1a1",
-    #     label="tautau_channel_a1_a1",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_pionrho",
-    #     id=305,
-    #     selection="sel_tautau_pionrho",
-    #     label="tautau_channel_pi_rho",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_a1pion",
-    #     id=306,
-    #     selection="sel_tautau_a1pion",
-    #     label="tautau_channel_a1_pion",
-    # )
-    # add_category(
-    #     config,
-    #     name="tautau_a1rho",
-    #     id=307,
-    #     selection="sel_tautau_a1rho",
-    #     label="tautau_channel_a1_rho",
-    # )
+    ################################
+    ### e-tau channel categories ###
+    ################################

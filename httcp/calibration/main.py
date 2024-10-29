@@ -49,6 +49,7 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
    
     if self.dataset_inst.is_mc: 
     #Apply tau energy scale correction
+        print("Performing tau energy scale correction...")
         events = self[tau_energy_scale](events, **kwargs)
 
     return events

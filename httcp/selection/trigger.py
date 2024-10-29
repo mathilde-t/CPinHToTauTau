@@ -41,12 +41,10 @@ def trigger_selection(
     index = ak.local_index(events.TrigObj)
 
     for trigger in self.config_inst.x.triggers:
-        #print(f"The HLT_path {trigger.hlt_field} applies to {self.dataset_inst.name}: {trigger.applies_to_dataset(self.dataset_inst)}")
-        # get bare decisions
-        fired = events.HLT[trigger.hlt_field] == 1
-        any_fired = (any_fired | fired)
-        
-        # get trigger objects for fired events per leg
+        # skip the trigger if it does not apply to the dataset
+        #if not trigger.applies_to_dataset(self.dataset_inst):
+        #    continue
+        #perform leg-specific selections first
         leg_masks = []
         all_legs_match = True
         
@@ -80,7 +78,11 @@ def trigger_selection(
             leg_masks.append(index[leg_mask])
             # at least one object must match this leg
             all_legs_match = all_legs_match & ak.any(leg_mask, axis=1)
-            
+        
+       
+        # get bare decisions
+        fired = events.HLT[trigger.hlt_field]
+        any_fired = any_fired | fired
         # final trigger decision
         fired_and_all_legs_match = fired & all_legs_match
         any_fired_all_legs_match = (any_fired_all_legs_match | fired_and_all_legs_match)

@@ -12,6 +12,7 @@ import order as od
 from typing import Any
 from columnflow.util import maybe_import
 from columnflow.columnar_util import ArrayFunction, deferred_column
+from columnflow.util import DotDict
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -27,6 +28,17 @@ def IF_NANO_V9(self, func: ArrayFunction) -> Any | set[Any]:
 @deferred_column
 def IF_NANO_V11(self, func: ArrayFunction) -> Any | set[Any]:
     return self.get() if func.config_inst.campaign.x.version >= 10 else None
+
+# lambda function to get 4-vector of a lepton
+def get_lep_p4(part): return ak.zip({f"{var}": part[var] for var in ['pt', 'eta', 'phi', 'mass']},
+                                    with_name="PtEtaPhiMLorentzVector",
+                                    behavior=coffea.nanoevents.methods.vector.behavior)
+
+# lambda function to get 4-vector of impact parameter from the particle objects
+# Zeroth component of IP vector is set to zero by definition that can be found here: https://www.mdpi.com/2218-1997/8/5/256
+def get_ip_p4(part): return ak.zip({f'{var}': part[f'IP{var}']for var in ['x', 'y', 'z']} | {'t': ak.zeros_like(part.IPx)},
+                                   with_name="LorentzVector",
+                                   behavior=coffea.nanoevents.methods.vector.behavior)# # lambda function to get 4-vector from the particle objects
 
 
 def transverse_mass(lepton: ak.Array, met: ak.Array) -> ak.Array:
@@ -53,23 +65,6 @@ def trigger_object_matching(
     any_match = (dr < threshold)
     return any_match
 
-# def hlt_path_fired(dictionary):
-#     from IPython import embed; embed()
-#     if len(dictionary) > 0:
-#         max_length = 0
-#         for key in dictionary.keys():
-#             temp_length = ak.max(ak.num(dictionary[key], axis=1))
-#             if temp_length > max_length: max_length = temp_length
-
-#         hlt_condition = {}
-#         for key in dictionary.keys():
-#             hlt_condition[key] = ak.pad_none(dictionary[key], target=max_length)
-#             hlt_condition[key] = ak.fill_none(hlt_condition[key],-1)[:,:,None]
-
-#         hlt_condition_values = list(hlt_condition.values())
-#         hlt_condition_values_concat = ak.concatenate(hlt_condition_values, axis=-1)
-#         HLT_path_fired = ak.max(hlt_condition_values_concat, axis=-1)
-#         return HLT_path_fired 
 
 def hlt_path_fired(events,dictionary):
     HLT_path_fired = -1*ak.ones_like(ak.local_index(events.event), dtype=np.int64)
@@ -133,100 +128,7 @@ def getGenTauDecayMode(prod: ak.Array):
     return dm
 
 
-def enforce_hcand_type(hcand_pair_concat, field_type_dict):
-    temp = {}
-    for field, typename in field_type_dict.items():
-        temp[field] = ak.enforce_type(ak.values_astype(hcand_pair_concat[field], typename), f"var * var * {typename}")
-    hcand_array = ak.zip(temp)
-    return hcand_array
-
-
-# def enforce_hcand_type(hcand_array, field_type_dict):
-#     temp = {}
-    
-#     for field, typename in field_type_dict.items():
-#         # Extract the field from the collection
-#         field_data = hcand_array[field]
-
-#         # Handle empty lists by filling them with a default value
-#         if 'float' in typename:
-#             default_value = 0.0
-#         elif 'int' in typename:
-#             default_value = 0
-#         else:
-#             raise ValueError(f"Unsupported type: {typename}")
-        
-#         # Fill empty lists with the default value
-#         filled_data = ak.fill_none(field_data, default_value, axis=-1)
-        
-#         # If the data is deeply nested, consider flattening
-#         if isinstance(ak.type(filled_data), ak.types.ListType):
-#             try:
-#                 enforced_field = ak.enforce_type(ak.values_astype(filled_data, typename), f"var * {typename}")
-#             except Exception as e:
-#                 print(f"Failed to enforce type for {field}: {e}")
-#                 enforced_field = filled_data  # Fallback to the filled data without enforcing
-#         else:
-#             enforced_field = ak.values_astype(filled_data, typename)
-        
-#         # Store the enforced field back in the temp dictionary
-#         temp[field] = enforced_field
-    
-#     # Zip the fields back into a NanoCollection-like structure
-#     hcand_array = ak.zip(temp)
-    
-#     return hcand_array
-
-
-    
-def enforce_tauprods_type(tauprods, field_type_dict):
-    temp = {}
-    
-    # Iterate over each field and apply type enforcement
-    for field, typename in field_type_dict.items():
-        # Extract the field from the collection
-        field_data = tauprods[field]
-        
-        # Convert the field to the specified type
-        # Use ak.values_astype to ensure the correct type at each level
-        # Enforce type with "var * typename"
-        enforced_field = ak.enforce_type(ak.values_astype(field_data, typename), f"var * {typename}")
-        
-        # Store the enforced field back in the temp dictionary
-        temp[field] = enforced_field
-    
-    # Zip the fields back into a NanoCollection-like structure
-    tauprods = ak.zip(temp)
-    
-    return tauprods
-
-
-# def has_matching_pt(vector1, vector2, threshold=1.0):
-#     """
-#     Checks if there is at least one object in vector1 that has a pt
-#     difference with any object in vector2 not greater than the threshold.
-    
-#     Parameters:
-#         vector1 (awkward.Array): The pt values of the first vector (nested).
-#         vector2 (awkward.Array): The pt values of the second vector (nested).
-#         threshold (float): The maximum allowable difference in pt.
-    
-#     Returns:
-#         awkward.Array: A boolean array with True if at least one pair of objects
-#                        has a pt difference not greater than the threshold, otherwise False.
-#     """
-#     # Cartesian product to get all pairs
-#     cartesian_product = ak.cartesian({"v1": vector1, "v2": vector2}, axis=-1, nested=True)
-    
-#     # Extract pt differences
-#     pt_diff_values = np.abs(cartesian_product["v1"].pt - cartesian_product["v2"].pt)
-    
-#     # Check if any of the differences are within the threshold
-#     has_match = ak.any(pt_diff_values <= threshold, axis=-1)
-    
-#     return has_match
-
-def has_pt_greater_equal(vector1, vector2, offset):
+def has_pt_greater_equal(obj_1, obj_2, pt_offset):
     """
     Checks if the pt of any object in vector1 is greater than or equal to 
     the pt of any object in vector2 plus an offset.
@@ -241,57 +143,11 @@ def has_pt_greater_equal(vector1, vector2, offset):
                        has pt greater than or equal to pt in vector2 + offset, otherwise False.
     """
     # Cartesian product to get all pairs
-    cartesian_product = ak.cartesian({"v1": vector1, "v2": vector2}, axis=-1, nested=True)
-    
-    # Extract pt values and apply the condition
-    pt_comparison = (cartesian_product["v1"].pt >= (cartesian_product["v2"].pt + offset))
-    
-    # Check if the condition is met for any pair
-    has_match = pt_comparison
-    
-    return has_match
+    pairs = ak.cartesian([obj_1, obj_2], axis=-1, nested=True)
+    obj_1_br, obj_2_br = ak.unzip(pairs)
+    return obj_1_br.pt >= (obj_2_br.pt + pt_offset)
 
-def delta_phi(phi1, phi2):
-    delta_phi = phi1 - phi2
-    return ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, 
-                    ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi))
-
-def delta_eta(eta1, eta2):
-    return eta1 - eta2
-
-def delta_r(vector1, vector2):
-    dphi = delta_phi(vector1.phi, vector2.phi)
-    deta = delta_eta(vector1.eta, vector2.eta)
-    return np.sqrt(deta**2 + dphi**2)
-
-def has_delta_r_less_equal(vector1, vector2, threshold):
-    """
-    Checks if the delta_R between any object in vector1 and any object in vector2
-    is less than or equal to the threshold.
-    
-    Parameters:
-        vector1 (awkward.Array): The first vector (nested) containing eta and phi.
-        vector2 (awkward.Array): The second vector (nested) containing eta and phi.
-        threshold (float): The delta_R threshold value.
-    
-    Returns:
-        awkward.Array: A boolean array with True if at least one pair of objects
-                       has delta_R less than or equal to the threshold, otherwise False.
-    """
-    # Cartesian product to get all pairs
-    cartesian_product = ak.cartesian({"v1": vector1, "v2": vector2}, axis=-1, nested=True)
-    
-    # Calculate delta_R
-    delta_r_values = delta_r(cartesian_product["v1"], cartesian_product["v2"])
-    
-    # Check if the delta_R is less than or equal to the threshold for any pair
-    has_match = ak.any(delta_r_values < threshold, axis=-1)
-    
-    return has_match
-
-def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_match, tau_etau_to_match, 
-                      tau1_tautau_to_match, tau2_tautau_to_match, hcand_pair):
-    
+def hlt_path_matching(events, triggers, pair_objects):
     # Initialize masks and dictionaries
     false_mask = ak.zeros_like(ak.local_index(events.event), dtype=np.bool_)
     single_electron_triggered = false_mask
@@ -316,8 +172,8 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
         is_cross_tau = trigger.has_tag("cross_tau_tau")
         
         if is_single_mu or is_cross_mu:
-            muons = mu_to_match
-            taus = tau_mutau_to_match
+            muons = pair_objects.mutau.lep0
+            taus = pair_objects.mutau.lep1
             
             if is_single_mu:
                 assert trigger.n_legs == len(leg_masks) == 1
@@ -340,9 +196,9 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
                 dr_matching_mu = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
                 cross_mu_matches_leg0 = (mu_matches_pt & dr_matching_mu)
                 
-                tau_matches_pt = has_pt_greater_equal(taus, events.TrigObj[leg_masks[1]], 0)
+                #tau_matches_pt = has_pt_greater_equal(taus, events.TrigObj[leg_masks[1]], 0)
                 dr_matching_tau = trigger_object_matching(taus, events.TrigObj[leg_masks[1]])
-                cross_mu_tau_matches_leg1 = (tau_matches_pt & dr_matching_tau)
+                cross_mu_tau_matches_leg1 = dr_matching_tau
                 
                 cross_mu_tau_matched = (ak.any(ak.flatten(cross_mu_matches_leg0, axis=-1), axis=1) & 
                                         ak.any(ak.flatten(cross_mu_tau_matches_leg1, axis=-1), axis=1))
@@ -350,17 +206,17 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
                 hlt_path_fired_mutau[trigger.hlt_field] = ak.where(cross_mu_tau_matched, trigger.id, -1)
 
         if is_single_el or is_cross_el:
-            electrons = e_to_match
-            taus = tau_etau_to_match
+            electrons =  pair_objects.etau.lep0
+            taus =  pair_objects.etau.lep1
 
             if is_single_el:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 11
                 
-                el_matches_pt = has_pt_greater_equal(electrons, events.TrigObj[leg_masks[0]], 0)
+                #el_matches_pt = has_pt_greater_equal(electrons, events.TrigObj[leg_masks[0]], 0)
                 dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
                 
-                single_e_matches_leg0 = (el_matches_pt & dr_matching_e)
+                single_e_matches_leg0 =  dr_matching_e
                 single_e_matches_leg0 = ak.any(ak.flatten(single_e_matches_leg0, axis=-1), axis=1)
                 single_electron_triggered = ak.where(trigger_fired & is_single_el, True, single_electron_triggered)
                 hlt_path_fired_e[trigger.hlt_field] = ak.where(single_e_matches_leg0, trigger.id, -1)
@@ -370,13 +226,11 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
                 assert abs(trigger.legs[0].pdg_id) == 11
                 assert abs(trigger.legs[1].pdg_id) == 15
                 
-                el_matches_pt = has_pt_greater_equal(electrons, events.TrigObj[leg_masks[0]], 0)
                 dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
-                cross_e_matches_leg0 = (el_matches_pt & dr_matching_e)
+                cross_e_matches_leg0 = dr_matching_e
                 
-                tau_matches_pt = has_pt_greater_equal(taus, events.TrigObj[leg_masks[1]], 0)
                 dr_matching_tau = trigger_object_matching(taus, events.TrigObj[leg_masks[1]])
-                cross_e_tau_matches_leg1 = (tau_matches_pt & dr_matching_tau)
+                cross_e_tau_matches_leg1 = dr_matching_tau
                 
                 cross_e_tau_matched = (ak.any(ak.flatten(cross_e_matches_leg0, axis=-1), axis=1) & 
                                        ak.any(ak.flatten(cross_e_tau_matches_leg1, axis=-1), axis=1))
@@ -388,17 +242,14 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
             assert abs(trigger.legs[0].pdg_id) == 15
             assert abs(trigger.legs[1].pdg_id) == 15
             
-            taus1 = tau1_tautau_to_match
-            taus2 = tau2_tautau_to_match
-            
-            tau1_matches_pt = has_pt_greater_equal(taus1, events.TrigObj[leg_masks[0]], 0)
-            tau2_matches_pt = has_pt_greater_equal(taus2, events.TrigObj[leg_masks[1]], 0)
+            taus1 =  pair_objects.tautau.lep0
+            taus2 =  pair_objects.tautau.lep1
             
             dr_matching_tau1 = trigger_object_matching(taus1, events.TrigObj[leg_masks[0]])
             dr_matching_tau2 = trigger_object_matching(taus2, events.TrigObj[leg_masks[1]])
             
-            cross_tau1_matches_leg0 = (tau1_matches_pt & dr_matching_tau1)
-            cross_tau2_matches_leg1 = (tau2_matches_pt & dr_matching_tau2)
+            cross_tau1_matches_leg0 =  dr_matching_tau1
+            cross_tau2_matches_leg1 =  dr_matching_tau2
             cross_tau_tau_matched = (ak.any(ak.flatten(cross_tau1_matches_leg0, axis=-1), axis=1) & 
                                      ak.any(ak.flatten(cross_tau2_matches_leg1, axis=-1), axis=1))
             cross_tau_triggered = ak.where(trigger_fired & is_cross_tau, True, cross_tau_triggered)
@@ -412,15 +263,16 @@ def HLT_path_matching(events, triggers, mu_to_match, e_to_match, tau_mutau_to_ma
     triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
     
     # Generate candidate pairs based on matching triggers
-    empty_hcand_pair = hcand_pair[:, :0][:, None]
     etau_channel_mask = ((triggerID_e > 0) | (triggerID_etau > 0))
     mutau_channel_mask = ((triggerID_mu > 0) | (triggerID_mutau > 0))
     tautau_channel_mask = (triggerID_tau > 0)
     
-    hcand_pair_etau   = ak.where(etau_channel_mask, hcand_pair[:, 0][:, None], empty_hcand_pair)
-    hcand_pair_mutau  = ak.where(mutau_channel_mask, hcand_pair[:, 1][:, None], empty_hcand_pair)
-    hcand_pair_tautau = ak.where(tautau_channel_mask, hcand_pair[:, 2][:, None], empty_hcand_pair)
+    matched_masks = DotDict.wrap({
+        'etau'  : etau_channel_mask,
+        'mutau' : mutau_channel_mask,
+        'tautau': tautau_channel_mask
+    })
+    return matched_masks
 
-    hcand_array = ak.concatenate([hcand_pair_etau, hcand_pair_mutau, hcand_pair_tautau], axis=1)
 
-    return hcand_array, etau_channel_mask, mutau_channel_mask, tautau_channel_mask
+

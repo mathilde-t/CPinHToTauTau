@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
 Column production methods related to higher-level features.
 """
@@ -75,6 +73,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             print("Splitting Drell-Yan dataset...")
             events = self[split_dy](events,**kwargs)
         print("Producing PU weights...")  
+        
         events = self[pu_weight](events, **kwargs)
         print("Producing Muon weights...")
         events = self[muon_weight](events,do_syst = True, **kwargs)

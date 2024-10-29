@@ -26,7 +26,7 @@ from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from httcp.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
 from httcp.selection.trigger import trigger_selection
 from httcp.selection.lepton_pair_etau import etau_selection
-from httcp.selection.lepton_pair_mutau import mutau_selection
+from httcp.selection.lepton_pair_mutau import pair_selection
 from httcp.selection.lepton_pair_tautau import tautau_selection
 from httcp.selection.lepton_pair_emu import emu_selection
 from httcp.selection.match_trigobj import match_trigobj
@@ -58,7 +58,7 @@ coffea = maybe_import("coffea")
         jet_selection,
         jet_veto,
         etau_selection,
-        mutau_selection,
+        pair_selection,
         tautau_selection,
         channel_id,
         extra_lepton_veto,
@@ -84,7 +84,7 @@ coffea = maybe_import("coffea")
         jet_selection,
         jet_veto,
         etau_selection,
-        mutau_selection,
+        pair_selection,
         tautau_selection,
         channel_id,
         extra_lepton_veto,
@@ -125,106 +125,59 @@ def main(
     events, met_filter_results = self[met_filters](events, **kwargs)
     results += met_filter_results
 
-    # # jet veto
-    # events, bjet_veto_result = self[jet_selection](events,
-    #                                                call_force=True,
-    #                                                **kwargs)
-    # results += bjet_veto_result
-
     # muon selection
     # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]
     events, muon_results, good_muon_indices, veto_muon_indices, dlveto_muon_indices = self[muon_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
-    results += muon_results
-
+    
     # electron selection
     # e.g. ele_idx: [ [], [0,1], [], [], [1,2] ]
     events, ele_results, good_ele_indices, veto_ele_indices, dlveto_ele_indices = self[electron_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
-    results += ele_results
 
     # tau selection
     # e.g. tau_idx: [ [1], [0,1], [1,2], [], [0,1] ]
-    events, tau_results, good_tau_indices = self[tau_selection](events,
-                                                                call_force=True,
-                                                                **kwargs)
-    results += tau_results
-
+    events, good_tau_indices = self[tau_selection](events,
+                                                    call_force=True,
+                                                    **kwargs)
+    
     # double lepton veto
     events, double_lepton_veto_results = self[double_lepton_veto](events,
                                                                   dlveto_ele_indices,
                                                                   dlveto_muon_indices)
     results += double_lepton_veto_results
 
-    # e-tau pair i.e. hcand selection
-    # e.g. [ [], [e1, tau1], [], [], [e1, tau2] ]
-    etau_results, etau_indices_pair = self[etau_selection](events,
-                                                           good_ele_indices,
-                                                           good_tau_indices,
-                                                           call_force=True,
-                                                           **kwargs)
-    #results += etau_results
-    # etau_pair = ak.concatenate([events.Electron[etau_indices_pair[:, 0:1]],
-    #                             events.Tau[etau_indices_pair[:, 1:2]]],
-    #                            axis=1)
-
-    # mu-tau pair i.e. hcand selection
-    # e.g. [ [mu1, tau1], [], [mu1, tau2], [], [] ]
-    mutau_results, mutau_indices_pair = self[mutau_selection](events,
-                                                              good_muon_indices,
-                                                              good_tau_indices,
-                                                              call_force=True,
-                                                              **kwargs)
-    #results += mutau_results
-    # mutau_pair = ak.concatenate([events.Muon[mutau_indices_pair[:, 0:1]],
-    #                              events.Tau[mutau_indices_pair[:, 1:2]]],
-    #                             axis=1)
-
-    # tau-tau pair i.e. hcand selection
-    # e.g. [ [], [tau1, tau2], [], [], [] ]
-    tautau_results, tautau_indices_pair = self[tautau_selection](events,
-                                                                 good_tau_indices,
-                                                                 call_force=True,
-                                                                 **kwargs)
-    #results += tautau_results
-
-    # tautau_pair = ak.concatenate([events.Tau[tautau_indices_pair[:, 0:1]],
-    #                               events.Tau[tautau_indices_pair[:, 1:2]]],
-    #                              axis=1)
-
-    # # e-mu pair i.e. hcand selection
-    # # e.g. [ [], [e1, mu2], [], [], [] ]
-    # emu_results, emu_indices_pair = self[emu_selection](events,
-    #                                                        good_ele_indices,
-    #                                                        good_mu_indices,
-    #                                                        call_force=True,
-    #                                                        **kwargs)
-    # results += emu_results
-    # emu_pair = ak.concatenate([events.Electron[emu_indices_pair[:,0:1]],
-    #                             events.Muon[emu_indices_pair[:,1:2]]],
-    #                            axis=1)
-
-
-    # make sure events have at least one lepton pair
-    # hcand pair: [ [[e1,tau1]], [[mu1,tau1],[tau1,tau2]], [[e1,tau2]], [[mu1,tau2]], [] ]
-    # hcand_pairs = ak.concatenate(
-    #     [etau_pair[:, None], mutau_pair[:, None], tautau_pair[:, None]], axis=1)
-    # at_least_one_hcand = ak.num(hcand_pairs, axis=-1) > 0
-
-    # check if there are at least one hcand [before trigger obj matching]
-    # prematch_mask = ak.sum(ak.num(hcand_pairs, axis=-1) > 0, axis=1) > 0
+    mutau_indices_pair = self[pair_selection](events,
+                                              'mutau',
+                                              good_muon_indices,
+                                              good_tau_indices)
+    #from IPython import embed; embed()
+    etau_indices_pair = self[pair_selection](events,
+                                             'etau',
+                                             good_ele_indices,
+                                             good_tau_indices)
+    
+    tautau_indices_pair = self[pair_selection](events,
+                                              'tautau',
+                                              good_tau_indices,
+                                              good_tau_indices)
     
     pair_idxs = DotDict.wrap({
         'etau' : etau_indices_pair,
         'mutau' : mutau_indices_pair,
         'tautau' : tautau_indices_pair
     })
-   
-    #events, good_muon_indices, good_ele_indices, good_tau_indices, etau_channel_mask, mutau_channel_mask, tautau_channel_mask, hcand_array, hcand_results = self[higgscand](
-    #    events, trigger_results, hcand_pairs, domatch=True)
     
+    raw_dilepton_mask = ak.ones_like(events.event, dtype=np.bool_)
+    for channel in self.config_inst.channels.names():
+        raw_dilepton_mask = raw_dilepton_mask | eval(f'(ak.num({channel}_indices_pair.lep0, axis=1) > 0)')
+    
+    results += SelectionResult(
+    steps = {
+        "has_at_least_2_leptons" : raw_dilepton_mask,
+    })
     events, hcand_res = self[new_higgscand](events,
                                  trigger_results,
                                  pair_idxs,
@@ -249,16 +202,8 @@ def main(
     #Check arrays for np.nan values and mask them
     events, nan_mask_res = self[mask_nans](events)
     results += nan_mask_res
-    # gen particles info
-    # hcand-gentau match = True/False
-    # if "is_signal" in list(self.dataset_inst.aux.keys()):
-    #     if self.dataset_inst.aux["is_signal"]:
-    #         # print("hcand-gentau matching")
-    #         events, gentau_results = self[gentau_selection](events, True)
-    #         results += gentau_results
-    
+   
     # combined event selection after all steps
-
     event_sel = reduce(and_, results.steps.values())
     results.event = event_sel
     # add the mc weight

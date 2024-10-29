@@ -40,11 +40,8 @@ def channel_id(
                               self.config_inst.get_channel(channel).id,
                               channel_id)
 
-    if ak.any(and_mask):
-        raise TypeError('Found events belonging to multiple channels!')
-    else:
-        channel_id = ak.values_astype(channel_id, np.uint8)
-        events = set_ak_column(events, "channel_id", channel_id)
+    channel_id = ak.values_astype(channel_id, np.uint8)
+    events = set_ak_column(events, "channel_id", channel_id)
 
     return events
 

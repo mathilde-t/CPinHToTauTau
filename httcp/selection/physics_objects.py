@@ -289,50 +289,29 @@ def tau_selection(
     deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
 
     good_selections = {
-        "tau_pt_40"     : events.Tau.pt > 40,
-        "tau_eta_2p1"   : abs(events.Tau.eta) < 2.1,
+        "tau_pt_40"     : events.Tau.pt > 20,
+        "tau_eta_2p1"   : abs(events.Tau.eta) < 2.5,
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
         "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
-        "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"],
+        "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVVLoose"],
         "DeepTauVSmu"   : events.Tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"],
         "DecayMode"     : ((events.Tau.decayMode == 0) 
                            | (events.Tau.decayMode == 1)
                            | (events.Tau.decayMode == 10)
                            | (events.Tau.decayMode == 11))
     }
-
     # pt sorted indices for converting masks to indices
     sorted_indices = ak.argsort(events.Tau.pt, axis=-1, ascending=False)
-    tau_mask  = ak.local_index(events.Tau.pt) >= 0
-
-    good_tau_mask = tau_mask
-    #selection_steps = {}
-
-    # selection_steps = {"Starts with": good_tau_mask}
-    # for cut in good_selections.keys():
-    #     good_tau_mask = good_tau_mask & ak.fill_none(good_selections[cut], False)
-    #     selection_steps[cut] = good_tau_mask
+    tau_mask  = ak.ones_like(events.Tau.pt, dtype=np.bool_)
+    
+    for cut in good_selections.keys():
+        tau_mask = tau_mask & good_selections[cut] 
         
-    # if electron_indices is not None:
-    #     good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Electron[electron_indices]) > 0.2, axis=2)
-    #     selection_steps["clean_against_electrons"] = good_tau_mask 
-
-    # if muon_indices is not None:
-    #     good_tau_mask = good_tau_mask & ak.all(events.Tau.metric_table(events.Muon[muon_indices]) > 0.2, axis=2)
-    #     selection_steps["clean_against_muons"] = good_tau_mask
-
     # convert to sorted indices
-    good_tau_indices = sorted_indices[good_tau_mask[sorted_indices]]
-    good_tau_indices = ak.values_astype(good_tau_indices, np.int32)
+    selected_tau_idx = sorted_indices[tau_mask[sorted_indices]]
+    selected_tau_idx = ak.values_astype(selected_tau_idx, np.int32)
 
-    return events, SelectionResult(
-        objects={
-            "Tau": {
-                "Tau": good_tau_indices,
-            },
-        },
-        #aux=selection_steps,
-    ), good_tau_indices
+    return events, selected_tau_idx
 
 
 # ------------------------------------------------------------------------------------------------------- #

@@ -45,7 +45,6 @@ def prepare_acop_vecs(self: Producer, events: ak.Array, pair_decay_ch, **kwargs)
     tau     = events.hcand_mutau.lep1 
     tauprod = events.tau_decay_prods_mutau_lep1
     muon    = events.hcand_mutau.lep0
-    
     mask = ak.ones_like(events.hcand_mutau.lep1.pt, dtype=np.bool_)
     mask = mask & (muon.ip_sig >= 1)
     # Create masks for different channels
@@ -257,8 +256,7 @@ def phi_cp(
 
         phi_cp_2bin = (phi_cp + np.pi/2.) % (2*np.pi)
         events = set_ak_column_f32(
-            events, f"phi_cp_{the_ch}_2bin",  ak.fill_none(phi_cp_2bin, EMPTY_FLOAT))
-
+            events, f"phi_cp_{the_ch}_2bin",  ak.fill_none(ak.firsts(phi_cp_2bin),EMPTY_FLOAT))
         # for the_reg in ['reg1', 'reg2']:
         #     var = ak.where(eval(f'{the_reg}_mask'), phi_cp, EMPTY_FLOAT)
         #     var_2bin = ak.where(
@@ -271,5 +269,5 @@ def phi_cp(
         # events = set_ak_column_f32(
         #     events, f'alpha_{the_ch}', ak.fill_none(alpha, EMPTY_FLOAT))
         events = set_ak_column_f32(
-            events, f"phi_cp_{the_ch}",  ak.fill_none(phi_cp, EMPTY_FLOAT))
+            events, f"phi_cp_{the_ch}",  ak.fill_none(ak.firsts(phi_cp),EMPTY_FLOAT))
     return events

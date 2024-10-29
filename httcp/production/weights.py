@@ -14,57 +14,6 @@ warn = maybe_import("warnings")
 # helper
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
-# @producer(
-#     uses={
-#         "Pileup.nTrueInt"
-#     },
-#     produces={
-#         "pu_weight"
-#     },
-#     mc_only=True,
-# )
-# def pu_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-#     nTrueInt = events.Pileup.nTrueInt
-#     pu_weight = ak.where (self.mc_weight(nTrueInt) != 0,
-#                           self.data_weight(nTrueInt)/self.mc_weight(nTrueInt) * self.mc2data_norm,
-#                           0)
-    
-#     events = set_ak_column_f32(events, "pu_weight", pu_weight)
-#     return events
-
-# @pu_weight.setup
-# def pu_weight_setup(
-#     self: Producer,
-#     reqs: dict,
-#     inputs: dict,
-#     reader_targets: InsertableDict,
-# ) -> None:
-#     """
-#     Loads the pileup weights added through the requirements and saves them in the
-#     py:attr:`pu_weight` attribute for simpler access in the actual callable.
-#     """
-#     from coffea.lookup_tools import extractor
-#     ext = extractor()
-#     data_full_fname = self.config_inst.x.external_files.pileup.data
-#     data_name = data_full_fname.split('/')[-1].split('.')[0]
-#     mc_full_fname = self.config_inst.x.external_files.pileup.mc
-#     mc_name = mc_full_fname.split('/')[-1].split('.')[0]
-#     ext.add_weight_sets([f'{data_name} pileup {data_full_fname}', f'{mc_name} pileup {mc_full_fname}' ])
-#     ext.finalize()
-    
-#     self.evaluator = ext.make_evaluator()
-    
-#     mc_integral = 0.
-#     data_integral = 0.
-#     for npu in range(0,1000):
-#         mc_integral += self.evaluator[mc_name](npu)
-#         data_integral += self.evaluator[data_name](npu)
-    
-#     self.mc_weight = self.evaluator[mc_name]
-#     self.data_weight = self.evaluator[data_name] 
-#     self.mc2data_norm = safe_div(mc_integral,data_integral)
-
-
 @producer(
     uses={"genWeight", optional("LHEWeight.originalXWGTUP")},
     produces={"mc_weight"},
@@ -310,14 +259,6 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                                                             genmatch[mask],
                                                             self.config_inst.x.deep_tau.vs_mu,
                                                             syst)
-                            
-                        # args_vs_jet = lambda mask, syst : (pt[mask],
-                        #                                     dm[mask],
-                        #                                     genmatch[mask],
-                        #                                     self.config_inst.x.deep_tau.vs_jet,
-                        #                                     self.config_inst.x.deep_tau.vs_e, 
-                        #                                     '' if syst =="nom" else syst,
-                        #                                     "dm")
                     else: #Run3 scale factor inputs:
                         args_vs_e = lambda mask, syst : (eta[mask],
                                                         dm[mask],
@@ -328,13 +269,6 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                                                         genmatch[mask],
                                                         self.config_inst.x.deep_tau.vs_mu, 
                                                         syst)  
-                        # args_vs_jet = lambda mask, syst : (pt[mask],
-                        #                                     dm[mask],
-                        #                                     genmatch[mask],
-                        #                                     self.config_inst.x.deep_tau.vs_jet,
-                        #                                     self.config_inst.x.deep_tau.vs_e, 
-                        #                                     '' if syst =="nom" else syst,
-                        #                                     "dm")
                     tau_part_flav = {
                         "prompt_e"  : 1,
                         "prompt_mu" : 2,
@@ -343,14 +277,12 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                         "tau_had"   : 5
                     }
                     #Calculate scale factors for tau vs electron classifier 
-                    e_mask = ((genmatch == tau_part_flav["prompt_e"]) | (genmatch == tau_part_flav["tau->e"]))
+                    masked_dm = (dm != 5) & (dm != 6)
+                    e_mask = ((genmatch == tau_part_flav["prompt_e"]) | (genmatch == tau_part_flav["tau->e"])) & masked_dm
                     per_ch_sf[e_mask] *= self.id_vs_e_corrector.evaluate(*args_vs_e(e_mask,shift))
                     #Calculate scale factors for tau vs muon classifier 
-                    mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"]))
+                    mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"])) & masked_dm
                     per_ch_sf[mu_mask] *= self.id_vs_mu_corrector.evaluate(*args_vs_mu(mu_mask,shift)) 
-                    #Calculate scale factors for tau vs jet classifier 
-                    #tau_mask = (genmatch == tau_part_flav["tau_had"]) 
-                    #per_ch_sf[tau_mask] *= self.id_vs_jet_corrector.evaluate(*args_vs_jet(tau_mask,shift))
                     ch_mask = ak.num(tau, axis=1) > 0
                     shaped_sf = ak.unflatten(per_ch_sf, ak.num(tau.pt, axis=1))
                     sf_values = sf_values * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)       

@@ -10,7 +10,6 @@ from columnflow.selection.util import create_collections_from_masks
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
-from httcp.util import transverse_mass
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -106,17 +105,8 @@ def etau_selection(
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult, ak.Array]:
 
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
-
-    good_selections = ((events.Tau[lep2_indices].idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Tight"]) &  #vsJet
-                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"]) &  #vsE
-                       (events.Tau[lep2_indices].idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Loose"]))     #vsMu
-    lep2_indices = lep2_indices[good_selections]
-
-    # lep1 and lep2 e.g.
-    # lep1: [ [e1], [e1],    [e1,e2], [],   [e1,e2] ]
-    # lep2: [ [t1], [t1,t2], [t1],    [t1], [t1,t2] ]
+    deep_tau_vs_e_jet_wps   = self.config_inst.x.deep_tau.vs_e_jet_wps
+    deep_tau_vs_mu_wps      = self.config_inst.x.deep_tau.vs_mu_wps
 
     # Sorting lep1 [Electron] by isolation [ascending]
     lep1_sort_key       = events.Electron[lep1_indices].pfRelIso03_all
@@ -129,29 +119,16 @@ def etau_selection(
     
     # e.g. [ [(e1,t1)], [(e1,t1),(e1,t2)], [(e1,t1),(e2,t1)], [], [(e1,t1),(e1,t2),(e2,t1),(e2,t2)] ]
     # and their indices                         -> lep_indices_pair 
-    leps_pair        = ak.cartesian([events.Electron[lep1_indices], 
-                                     events.Tau[lep2_indices]], axis=1)
-    lep_indices_pair = ak.cartesian([lep1_indices, lep2_indices], axis=1)
-
+    lep1, lep2 = ak.unzip(ak.cartesian([events.Electron[lep1_indices], events.Tau[lep2_indices]], axis=1))
+    lep1_idx, lep2_idx = ak.unzip(ak.cartesian([lep1_indices, lep2_indices], axis=1))
     # unzip to get individuals
     # e.g.
     # lep1 -> lep_pair["0"] -> [ [e1], [e1,e1], [e1,e2], [], [e1,e1,e2,e2] ]
     # lep2 -> lep_pair["1"] -> [ [t1], [t1,t2], [t1,t1], [], [t1,t2,t1,t2] ]
-    lep1, lep2 = ak.unzip(leps_pair)
-    lep1_idx, lep2_idx = ak.unzip(lep_indices_pair)
-
-    preselection = {
-        #"etau_is_os"         : (lep1.charge * lep2.charge) < 0, #This selection is moved to categorisation
-        "etau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  # deltaR(lep1, lep2) > 0.5,
-        #"etau_mT_50"         : transverse_mass(lep1, events.PuppiMET) < 50 #This selection is moved to categorisation
-    }
+    dr_cut = lep1.delta_r(lep2) > 0.5
     # get preselected pairs
     good_pair_mask = lep1_idx >= 0
-    pair_selection_steps = {}
-    for cut in preselection.keys():
-        good_pair_mask = good_pair_mask & preselection[cut]
-        pair_selection_steps[cut] = good_pair_mask
-        
+    good_pair_mask = good_pair_mask & dr_cut
     # preselected etau pairs and their indices
     leps_pair_sel = leps_pair[good_pair_mask]
     lep_indices_pair_sel = lep_indices_pair[good_pair_mask]

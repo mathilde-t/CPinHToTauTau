@@ -13,6 +13,8 @@ from typing import Any
 from columnflow.util import maybe_import
 from columnflow.columnar_util import ArrayFunction, deferred_column
 from columnflow.util import DotDict
+from columnflow.columnar_util import set_ak_column
+
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -219,11 +221,17 @@ def hlt_path_matching(events, triggers, pair_objects):
             if is_single_mu:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 13
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(muons.eta) <= trigger.legs[0].min_eta)
+                # muons to match with the trigger
+                muons = muons[pt_mask0 & eta_mask0]
                 
-                mu_matches_pt = has_pt_greater_equal(muons, events.TrigObj[leg_masks[0]], 0)
+                # Delta R matching
                 dr_matching = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
                 
-                single_mu_matches_leg0 = (mu_matches_pt & dr_matching)
+                single_mu_matches_leg0 = dr_matching
                 single_mu_matches_leg0 = ak.any(ak.flatten(single_mu_matches_leg0, axis=-1), axis=1)
                 single_muon_triggered = ak.where(trigger_fired & is_single_mu, True, single_muon_triggered)
                 hlt_path_fired_mu[trigger.hlt_field] = ak.where(single_mu_matches_leg0, trigger.id, -1)
@@ -233,11 +241,23 @@ def hlt_path_matching(events, triggers, pair_objects):
                 assert abs(trigger.legs[0].pdg_id) == 13
                 assert abs(trigger.legs[1].pdg_id) == 15
                 
-                mu_matches_pt = has_pt_greater_equal(muons, events.TrigObj[leg_masks[0]], 0)
-                dr_matching_mu = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
-                cross_mu_matches_leg0 = (mu_matches_pt & dr_matching_mu)
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(muons.eta) <= trigger.legs[0].min_eta)
+                # pt requirement on the offline object before the trigger matching (leg 1)
+                pt_mask1 = (taus.pt >= trigger.legs[1].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 1)                 
+                eta_mask1 = (abs(taus.eta) <= trigger.legs[1].min_eta)
                 
-                #tau_matches_pt = has_pt_greater_equal(taus, events.TrigObj[leg_masks[1]], 0)
+                # muons to match with the trigger
+                muons = muons[pt_mask0 & eta_mask0]
+                # taus to match with the trigger
+                taus  = taus[pt_mask1 & eta_mask1]
+
+                dr_matching_mu = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
+                cross_mu_matches_leg0 = dr_matching_mu
+            
                 dr_matching_tau = trigger_object_matching(taus, events.TrigObj[leg_masks[1]])
                 cross_mu_tau_matches_leg1 = dr_matching_tau
                 
@@ -254,7 +274,14 @@ def hlt_path_matching(events, triggers, pair_objects):
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 11
                 
-                #el_matches_pt = has_pt_greater_equal(electrons, events.TrigObj[leg_masks[0]], 0)
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (electrons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(electrons.eta) <= trigger.legs[0].min_eta)
+                
+                # electrons to match with the trigger
+                electrons = electrons[pt_mask0 & eta_mask0]           
+
                 dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
                 
                 single_e_matches_leg0 =  dr_matching_e
@@ -266,6 +293,20 @@ def hlt_path_matching(events, triggers, pair_objects):
                 assert trigger.n_legs == len(leg_masks) == 2
                 assert abs(trigger.legs[0].pdg_id) == 11
                 assert abs(trigger.legs[1].pdg_id) == 15
+                
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (electrons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(electrons.eta) <= trigger.legs[0].min_eta)
+                # pt requirement on the offline object before the trigger matching (leg 1)
+                pt_mask1 = (taus.pt >= trigger.legs[1].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 1)                 
+                eta_mask1 = (abs(taus.eta) <= trigger.legs[1].min_eta) 
+                
+                # muons to match with the trigger
+                electrons = electrons[pt_mask0 & eta_mask0]
+                # taus to match with the trigger
+                taus  = taus[pt_mask1 & eta_mask1]
                 
                 dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
                 cross_e_matches_leg0 = dr_matching_e
@@ -286,6 +327,20 @@ def hlt_path_matching(events, triggers, pair_objects):
             taus1 =  pair_objects.tautau.lep0
             taus2 =  pair_objects.tautau.lep1
             
+            # pt requirement on the offline object before the trigger matching (leg 0)
+            pt_mask0 = (taus1.pt >= trigger.legs[0].min_pt)
+            # eta requirement on the offline object before the trigger matching (leg 0)
+            eta_mask0 = (abs(taus1.eta) <= trigger.legs[0].min_eta)
+            # pt requirement on the offline object before the trigger matching (leg 1)
+            pt_mask1 = (taus2.pt >= trigger.legs[1].min_pt)
+            # eta requirement on the offline object before the trigger matching (leg 1)                 
+            eta_mask1 = (abs(taus2.eta) <= trigger.legs[1].min_eta) 
+            
+            # muons to match with the trigger
+            taus1 = taus1[pt_mask0 & eta_mask0]
+            # taus to match with the trigger
+            taus2 = taus2[pt_mask1 & eta_mask1]
+            
             dr_matching_tau1 = trigger_object_matching(taus1, events.TrigObj[leg_masks[0]])
             dr_matching_tau2 = trigger_object_matching(taus2, events.TrigObj[leg_masks[1]])
             
@@ -303,6 +358,12 @@ def hlt_path_matching(events, triggers, pair_objects):
     triggerID_mutau = hlt_path_fired(events, hlt_path_fired_mutau)
     triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
     
+    events = set_ak_column(events, "triggerID_e", triggerID_e)
+    events = set_ak_column(events, "triggerID_etau", triggerID_etau)
+    events = set_ak_column(events, "triggerID_mu", triggerID_mu)
+    events = set_ak_column(events, "triggerID_mutau", triggerID_mutau)
+    events = set_ak_column(events, "triggerID_tau", triggerID_tau)
+
     # Generate candidate pairs based on matching triggers
     etau_channel_mask = ((triggerID_e > 0) | (triggerID_etau > 0))
     mutau_channel_mask = ((triggerID_mu > 0) | (triggerID_mutau > 0))

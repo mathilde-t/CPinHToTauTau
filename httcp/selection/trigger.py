@@ -57,16 +57,16 @@ def trigger_selection(
                 Trig_pdg_ID = (abs(events.TrigObj.id) == leg.pdg_id)
                 Trig_pdg_ID = ak.enforce_type(Trig_pdg_ID, f"var * bool")
                 leg_mask = leg_mask & Trig_pdg_ID
-            # pt cut
-            if leg.min_pt is not None:
-                Trig_pt = (events.TrigObj.pt >= leg.min_pt)
-                Trig_pt = ak.enforce_type(Trig_pt, f"var * bool")
-                leg_mask = leg_mask & (events.TrigObj.pt >= leg.min_pt)
-            # eta cut
-            if leg.min_eta is not None:
-                Trig_eta = (abs(events.TrigObj.eta) < leg.min_eta)
-                Trig_eta = ak.enforce_type(Trig_eta, f"var * bool")
-                leg_mask = leg_mask & Trig_eta
+            # # pt cut
+            # if leg.min_pt is not None:
+            #     Trig_pt = (events.TrigObj.pt >= leg.min_pt)
+            #     Trig_pt = ak.enforce_type(Trig_pt, f"var * bool")
+            #     leg_mask = leg_mask & (events.TrigObj.pt >= leg.min_pt)
+            # # eta cut
+            # if leg.min_eta is not None:
+            #     Trig_eta = (abs(events.TrigObj.eta) < leg.min_eta)
+            #     Trig_eta = ak.enforce_type(Trig_eta, f"var * bool")
+            #     leg_mask = leg_mask & Trig_eta
             # trigger bits match
             if leg.trigger_bits is not None:
                 bit_mask = 0

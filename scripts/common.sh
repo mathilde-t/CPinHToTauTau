@@ -2,7 +2,7 @@
 
 set_common_vars() {
 
-version="trig_bug"
+version="fixed_also_mutau_trigmatch"
 case $1 in
     "run3ts_lim")
         config="run3_2022_preEE_tau_spinner_limited"
@@ -18,34 +18,35 @@ case $1 in
     ;;
     "run3_lim")
         config="run3_2022_preEE_limited"
-        datasets='data_e_C' 
-        processes='data_e' 
+        datasets='dy_incl' 
+        processes='dy_z2mumu,dy_lep' 
         workflow='local'
     ;;
-    "run3")
+    "run3_data")
+        config="run3_2022_preEE"
+        datasets='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D'
+        processes='data' 
+        workflow='htcondor'
+    ;;
+    "run3_data_lim")
+        config="run3_2022_preEE_limited"
+        datasets='data_e_C'
+        processes='data' 
+        workflow='local'
+    ;;
+    "run3preEE")
         config="run3_2022_preEE"
         data='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D,'
         bkg_ewk='wj_incl,ww,wz,zz,dy_incl,'
         bkg_top='st_twchannel_t_fh,st_twchannel_t_sl,st_twchannel_t_dl,st_twchannel_tbar_sl,st_twchannel_tbar_dl,st_tchannel_tbar,st_tchannel_t,'
         bkg_ttbar='tt_sl,tt_dl,tt_fh'
         datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
-        processes='dy_lep,vv,tt,st,wj,data'
+        processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
         workflow='htcondor'
     ;;
-    # "run3")
-    #     config="run3_2022_preEE_nano_tau_v12"
-    #     #Datasets to use
-    #     data='data_mu_c,data_mu_d,data_mu_e,'
-    #     bkg_ewk='wj_incl,ww,wz,zz,wj, dy_incl,'
-    #     bkg_top='st_t_bbarq,st_tbar_bq,'`
-    #     `'st_t_wminus_to_lnu2q,st_t_wminus_to_2l2nu,'`
-    #     `'st_tbar_wplus_to_lnu2q,st_tbar_wplus_to_2l2nu,'
-    #     bkg_ttbar='tt_sl,tt_dl,tt_fh'
-    #     datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
-    #     processes="dy_z2mumu,dy_z2tautau,vv,tt,st,wj,data"
-    # ;;
     *)
     echo "Unknown run argument!"
     exit
+    ;;
 esac
 }

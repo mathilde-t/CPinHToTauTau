@@ -57,7 +57,6 @@ def extra_lepton_veto(
             else:
                 #For electrons and muons there we need to check if there exists a lepton, separated from the pair lepton
                 lep_mask = n_sep_leps > 0
-            from IPython import embed; embed()
             has_no_exra_lep = has_no_exra_lep | lep_mask
     return events, SelectionResult(
         steps={"extra_lepton_veto": ~has_no_exra_lep #Since it's veto, this field shoud be reversed 

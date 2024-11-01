@@ -12,11 +12,11 @@ args=(
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
         --cf.MergeReducedEvents-workflow local
-        --variables phi_cp_mu_pi,phi_cp_mu_rho,phi_cp_mu_a1_1pr,phi_cp_rho_rho
-        --shift-sources tauspinner
-        --general-settings "cms-label=simpw"
-        --cf.PlotShiftedVariables1D-hide-errors True
-        --hide-errors True
+        --variables phi_cp_mu_pi,phi_cp_mu_rho,phi_cp_pi_pi,phi_cp_rho_rho,
+        --shift-sources ts
+        --cms-label 'sim'
+        --cf.PlotShiftedVariables1D-hide-errors 1
+        --hide-errors 1
         "${@:2}"
     )
 echo law run cf.PlotShiftedVariables1D "${args[@]}"

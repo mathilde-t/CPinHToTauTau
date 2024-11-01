@@ -14,57 +14,6 @@ warn = maybe_import("warnings")
 # helper
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
-# @producer(
-#     uses={
-#         "Pileup.nTrueInt"
-#     },
-#     produces={
-#         "pu_weight"
-#     },
-#     mc_only=True,
-# )
-# def pu_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-#     nTrueInt = events.Pileup.nTrueInt
-#     pu_weight = ak.where (self.mc_weight(nTrueInt) != 0,
-#                           self.data_weight(nTrueInt)/self.mc_weight(nTrueInt) * self.mc2data_norm,
-#                           0)
-    
-#     events = set_ak_column_f32(events, "pu_weight", pu_weight)
-#     return events
-
-# @pu_weight.setup
-# def pu_weight_setup(
-#     self: Producer,
-#     reqs: dict,
-#     inputs: dict,
-#     reader_targets: InsertableDict,
-# ) -> None:
-#     """
-#     Loads the pileup weights added through the requirements and saves them in the
-#     py:attr:`pu_weight` attribute for simpler access in the actual callable.
-#     """
-#     from coffea.lookup_tools import extractor
-#     ext = extractor()
-#     data_full_fname = self.config_inst.x.external_files.pileup.data
-#     data_name = data_full_fname.split('/')[-1].split('.')[0]
-#     mc_full_fname = self.config_inst.x.external_files.pileup.mc
-#     mc_name = mc_full_fname.split('/')[-1].split('.')[0]
-#     ext.add_weight_sets([f'{data_name} pileup {data_full_fname}', f'{mc_name} pileup {mc_full_fname}' ])
-#     ext.finalize()
-    
-#     self.evaluator = ext.make_evaluator()
-    
-#     mc_integral = 0.
-#     data_integral = 0.
-#     for npu in range(0,1000):
-#         mc_integral += self.evaluator[mc_name](npu)
-#         data_integral += self.evaluator[data_name](npu)
-    
-#     self.mc_weight = self.evaluator[mc_name]
-#     self.data_weight = self.evaluator[data_name] 
-#     self.mc2data_norm = safe_div(mc_integral,data_integral)
-
-
 @producer(
     uses={"genWeight", optional("LHEWeight.originalXWGTUP")},
     produces={"mc_weight"},
@@ -100,10 +49,7 @@ def get_mc_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 
 @producer(
     uses={
-        f"hcand.{var}" for var in [
-                "pt","eta","phi","mass", "charge", 
-                "decayMode", "rawIdx"
-            ]
+        'hcand_*', 'event'
     },
     produces={
          f"muon_weight_{shift}"
@@ -112,39 +58,36 @@ def get_mc_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     mc_only=True,
 )
 def muon_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) -> ak.Array:
+    
     shifts = ["nominal"]
     if do_syst: shifts=[*shifts,"systup", "systdown"] 
-    
-    rename_systs = {"nominal" : "nom",
-                    "systup"  : "up",
-                    "systdown": "down"
-    }
-    mutau_id  = self.config_inst.get_channel("mutau").id
-    #Get mask for mutau channel
-    is_mutau = events.channel_id == mutau_id
-    
-    #Create an instance of scale factor to make copies from
-    
-    # Create sf array template to make copies and dict for finnal results of all systematics
-    pt =  flat_np_view(events.hcand.pt[:,:1],axis=1) #take the first particle from the hcand pair
-    eta =  flat_np_view(events.hcand.eta[:,:1],axis=1)
-    _sf = np.ones_like(pt, dtype=np.float32)
     sf_values = {}
+    for the_shift in shifts: sf_values[the_shift] = np.ones_like(events.event, dtype=np.float32)
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    for ch_str in channels:
+        hcand = events[f'hcand_{ch_str}']
+        for lep in [field for field in hcand.fields if 'lep' in field]:
+            if ch_objects[ch_str][lep] == 'Muon':
+                muon = hcand[lep]
+                # Create sf array template to make copies and dict for finnal results of all systematics
+                pt =  flat_np_view(muon.pt,axis=1) #take the first particle from the hcand pair
+                eta =  flat_np_view(abs(muon.eta),axis=1)
+                #Prepare a tuple with the inputs of the correction evaluator
+                mu_sf_args = lambda syst : (eta,pt,syst)
+                #Loop over the shifts and calculate for each shift muon scale factor
+                for the_shift in shifts:
+                    flat_sf = ak.ones_like(pt)
+                    for the_sf in [self.muon_id, self.muon_iso, self.muon_trig]: 
+                        flat_sf = flat_sf * the_sf.evaluate(*mu_sf_args(the_shift))
+                    shaped_sf = ak.unflatten(flat_sf, ak.num(muon.pt, axis=1))
+                    sf_values[the_shift] = sf_values[the_shift] * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)
 
-    #Check if the input muon array is flat. Well it should be
-    if len(pt) != len(events) : raise TypeError('Found multiple H candidates in some of the events: check hcand array')
-    
-    #Prepare a tuple with the inputs of the correction evaluator
-    mu_sf_args = lambda syst : (eta[is_mutau],
-                                pt[is_mutau],
-                                syst)
-    #Loop over the shifts and calculate for each shift muon scale factor
-    for the_shift in shifts:
-        sf_values[the_shift] = _sf.copy()
-        for the_sf in [self.muon_id, self.muon_iso, self.muon_trig]:
-            sf_values[the_shift][is_mutau] *= the_sf.evaluate(*mu_sf_args(the_shift))
-            
-        events = set_ak_column_f32(events, f"muon_weight_{rename_systs[the_shift]}", sf_values[the_shift])
+    rename_systs = {"nominal" : "nom",
+                "systup"  : "up",
+                "systdown": "down"
+    }
+    for the_shift in shifts: events = set_ak_column_f32(events, f"muon_weight_{rename_systs[the_shift]}", sf_values[the_shift])
     return events
 
 @muon_weight.requires
@@ -254,9 +197,7 @@ def muon_weight_setup(
 
 @producer(
     uses={
-        f"Tau.{var}" for var in [
-            "pt","eta","decayMode", "genPartFlav"
-        ] 
+        'event', 'hcand_*',
     },
     produces={
         f"tau_weight_{shift}"
@@ -288,88 +229,65 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                                   mask_identity=False)
     
     #Make masks for each channel
-    mask = {}
-    for the_ch in ["etau","mutau", "tautau"]: mask[the_ch] = events.channel_id == self.config_inst.get_channel(the_ch).id
-    
-    
-    #Prepare flat arrays of the inputs to send into the 
-    pt = flat_np_view(events.Tau.pt, axis=1)
-    eta = flat_np_view(abs(events.Tau.eta), axis=1)
-    dm = flat_np_view(events.Tau.decayMode, axis=1)
-    genmatch = flat_np_view(events.Tau.genPartFlav, axis=1)
-
-    if self.config_inst.x.year in [2016,2017,2018]: #Run2 scale factors have the input variables different from the Run3 ones.
-
-        args_vs_e = lambda mask, syst : (eta[mask],
-                                        genmatch[mask],
-                                        self.config_inst.x.deep_tau.vs_e,
-                                        syst)
-        
-        args_vs_mu = lambda mask, syst : (eta[mask],
-                                          genmatch[mask],
-                                          self.config_inst.x.deep_tau.vs_mu,
-                                          syst)
-          
-        args_vs_jet = lambda mask, syst : (pt[mask],
-                                            dm[mask],
-                                            genmatch[mask],
-                                            self.config_inst.x.deep_tau.vs_jet,
-                                            self.config_inst.x.deep_tau.vs_e, 
-                                            '' if syst =="nom" else syst,
-                                            "dm")
-    else: #Run3 scale factor inputs:
-
-        args_vs_e = lambda mask, syst : (eta[mask],
-                                        dm[mask],
-                                        genmatch[mask],
-                                        self.config_inst.x.deep_tau.vs_e, 
-                                        syst)   
-        args_vs_mu = lambda mask, syst : (eta[mask],
-                                        genmatch[mask],
-                                        self.config_inst.x.deep_tau.vs_mu, 
-                                        syst)  
-        args_vs_jet = lambda mask, syst : (pt[mask],
-                                            dm[mask],
-                                            genmatch[mask],
-                                            self.config_inst.x.deep_tau.vs_jet,
-                                            self.config_inst.x.deep_tau.vs_e, 
-                                            '' if syst =="nom" else syst,
-                                            "dm")
-    tau_part_flav = {
-        "prompt_e"  : 1,
-        "prompt_mu" : 2,
-        "tau->e"    : 3,
-        "tau->mu"   : 4,
-        "tau_had"   : 5
-    }
-    
     shifts = ["nom"]
-    if  do_syst:    shifts=[*shifts,"up", "down"]         
-    
-    _sf = np.ones_like(pt, dtype=np.float32)
+    if  do_syst: shifts=[*shifts,"up", "down"]         
     sf_values = {}
-    for the_shift in shifts:
-        
-        sf_values[the_shift] = _sf.copy()
-        #Calculate scale factors for tau vs electron classifier 
-        e_mask = ((genmatch == tau_part_flav["prompt_e"]) | (genmatch == tau_part_flav["tau->e"]))
-        sf_values[the_shift][e_mask] = self.id_vs_e_corrector.evaluate(*args_vs_e(e_mask,the_shift))
-
-        #Calculate scale factors for tau vs muon classifier 
-        mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"]))
-        sf_values[the_shift][mu_mask] = self.id_vs_mu_corrector.evaluate(*args_vs_mu(mu_mask,the_shift))
-         
-        #Calculate scale factors for tau vs jet classifier 
-        tau_mask = (genmatch == tau_part_flav["tau_had"]) 
-
-        sf_values[the_shift][tau_mask] = self.id_vs_jet_corrector.evaluate(*args_vs_jet(tau_mask,the_shift))
-        
-        #Save weights and their systematic variations to the main tree. For tautau the result is a product of two vs_jet weights of the corresponding taus
-        events = set_ak_column(events,
-                               f"tau_weight_{the_shift}",
-                               shape_sf(sf_values[the_shift]),
-                               value_type=np.float32)
-        
+   
+                
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    for shift in shifts:
+        sf_values = np.ones_like(events.event, dtype=np.float32)
+        for ch_str in channels:
+            hcand = events[f'hcand_{ch_str}']
+            for lep in [field for field in hcand.fields if 'lep' in field]:
+                if ch_objects[ch_str][lep]  == 'Tau':
+                    tau = hcand[lep]
+                    #Prepare flat arrays of the inputs to send into the 
+                    pt = flat_np_view(tau.pt, axis=1)
+                    eta = flat_np_view(abs(tau.eta), axis=1)
+                    dm = flat_np_view(tau.decayMode, axis=1)
+                    genmatch = flat_np_view(tau.genPartFlav, axis=1)
+                    per_ch_sf = np.ones_like(pt, dtype=np.float32)
+                    if self.config_inst.x.year in [2016,2017,2018]: #Run2 scale factors have the input variables different from the Run3 ones.
+                        args_vs_e = lambda mask, syst : (eta[mask],
+                                                        genmatch[mask],
+                                                        self.config_inst.x.deep_tau.vs_e,
+                                                        syst)
+                        
+                        args_vs_mu = lambda mask, syst : (eta[mask],
+                                                            genmatch[mask],
+                                                            self.config_inst.x.deep_tau.vs_mu,
+                                                            syst)
+                    else: #Run3 scale factor inputs:
+                        args_vs_e = lambda mask, syst : (eta[mask],
+                                                        dm[mask],
+                                                        genmatch[mask],
+                                                        self.config_inst.x.deep_tau.vs_e, 
+                                                        syst)   
+                        args_vs_mu = lambda mask, syst : (eta[mask],
+                                                        genmatch[mask],
+                                                        self.config_inst.x.deep_tau.vs_mu, 
+                                                        syst)  
+                    tau_part_flav = {
+                        "prompt_e"  : 1,
+                        "prompt_mu" : 2,
+                        "tau->e"    : 3,
+                        "tau->mu"   : 4,
+                        "tau_had"   : 5
+                    }
+                    #Calculate scale factors for tau vs electron classifier 
+                    masked_dm = (dm != 5) & (dm != 6)
+                    e_mask = ((genmatch == tau_part_flav["prompt_e"]) | (genmatch == tau_part_flav["tau->e"])) & masked_dm
+                    per_ch_sf[e_mask] *= self.id_vs_e_corrector.evaluate(*args_vs_e(e_mask,shift))
+                    #Calculate scale factors for tau vs muon classifier 
+                    mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"])) & masked_dm
+                    per_ch_sf[mu_mask] *= self.id_vs_mu_corrector.evaluate(*args_vs_mu(mu_mask,shift)) 
+                    ch_mask = ak.num(tau, axis=1) > 0
+                    shaped_sf = ak.unflatten(per_ch_sf, ak.num(tau.pt, axis=1))
+                    sf_values = sf_values * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)       
+        events = set_ak_column(events,f"tau_weight_{shift}",sf_values,value_type=np.float32)
+                                    
     return events
 
 @tau_weight.requires
@@ -401,7 +319,7 @@ def tau_weight_setup(
 
 @producer(
     uses={
-        optional("TauSpinner*") 
+        'event', optional("TauSpinner*") 
     },
     produces={
         "tauspinner_weight_up", "tauspinner_weight", "tauspinner_weight_down"

@@ -6,11 +6,9 @@ wrapper_args=(
     --configs $config
     --datasets $datasets
     --version $version
-    --cf.CalibrateEvents-workflow $workflow
-    --cf.SelectEvents-workflow $workflow
-    --cf.ReduceEvents-workflow $workflow
-    --cf.MergeReducedEvents-workflow local
+    --cf.ReduceEvents-workflow local
+    --cf.ReduceEvents-branch -1
     "${@:2}"
     )
-echo law run cf.MergeReducedEventsWrapper "${wrapper_args[@]}"
-law run cf.MergeReducedEventsWrapper "${wrapper_args[@]}"
+echo law run cf.ReduceEventsWrapper "${wrapper_args[@]}"
+law run cf.ReduceEventsWrapper "${wrapper_args[@]}"

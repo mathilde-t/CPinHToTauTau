@@ -12,7 +12,9 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 
 @producer(
-    uses={'hcand_mutau*', 'hcand_etau*', 'event'
+    uses={f"Tau.{var}" for var in [
+                "decayMode", "genPartFlav"
+                ] 
     } | {"process_id"},
     produces={
         "process_id"
@@ -20,7 +22,11 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
     mc_only=True,
 )
 def split_dy(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-    
+  
+    dm = flat_np_view(events.Tau.decayMode, axis=1)
+    match = flat_np_view(events.Tau.genPartFlav, axis=1)
+    process_id = np.array(events.process_id)
+   
     tau_part_flav = {
         "prompt_e"  : 1,
         "prompt_mu" : 2,
@@ -28,21 +34,13 @@ def split_dy(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         "tau->mu"   : 4,
         "tau_had"   : 5
     }
-    channels =  ['etau', 'mutau']
-    process_id = events.process_id
-    for ch_str in channels:
-        hcand = events[f'hcand_{ch_str}']
-        tau_dm = ak.firsts(hcand.lep1.genPartFlav)
-        fake_mask = ak.zeros_like(tau_dm, dtype=np.bool_)
-        if ch_str == 'etau':
-            fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_e"])
-            fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->e"])
-            process_id = ak.where(ak.fill_none(fake_mask, False), 51001, 51005) #z->ee events
-        elif ch_str == 'mutau':
-            fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_mu"])
-            fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->mu"])
-            process_id = ak.where(ak.fill_none(fake_mask, False), 51004, 51005) #z->mumu events
-    events = set_ak_column(events, "process_id", process_id, value_type=np.int64)
+    mu2tau_fakes_mask = (match == tau_part_flav["prompt_mu"])
+    mu_tau_fake_id = 51001*ak.ones_like(events.process_id) 
+    mu_tau_gen_id = 51002*ak.ones_like(events.process_id) 
+    process_id[mu2tau_fakes_mask] = mu_tau_fake_id[mu2tau_fakes_mask]
+    process_id[~mu2tau_fakes_mask] = mu_tau_gen_id[~mu2tau_fakes_mask]
+    events = remove_ak_column(events, "process_id")
+    events = set_ak_column(events, "process_id", process_id, value_type=np.int32)
     return events
 
 

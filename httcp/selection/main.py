@@ -7,7 +7,6 @@ Exemplary selection methods.
 from typing import Optional
 from operator import and_
 from functools import reduce
-
 from collections import defaultdict, OrderedDict
 
 from columnflow.selection import Selector, SelectionResult, selector
@@ -18,26 +17,79 @@ from columnflow.selection.cms.met_filters import met_filters
 from columnflow.production.processes import process_ids
 from columnflow.production.cms.mc_weight import mc_weight
 from columnflow.production.util import attach_coffea_behavior
+from columnflow.production.categories import category_ids
 
-from columnflow.util import maybe_import, DotDict
+from columnflow.util import maybe_import
 from columnflow.columnar_util import optional_column as optional
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
-from httcp.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
+from httcp.selection.physics_objects import *
 from httcp.selection.trigger import trigger_selection
 from httcp.selection.lepton_pair_etau import etau_selection
-from httcp.selection.lepton_pair_mutau import pair_selection
+from httcp.selection.lepton_pair_mutau import mutau_selection
 from httcp.selection.lepton_pair_tautau import tautau_selection
-from httcp.selection.lepton_pair_emu import emu_selection
+from httcp.selection.event_category import get_categories
 from httcp.selection.match_trigobj import match_trigobj
-from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
-from httcp.selection.higgscand import new_higgscand, mask_nans
+from httcp.selection.lepton_veto import *
+from httcp.selection.higgscand import higgscand, higgscandprod
 
-from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
+#from httcp.production.main import cutflow_features
+from httcp.production.dilepton_features import hcand_mass, mT, rel_charge #TODO: rename mutau_vars -> dilepton_vars
+
+from IPython import embed
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
 coffea = maybe_import("coffea")
+
+
+@selector(uses={"process_id", optional("mc_weight")}) #TODO: Move it to utils
+def custom_increment_stats(
+    self: Selector,
+    events: ak.Array,
+    results: SelectionResult,
+    stats: dict,
+    **kwargs,
+) -> ak.Array:
+    """
+    Unexposed selector that does not actually select objects but instead increments selection
+    *stats* in-place based on all input *events* and the final selection *mask*.
+    """
+    # get event masks
+    event_mask = results.event
+
+    # get a list of unique process ids present in the chunk
+    unique_process_ids = np.unique(events.process_id)
+    # increment plain counts
+    n_evt_per_file = self.dataset_inst.n_events/self.dataset_inst.n_files
+    stats["num_events"] = n_evt_per_file
+    stats["num_events_selected"] += ak.sum(event_mask, axis=0)
+    if self.dataset_inst.is_mc:
+        stats[f"sum_mc_weight"] = n_evt_per_file
+        stats.setdefault(f"sum_mc_weight_per_process", defaultdict(float))
+        for p in unique_process_ids:
+            stats[f"sum_mc_weight_per_process"][int(p)] = n_evt_per_file
+        
+    # create a map of entry names to (weight, mask) pairs that will be written to stats
+    weight_map = OrderedDict()
+    if self.dataset_inst.is_mc:
+        # mc weight for selected events
+        weight_map["mc_weight_selected"] = (events.mc_weight, event_mask)
+
+    # get and store the sum of weights in the stats dictionary
+    for name, (weights, mask) in weight_map.items():
+        joinable_mask = True if mask is Ellipsis else mask
+
+        # sum of different weights in weight_map for all processes
+        stats[f"sum_{name}"] += ak.sum(weights[mask])
+        # sums per process id
+        stats.setdefault(f"sum_{name}_per_process", defaultdict(float))
+        for p in unique_process_ids:
+            stats[f"sum_{name}_per_process"][int(p)] += ak.sum(
+                weights[(events.process_id == p) & joinable_mask],
+            )
+
+    return events, results
 
 
 # exposed selectors
@@ -47,55 +99,50 @@ coffea = maybe_import("coffea")
         "event",
         # selectors / producers called within _this_ selector
         attach_coffea_behavior,
-        json_filter,
-        met_filters,
-        mc_weight,
+        json_filter, 
+        met_filters, 
+        mc_weight, 
         process_ids,
-        trigger_selection,
-        muon_selection,
-        electron_selection,
-        tau_selection,
+        trigger_selection, 
+        muon_selection, 
+        electron_selection, 
+        tau_selection, 
         jet_selection,
-        jet_veto,
-        etau_selection,
-        pair_selection,
-        tautau_selection,
-        channel_id,
-        extra_lepton_veto,
-        double_lepton_veto,
+        etau_selection, 
+        mutau_selection, 
+        tautau_selection, 
+        get_categories,
+        extra_lepton_veto, 
+        double_lepton_veto, 
         match_trigobj,
-        increment_stats,
-        new_higgscand,
+        increment_stats, 
+        custom_increment_stats,
+        higgscand,
         gentau_selection,
-        add_tau_prods,
-        mask_nans,
+        higgscandprod,
+        rel_charge,
+        category_ids,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
-        attach_coffea_behavior,
-        json_filter,
-        met_filters,
-        mc_weight,
-        process_ids,
-        trigger_selection,
-        muon_selection,
-        electron_selection,
-        tau_selection,
+        mc_weight, 
+        trigger_selection, 
+        muon_selection, 
+        electron_selection, 
+        tau_selection, 
         jet_selection,
-        jet_veto,
-        etau_selection,
-        pair_selection,
-        tautau_selection,
-        channel_id,
-        extra_lepton_veto,
-        double_lepton_veto,
+        etau_selection, 
+        mutau_selection, 
+        tautau_selection, 
+        get_categories, 
+        process_ids,
+        extra_lepton_veto, 
+        double_lepton_veto, 
         match_trigobj,
-        increment_stats,
-        new_higgscand,
+        higgscandprod,
         gentau_selection,
-        add_tau_prods,
-        mask_nans,
-        "category_ids"
+        rel_charge,
+        category_ids,
     },
     exposed=True,
 )
@@ -105,7 +152,7 @@ def main(
     stats: defaultdict,
     **kwargs,
 ) -> tuple[ak.Array, SelectionResult]:
-
+    
     # ensure coffea behaviors are loaded
     events = self[attach_coffea_behavior](events, **kwargs)
 
@@ -124,96 +171,165 @@ def main(
     # met filter selection
     events, met_filter_results = self[met_filters](events, **kwargs)
     results += met_filter_results
+    
+    # jet selection
+    events, bjet_veto_result = self[jet_selection](events, 
+                                                   call_force=True, 
+                                                   **kwargs)
+    results += bjet_veto_result
 
     # muon selection
-    # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]
+    # e.g. mu_idx: [ [0,1], [], [1], [0], [] ] 
     events, muon_results, good_muon_indices, veto_muon_indices, dlveto_muon_indices = self[muon_selection](events,
-                                                                                                           call_force=True,
+                                                                                                           call_force=True, 
                                                                                                            **kwargs)
-    
+    results += muon_results
+
     # electron selection
-    # e.g. ele_idx: [ [], [0,1], [], [], [1,2] ]
+    # e.g. ele_idx: [ [], [0,1], [], [], [1,2] ] 
     events, ele_results, good_ele_indices, veto_ele_indices, dlveto_ele_indices = self[electron_selection](events,
-                                                                                                           call_force=True,
+                                                                                                           call_force=True, 
                                                                                                            **kwargs)
+    results += ele_results
 
     # tau selection
-    # e.g. tau_idx: [ [1], [0,1], [1,2], [], [0,1] ]
-    events, good_tau_indices = self[tau_selection](events,
-                                                    call_force=True,
-                                                    **kwargs)
-    
+    # e.g. tau_idx: [ [1], [0,1], [1,2], [], [0,1] ] 
+    events, tau_results, good_tau_indices = self[tau_selection](events,
+                                                                call_force=True,
+                                                                **kwargs)
+    results += tau_results
+
+    # check if there are at least two leptons with at least one tau [before trigger obj matching]
+    _lepton_indices = ak.concatenate([good_muon_indices, good_ele_indices, good_tau_indices], axis=1)
+    prematch_mask = ((ak.num(_lepton_indices, axis=1) >= 2) & (ak.num(good_tau_indices, axis=1) >= 1))
+
+    # trigger obj matching
+    # INFO: The end bool is the switch to make it on or off
+    events, good_ele_indices, good_muon_indices, good_tau_indices = self[match_trigobj](events,
+                                                                                        trigger_results,
+                                                                                        good_ele_indices,
+                                                                                        good_muon_indices,
+                                                                                        good_tau_indices,
+                                                                                        True)
+
+    # check if there are at least two leptons with at least one tau [after trigger obj matching]
+    _lepton_indices = ak.concatenate([good_muon_indices, good_ele_indices, good_tau_indices], axis=1)
+    postmatch_mask = ((ak.num(_lepton_indices, axis=1) >= 2) & (ak.num(good_tau_indices, axis=1) >= 1))
+
+    match_res = SelectionResult(
+        steps = {
+            "PreTrigObjMatch"  : prematch_mask,
+            "PostTrigObjMatch" : postmatch_mask
+        },
+    )
+    results += match_res
+
     # double lepton veto
-    events, double_lepton_veto_results = self[double_lepton_veto](events,
-                                                                  dlveto_ele_indices,
-                                                                  dlveto_muon_indices)
-    results += double_lepton_veto_results
+    events, extra_double_lepton_veto_results = self[double_lepton_veto](events,
+                                                                        dlveto_ele_indices,
+                                                                        dlveto_muon_indices)
+    results += extra_double_lepton_veto_results
+    
+    # e-tau pair i.e. hcand selection
+    # e.g. [ [], [e1, tau1], [], [], [e1, tau2] ]
+    etau_results, etau_indices_pair = self[etau_selection](events,
+                                                           good_ele_indices,
+                                                           good_tau_indices,
+                                                           call_force=True,
+                                                           **kwargs)
+    results += etau_results
+    etau_pair = ak.concatenate([events.Electron[etau_indices_pair[:,0:1]],
+                                events.Tau[etau_indices_pair[:,1:2]]],
+                               axis=1)
 
-    mutau_indices_pair = self[pair_selection](events,
-                                              'mutau',
-                                              good_muon_indices,
-                                              good_tau_indices)
-    #from IPython import embed; embed()
-    etau_indices_pair = self[pair_selection](events,
-                                             'etau',
-                                             good_ele_indices,
-                                             good_tau_indices)
-    
-    tautau_indices_pair = self[pair_selection](events,
-                                              'tautau',
-                                              good_tau_indices,
-                                              good_tau_indices)
-    
-    pair_idxs = DotDict.wrap({
-        'etau' : etau_indices_pair,
-        'mutau' : mutau_indices_pair,
-        'tautau' : tautau_indices_pair
-    })
-    
-    raw_dilepton_mask = ak.ones_like(events.event, dtype=np.bool_)
-    for channel in self.config_inst.channels.names():
-        raw_dilepton_mask = raw_dilepton_mask | eval(f'(ak.num({channel}_indices_pair.lep0, axis=1) > 0)')
-    
-    results += SelectionResult(
-    steps = {
-        "has_at_least_2_leptons" : raw_dilepton_mask,
-    })
-    events, hcand_res = self[new_higgscand](events,
-                                 trigger_results,
-                                 pair_idxs,
-                                 domatch=True)
-    results += hcand_res
-    #produce is_b_vetoed columnd
-    events = self[jet_veto](events, **kwargs)
+    # mu-tau pair i.e. hcand selection
+    # e.g. [ [mu1, tau1], [], [mu1, tau2], [], [] ]
+    mutau_results, mutau_indices_pair = self[mutau_selection](events,
+                                                              good_muon_indices,
+                                                              good_tau_indices,
+                                                              call_force=True,
+                                                              **kwargs)
+    results += mutau_results
+    mutau_pair = ak.concatenate([events.Muon[mutau_indices_pair[:,0:1]], 
+                                 events.Tau[mutau_indices_pair[:,1:2]]],
+                                axis=1)
 
-    #produce channel id column (legacy)
-    events = self[channel_id](events)
+    #embed()
+    # tau-tau pair i.e. hcand selection
+    # e.g. [ [], [tau1, tau2], [], [], [] ]
+    tautau_results, tautau_indices_pair = self[tautau_selection](events,
+                                                                 good_tau_indices,
+                                                                 call_force=True,
+                                                                 **kwargs)
+    results += tautau_results
+
+
+    tautau_pair = ak.concatenate([events.Tau[tautau_indices_pair[:,0:1]], 
+                                  events.Tau[tautau_indices_pair[:,1:2]]], 
+                                 axis=1)
+
+    # channel selection
+    # channel_id is now in columns
+    events, channel_results = self[get_categories](events,
+                                                   trigger_results,
+                                                   etau_indices_pair,
+                                                   mutau_indices_pair,
+                                                   tautau_indices_pair)
+    results += channel_results
+
+    # make sure events have at least one lepton pair
+    # hcand pair: [ [[mu1,tau1]], [[e1,tau1],[tau1,tau2]], [[mu1,tau2]], [], [[e1,tau2]] ]
+    hcand_pairs = ak.concatenate([etau_pair[:,None], mutau_pair[:,None], tautau_pair[:,None]], axis=1)
 
     # extra lepton veto
     # it is only applied on the events with one higgs candidate only
     events, extra_lepton_veto_results = self[extra_lepton_veto](events,
                                                                 veto_ele_indices,
-                                                                veto_muon_indices)
+                                                                veto_muon_indices,
+                                                                hcand_pairs)
     results += extra_lepton_veto_results
+    
+    # hcand results
+    events, hcand_array, hcand_results = self[higgscand](events, hcand_pairs)
+    results += hcand_results
 
-    # Add tau decya products to the correspondent hcand_(channel) arrays
-    events, tau_prods_res = self[add_tau_prods](events)
-    results += tau_prods_res
-    #Check arrays for np.nan values and mask them
-    events, nan_mask_res = self[mask_nans](events)
-    results += nan_mask_res
-   
+    # hcand prod results
+    events, hcandprod_results = self[higgscandprod](events, hcand_array)
+    results += hcandprod_results
+
+    # gen particles info
+    # hcand-gentau match = True/False
+    if "is_signal" in list(self.dataset_inst.aux.keys()):
+        if self.dataset_inst.aux["is_signal"]:
+            #print("hcand-gentau matching")
+            events, gentau_results = self[gentau_selection](events, True)
+            results += gentau_results
+
+    #from IPython import embed; embed()
+    #1/0
+
+    # create process ids
+    #events = self[process_ids](events, **kwargs)
+
     # combined event selection after all steps
     event_sel = reduce(and_, results.steps.values())
     results.event = event_sel
+    
     # add the mc weight
     if self.dataset_inst.is_mc:
         events = self[mc_weight](events, **kwargs)
+
+    # rel-charge
+    events = self[rel_charge](events, **kwargs)
+
+    # add cutflow features, passing per-object masks
+    #events = self[cutflow_features](events, results.objects, **kwargs)
+
     events = self[process_ids](events, **kwargs)
-    events = set_ak_column(events, 'category_ids', ak.ones_like(events.event, dtype=np.uint8))
+    events = self[category_ids](events, **kwargs)     
 
-  
-
+   
+    # increment stats
     weight_map = {
         "num_events": Ellipsis,
         "num_events_selected": event_sel,
@@ -238,8 +354,20 @@ def main(
                 "mask_fn": (lambda v: events.channel_id == v),
             },
         }
-
     events, results = self[increment_stats](
-        events, results, stats, weight_map=weight_map, group_map=group_map, **kwargs)
-
+        events,
+        results,
+        stats,
+        weight_map=weight_map,
+        group_map=group_map,
+        **kwargs,
+    )
+    """
+    events, results = self[custom_increment_stats]( 
+        events,
+        results,
+        stats,
+    )
+    """
+    #from IPython import embed; embed()
     return events, results

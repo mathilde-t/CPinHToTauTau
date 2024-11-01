@@ -2,51 +2,41 @@
 
 set_common_vars() {
 
-version="fixed_also_mutau_trigmatch"
+version="test"
 case $1 in
-    "run3ts_lim")
-        config="run3_2022_preEE_tau_spinner_limited"
-        datasets='h_ggf_htt_filtered' #,h_ggf_htt_unfiltered,zh_htt_unfiltered'
-        processes='h_ggf_htt,data_mu' #,zh_htt'
-        workflow='local'
+    "run2" )
+        config=run2_UL2018_nano_tau_v10_limited
+        datasets='data_ul2018_a_single_mu,data_ul2018_b_single_mu,'`
+        `'data_ul2018_c_single_mu,data_ul2018_d_single_mu'
+        processes="data"
     ;;
-    "run3ts")
-        config="run3_2022_preEE_tau_spinner"
-        datasets='h_ggf_htt_filtered' #,h_ggf_htt_unfiltered,zh_htt_unfiltered'
-        processes='h_ggf_htt' #,zh_htt'
-        workflow='htcondor'
+    "run2_ul17_test" )
+        config=run2_UL2017_nano_tau_v10_limited
+        datasets='data_mu_f,wj_incl,dy_incl'
+        processes="data_mu,wj,dy_lep,"
     ;;
-    "run3_lim")
-        config="run3_2022_preEE_limited"
-        datasets='dy_incl' 
-        processes='dy_z2mumu,dy_lep' 
-        workflow='local'
+    "run3lim")
+        config="run3_2022_preEE_nano_tau_v12_limited"
+        datasets='data_mu_c,wj_incl'
+        #'st_t_bbarq,st_tbar_bq,'`
+        #`'st_t_wminus_to_lnu2q,st_t_wminus_to_2l2nu,'`
+        #`'st_tbar_wplus_to_lnu2q,st_tbar_wplus_to_2l2nu'
+        processes='data,wj'
     ;;
-    "run3_data")
-        config="run3_2022_preEE"
-        datasets='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D'
-        processes='data' 
-        workflow='htcondor'
-    ;;
-    "run3_data_lim")
-        config="run3_2022_preEE_limited"
-        datasets='data_e_C'
-        processes='data' 
-        workflow='local'
-    ;;
-    "run3preEE")
-        config="run3_2022_preEE"
-        data='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D,'
-        bkg_ewk='wj_incl,ww,wz,zz,dy_incl,'
-        bkg_top='st_twchannel_t_fh,st_twchannel_t_sl,st_twchannel_t_dl,st_twchannel_tbar_sl,st_twchannel_tbar_dl,st_tchannel_tbar,st_tchannel_t,'
+    "run3")
+        config="run3_2022_preEE_nano_tau_v12"
+        #Datasets to use
+        data='data_mu_c,data_mu_d,data_mu_e,'
+        bkg_ewk='wj_incl,ww,wz,zz,wj, dy_incl,'
+        bkg_top='st_t_bbarq,st_tbar_bq,'`
+        `'st_t_wminus_to_lnu2q,st_t_wminus_to_2l2nu,'`
+        `'st_tbar_wplus_to_lnu2q,st_tbar_wplus_to_2l2nu,'
         bkg_ttbar='tt_sl,tt_dl,tt_fh'
         datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
-        processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-        workflow='htcondor'
+        processes="dy_z2mumu,dy_z2tautau,vv,tt,st,wj,data"
     ;;
     *)
-    echo "Unknown run argument!"
+    echo "Unknown run argument! Choose from: [run2, run3, run3lim, run2_ul17_test]"
     exit
-    ;;
 esac
 }

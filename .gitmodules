@@ -4,6 +4,3 @@
 [submodule "modules/cmsdb"]
 	path = modules/cmsdb
 	url = https://github.com/uhh-cms/cmsdb.git
-[submodule "modules/jsonpog-integration"]
-	path = modules/jsonpog-integration
-	url = https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration.git

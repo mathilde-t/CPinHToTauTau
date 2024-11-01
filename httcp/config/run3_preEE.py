@@ -13,14 +13,14 @@ from scinum import Number
 from columnflow.util import DotDict, maybe_import, dev_sandbox
 from columnflow.config_util import (
     get_root_processes_from_campaign, 
-    add_category, add_shift_aliases,
-    verify_config_processes,get_shifts_from_sources
+    add_category,
+    verify_config_processes,
 )
 
 ak = maybe_import("awkward")
 
 
-def add_run3_2022_preEE (ana: od.Analysis,
+def add_run3_preEE (ana: od.Analysis,
                       campaign: od.Campaign,
                       config_name           = None,
                       config_id             = None,
@@ -35,23 +35,15 @@ def add_run3_2022_preEE (ana: od.Analysis,
                         id    = config_id)
 
     # gather campaign data
-    cfg.x.year = campaign.x.year
+    year = campaign.x.year
     
     # add processes we are interested in
-    
     process_names = [
-        "data", 
-        "data_mu",
-        "data_tau",
-        "data_e",
+        "data",
         #Drell-Yan
         "dy_lep",
-        "dy_z2ee",
         "dy_z2mumu",
         "dy_z2tautau",
-        # "dy_z2tautau",
-        # "dy_z2ll",
-        # "dy_lep_m10to50",
         #W + jets
         "wj",
         #diboson
@@ -59,80 +51,44 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "ww",
         "wz",
         "zz",
-        #ttbar
-        "tt",#ttbar inclusive
+        #ttbar 
+        "tt", # ttbar inclusive
         "tt_sl",
         "tt_dl",
         "tt_fh",
         #single top
         "st",
-        #single top t-channel        
-        "st_tchannel_tbar",
         "st_tchannel_t",
-        # single top tW channel
-        "st_twchannel_t_fh",
-        "st_twchannel_t_sl",
-        "st_twchannel_t_dl",
-        "st_twchannel_tbar_sl",
-        "st_twchannel_tbar_dl",
-        "st_twchannel_tbar_fh",
+        "st_twchannel",
+        "h_ggf_tautau"
     ]
     for process_name in process_names:
         # add the process
         proc = cfg.add_process(procs.get(process_name))
-        #for signal datasets create special tag
-        if process_name.startswith("h_"):
-            proc.add_tag("signal")
+        if proc.is_mc:
+            if proc.name == "dy_lep": proc.color1 = (223,102,72)
+            if proc.name == "h_ggf_tautau": proc.color1 = (51,53,204)
+            if proc.name == "wj": proc.color1 = (201,89,84)
+            if proc.name == "tt_sl": proc.color1 = (153,153,204)
+            if proc.name == "tt_dl": proc.color1 = (184,184,227)
+            if proc.name == "tt_fh": proc.color1 = (87,87,141)
+            if proc.name == "ww" : proc.color1 = (102,204,102)
+            if proc.name == "wz" : proc.color1 = (49,157,49)
+            if proc.name == "zz" : proc.color1 = (120,214,120)
             
-        #if proc.is_mc:
-            # Updated color mapping to avoid repetition and ensure unique colors
-            # if proc.name == "st"                  : proc.color1 = (63, 144, 218)  # Sky Blue
-            # if proc.name == "st_tchannel_t"       : proc.color1 = (63, 144, 218)  # Sky Blue
-            # if proc.name == "st_tchannel_tbar"    : proc.color1 = (87, 144, 252)  # Dodger Blue
-            # if proc.name == "st_twchannel_t_sl"   : proc.color1 = (146, 218, 221) # Pale Turquoise
-            # if proc.name == "st_twchannel_tbar_sl": proc.color1 = (148, 164, 162) # Cadet Grey
-            # if proc.name == "st_twchannel_t_dl"   : proc.color1 = (169, 107, 89)  # Rosy Brown
-            # if proc.name == "st_twchannel_tbar_dl": proc.color1 = (200, 73, 169)  # Medium Violet Red
-            # if proc.name == "st_twchannel_tbar_fh": proc.color1 = (131, 45, 182)  # Amethyst
-            # if proc.name == "tt"                  : proc.color1 = (255, 169, 14)  # Orange
-            # if proc.name == "tt_sl"               : proc.color1 = (255, 169, 14)  # Orange
-            # if proc.name == "tt_dl"               : proc.color1 = (248, 156, 32)  # Dark Golden Rod
-            # if proc.name == "tt_fh"               : proc.color1 = (228, 37, 54)   # Crimson Red
-            # if proc.name == "vv"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            # if proc.name == "ww"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            # if proc.name == "zz"                  : proc.color1 = (185, 172, 112) # Olive Drab
-            # if proc.name == "wz"                  : proc.color1 = (122, 33, 221)  # Blue Violet
-            # if proc.name == "dy_lep"              : proc.color1 = (156, 156, 161) # Dark Gray
-            # if proc.name == "wj"                  : proc.color1 = "#ff9f68"    # Orange Red
-            #if proc.name == "dy_lep": proc.color1 = color=(255,204,102)
-            #if proc.name == "h_ggf_tautau": proc.color1 = (51,53,204)
-            #if proc.name == "wj": proc.color1 = (201,89,84)
-            #if proc.name == "tt_sl": proc.color1 = (153,153,204)
-            #if proc.name == "tt_dl": proc.color1 = (184,184,227)
-            #if proc.name == "tt_fh": proc.color1 = (87,87,141)
-            #if proc.name == "ww" : proc.color1 = (102,204,102)
-            #if proc.name == "wz" : proc.color1 = (49,157,49)
-            #if proc.name == "zz" : proc.color1 = (120,214,120)
-            #if proc.name == "vv" : proc.color1 = (102,204,102)
-            #if proc.name == "zh_htt": proc.color1 = (223,102,72)
-            #if proc.name == "h_ggf_htt": proc.color1 = (51,53,204)
-            #if proc.name == "vv" : proc.color1 = (102,204,102)
+            if proc.name == "vv" : proc.color1 = (102,204,102)
 
         # configuration of colors, labels, etc. can happen here
-       
+        
 
     # add datasets we need to study
     dataset_names = [
         #data
-        "data_e_C",
-        "data_e_D",
-        "data_mu_C",
-        "data_mu_D",
-        "data_tau_C",
-        "data_tau_D",
+        "data_mu_c",
+        "data_mu_d",
+        "data_mu_e",
         #Drell-Yan
         "dy_incl",
-        # "dy_lep_m10to50",
         #W+jets
         "wj_incl",
         #Diboson
@@ -144,22 +100,20 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "tt_dl",
         "tt_fh",
         #single top t-channel
-        "st_tchannel_tbar",
-        "st_tchannel_t",
+        "st_t_bbarq",
+        "st_tbar_bq",
         # single top tW channel
-        "st_twchannel_t_fh",
-        "st_twchannel_t_sl",
-        "st_twchannel_t_dl",
-        "st_twchannel_tbar_sl",
-        "st_twchannel_tbar_dl",
-        "st_twchannel_tbar_fh",
+        "st_t_wminus_to_lnu2q",
+        "st_t_wminus_to_2l2nu",
+        "st_tbar_wplus_to_lnu2q",
+        "st_tbar_wplus_to_2l2nu",
+        "signal"
         ]
     
     for dataset_name in dataset_names:
         # add the dataset
         dataset = cfg.add_dataset(campaign.get_dataset(dataset_name))
-        if dataset_name.startswith("h_"):
-            dataset.add_tag("signal")
+
         # for testing purposes, limit the number of files to 1
         for info in dataset.info.values():
             if limit_dataset_files:
@@ -179,21 +133,17 @@ def add_run3_2022_preEE (ana: od.Analysis,
     cfg.x.default_calibrator = "main"
     cfg.x.default_selector = "main"
     cfg.x.default_producer = "main"
-    cfg.x.default_weight_producer = "main"
     cfg.x.default_ml_model = None
     cfg.x.default_inference_model = "example"
     cfg.x.default_categories = ("incl",)
+    #cfg.x.default_variables = ("n_jet", "jet1_pt")
     cfg.x.default_variables = ("event","channel_id")
 
     # process groups for conveniently looping over certain processs
     # (used in wrapper_factory and during plotting)
     cfg.x.process_groups = {
-        "data" : ["data_mu", "data_tau","data_e"],
-        "vv"   : ["ww", "wz", "zz"],
-        "tt"   : ["tt_sl","tt_dl","tt_fh"],
-        "st"   : ["st_tchannel_tbar","st_tchannel_t",
-               "st_twchannel_t_fh","st_twchannel_t_sl","st_twchannel_t_dl",
-               "st_twchannel_tbar_sl","st_twchannel_tbar_dl","st_twchannel_tbar_fh"]
+        "diboson": ["ww", "wz", "zz"],
+        "tt" : ["tt_sl","tt_dl","tt_fh"]
     }
 
     # dataset groups for conveniently looping over certain datasets
@@ -228,15 +178,18 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2?rev=2#Combination_and_correlations
     #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis#DATA_AN2
     #Only F and G eras
-    cfg.x.luminosity = Number(7980, {
-        "lumi_13p6TeV_2022": 0.014j,
+    cfg.x.luminosity = Number(13960, {
+        "lumi_13p6TeV_2022": 0.022j,
         
     })
     
 
     # names of muon correction sets and working points
     # (used in the muon producer)
-   
+    #cfg.x.muon_sf_names = ("NUM_TightRelIso_DEN_TightIDandIPCut", f"{year}")
+
+    # register shifts
+    cfg.add_shift(name="nominal", id=0)
   
     cfg.x.deep_tau = DotDict.wrap({
         "tagger": "DeepTau2018v2p5",
@@ -283,104 +236,19 @@ def add_run3_2022_preEE (ana: od.Analysis,
         },
     )
     
-    def tag_caster(campaign: od.Campaign) -> str:
-        #Helper function to cast campaign tags to the tags used in POG groups for the scale factors
-        year = campaign.x.year
-        tag = campaign.x.tag
-        out_tag = ''
-        if year in [2017,2018]  : out_tag = 'UL'
-        elif tag == "preEE"     : out_tag = "Summer22"
-        elif tag == "postEE"    : out_tag = "Summer22EE"
-        elif tag == "preBpix"   : out_tag = "Summer23"
-        elif tag == "postBpix"  : out_tag = "Summer23BPix"
-        elif tag == "preVFP"    : out_tag = "preVFP_UL"
-        elif tag == "postVFP"   : out_tag = "postVFP_UL"
-        return out_tag
-
-    import os
-    tag = tag_caster(campaign)
-    ### Jet energy correction and resolution configuration ###
-    cfg.x.jec = DotDict.wrap({
-        "campaign": f"{tag}_22Sep2023",
-        "version":  "V2",
-        "jet_type": "AK4PFPuppi",
-        "levels": ["L1FastJet", "L2Relative", "L2L3Residual", "L3Absolute"],
-        "levels_for_type1_met": ["L1FastJet"],
-        "uncertainty_sources": [
-            # "AbsoluteStat",
-            # "AbsoluteScale",
-            # "AbsoluteSample",
-            # "AbsoluteFlavMap",
-            # "AbsoluteMPFBias",
-            # "Fragmentation",
-            # "SinglePionECAL",
-            # "SinglePionHCAL",
-            # "FlavorQCD",
-            # "TimePtEta",
-            # "RelativeJEREC1",
-            # "RelativeJEREC2",
-            # "RelativeJERHF",
-            # "RelativePtBB",
-            # "RelativePtEC1",
-            # "RelativePtEC2",
-            # "RelativePtHF",
-            # "RelativeBal",
-            # "RelativeSample",
-            # "RelativeFSR",
-            # "RelativeStatFSR",
-            # "RelativeStatEC",
-            # "RelativeStatHF",
-            # "PileUpDataMC",
-            # "PileUpPtRef",
-            # "PileUpPtBB",
-            # "PileUpPtEC1",
-            # "PileUpPtEC2",
-            # "PileUpPtHF",
-            # "PileUpMuZero",
-            # "PileUpEnvelope",
-            # "SubTotalPileUp",
-            # "SubTotalRelative",
-            # "SubTotalPt",
-            # "SubTotalScale",
-            # "SubTotalAbsolute",
-            # "SubTotalMC",
-            "Total",
-            # "TotalNoFlavor",
-            # "TotalNoTime",
-            # "TotalNoFlavorNoTime",
-            # "FlavorZJet",
-            # "FlavorPhotonJet",
-            # "FlavorPureGluon",
-            # "FlavorPureQuark",
-            # "FlavorPureCharm",
-            # "FlavorPureBottom",
-            "CorrelationGroupMPFInSitu",
-            "CorrelationGroupIntercalibration",
-            "CorrelationGroupbJES",
-            "CorrelationGroupFlavor",
-            "CorrelationGroupUncorrelated",
-        ],
-    })
-    
-    cfg.x.jer = DotDict.wrap({
-        "campaign": f"{tag}_22Sep2023",
-        "version": "JRV1",
-        "jet_type": "AK4PFPuppi",
-        })
-    
-    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
-    jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
     cfg.x.external_files = DotDict.wrap({
         # lumi files
         "lumi": {
-            "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
-            "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
+            "golden": ("/eos/user/c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # noqa
+            "normtag": ("/afs/cern.ch/user/l/lumipro/public/Normtags/normtag_PHYSICS.json", "v1"),
         },
-        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
-        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}_{tag}/tau.json.gz", 
-        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
-        "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
+        "pileup":{
+            #"json": ("/eos/user/c/cmsdqm/www/CAF/certification/Collisions22/PileUp/EFG/pileup_JSON.txt", "v1")
+            "data" : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/Data_PileUp_2022_preEE.root", #TODO: make a link to the common correction repo
+            "mc"   : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/MC_PileUp_2022.root" #TODO: make a link to the common correction repo
+        },
+        "muon_correction" : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/muon_SFs_2022_preEE.root", #TODO: make a link to the common correction repo
+        "tau_correction"  : "/afs/cern.ch/user/s/stzakhar/work/CPinHToTauTau/httcp/data/corrections/tau_DeepTau2018v2p5_2022_preEE.json.gz" #TODO: make a link to the common correction repo
     })
 
     # target file size after MergeReducedEvents in MB
@@ -388,30 +256,24 @@ def add_run3_2022_preEE (ana: od.Analysis,
     
     from httcp.config.variables import keep_columns
     keep_columns(cfg)
- 
-    cfg.add_shift(name="nominal", id=0)
 
-    cfg.add_shift(name="tau_up", id=1, type="shape")
-    cfg.add_shift(name="tau_down", id=2, type="shape")
-    add_shift_aliases(cfg, "tau", {"tau_weight": "tau_weight_{direction}"})
-    
-    cfg.add_shift(name="mu_up", id=3, type="shape")
-    cfg.add_shift(name="mu_down", id=4, type="shape")
-    add_shift_aliases(cfg, "mu", {"muon_weight": "muon_weight_{direction}"})
-    
-    
-    cfg.add_shift(name="ts_up", id=5, type="shape") #cp-even
-    cfg.add_shift(name="ts_down", id=7, type="shape") #cp-odd
-    add_shift_aliases(cfg, "ts", {"tauspinner_weight": "tauspinner_weight_{direction}"})
     # event weight columns as keys in an OrderedDict, mapped to shift instances they depend on
-    get_shifts = functools.partial(get_shifts_from_sources, cfg)
+    #get_shifts = functools.partial(get_shifts_from_sources, cfg)
+    cfg.x.event_weights = DotDict({
+        "normalization_weight"  : [],
+        "pu_weight"             : [],
+        "muon_weight"           : [],
+        "tau_id_sf"             : [],
+    })
     
+    cfg.x.default_weight_producer = "all_weights"
+
     # versions per task family, either referring to strings or to callables receving the invoking
     # task instance and parameters to be passed to the task family
     def set_version(cls, inst, params):
         # per default, use the version set on the command line
         version = inst.version 
-        return version if version else 'dev'
+        return version if version else 'dev1'
             
         
     cfg.x.versions = {
@@ -426,17 +288,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # channels
     cfg.add_channel(name="etau",   id=1)
     cfg.add_channel(name="mutau",  id=2)
-    #cfg.add_channel(name="emu"  ,  id=3)
     cfg.add_channel(name="tautau", id=4)
-    
-    cfg.x.ch_objects = DotDict.wrap({
-        'etau'   : {'lep0' : 'Electron',
-                    'lep1' : 'Tau'},
-        'mutau'  : {'lep0' : 'Muon',
-                    'lep1' : 'Tau'},
-        'tautau' : {'lep0' : 'Tau',
-                    'lep1' : 'Tau'},
-    })
     
     if cfg.campaign.x("custom").get("creator") == "desy":  
         def get_dataset_lfns(dataset_inst: od.Dataset, shift_inst: od.Shift, dataset_key: str) -> list[str]:
@@ -449,7 +301,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
                 basepath = "" 
             lfn_base = law.wlcg.WLCGDirectoryTarget(
                 f"{basepath}{dataset_key}",
-                fs="wlcg_fs_eos",
+                fs="wlcg_fs_eoscms_redirector",
             )
             print(f"lfn basedir:{lfn_base}")
             # loop though files and interpret paths as lfns
@@ -462,7 +314,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         # define a custom sandbox
         cfg.x.get_dataset_lfns_sandbox = dev_sandbox("bash::$CF_BASE/sandboxes/cf.sh")
         # define custom remote fs's to look at
-        cfg.x.get_dataset_lfns_remote_fs =  lambda dataset_inst: "wlcg_fs_eos"
+        cfg.x.get_dataset_lfns_remote_fs =  lambda dataset_inst: "wlcg_fs_eoscms_redirector"
         
     # add categories using the "add_category" tool which adds auto-generated ids
     from httcp.config.categories import add_categories

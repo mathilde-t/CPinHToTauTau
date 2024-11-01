@@ -85,11 +85,9 @@ def get_sorted_pair(
 
 @selector(
     uses={
-            f"Tau.{var}" for var in [
-                "pt","eta","phi","mass","charge", 
-                "idDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSe","idDeepTau2018v2p5VSmu","rawDeepTau2018v2p5VSjet"
-            ] 
-        },
+        "Tau.pt", "Tau.eta", "Tau.phi", "Tau.mass",
+        "Tau.charge", "Tau.rawDeepTau2018v2p5VSjet",
+    },
     exposed=False,
 )
 def tautau_selection(
@@ -99,15 +97,8 @@ def tautau_selection(
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult, ak.Array]:
 
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
+    #from IPython import embed; embed()
 
-    #FIX_ME with the proper WPs
-    good_lep_selections = ((events.Tau[lep_indices].idDeepTau2018v2p5VSjet>= deep_tau_vs_e_jet_wps["Medium"]) & #vsJet
-                       (events.Tau[lep_indices].idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"]) &   #vsE
-                       (events.Tau[lep_indices].idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"]))        #vsMu
-    lep_indices = lep_indices[good_lep_selections]
-    
     # Sorting leps [Tau] by deeptau [descending]
     lep_sort_key       = events.Tau[lep_indices].rawDeepTau2018v2p5VSjet
     lep_sorted_indices = ak.argsort(lep_sort_key, axis=-1, ascending=False)
@@ -123,7 +114,9 @@ def tautau_selection(
 
     preselection = {
         "tautau_is_pt_40"      : (lep1.pt > 40) & (lep2.pt > 40),
-        "tautau_is_eta_2p1"    : (np.abs(lep1.eta) < 2.1) & (np.abs(lep2.eta) < 2.1),        "tautau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,
+        "tautau_is_eta_2p1"    : (np.abs(lep1.eta) < 2.1) & (np.abs(lep2.eta) < 2.1),
+        "tautau_is_os"         : (lep1.charge * lep2.charge) < 0,
+        "tautau_dr_0p5"        : (1*lep1).delta_r(1*lep2) > 0.5,  #deltaR(lep1, lep2) > 0.5,
     }
 
     good_pair_mask = lep1_idx >= 0

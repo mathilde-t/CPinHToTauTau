@@ -8,7 +8,7 @@ from columnflow.categorization import Categorizer, categorizer
 from columnflow.util import maybe_import
 
 ak = maybe_import("awkward")
-np = maybe_import("numpy")
+
 
 #
 # categorizer functions used by categories definitions
@@ -19,117 +19,160 @@ def cat_incl(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, a
     # fully inclusive selection
     return events, ak.ones_like(events.event) == 1
 
-#Three general categories: etau, mutau and tautau
-@categorizer(uses={'hcand_etau.*'})
-def cat_etau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.num(events.hcand_etau.lep0.pt > 0, axis =1) > 0
-    return events, mask 
 
-@categorizer(uses={'hcand_mutau.*'})
-def cat_mutau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.num(events.hcand_mutau.lep0.pt > 0, axis =1) > 0
-    return events, mask
+@categorizer(uses={"Jet.pt"})
+def cat_2j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    # two or more jets
+    return events, ak.num(events.Jet.pt, axis=1) >= 2
 
-@categorizer(uses={'hcand_tautau.*'})
-def cat_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ak.num(events.hcand_tautau.lep0.pt > 0, axis =1) > 0
-    return events, mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def os_charge(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for ch_str in channels:
-        mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].rel_charge < 0), axis=1),False)
-    return events, mask
+# ---------------------------------------------------------- #
+#                            e-tau                           #
+# ---------------------------------------------------------- #
+@categorizer(uses={"channel_id"})
+def sel_etau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    return events, events["channel_id"] == ch.id
 
-@categorizer(uses={'event', 'hcand_*'})
-def ss_charge(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for ch_str in channels:
-        mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].rel_charge > 0), axis=1),False)
-    return events, mask
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_etau_pion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 0), axis=1) == 1
+    return events, ch_mask & dm_mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def mt_inv_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for ch_str in channels:
-        if ch_str != 'tautau':
-            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt > 50), axis=1),False)
-    return events, mask
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_etau_rho(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 1), axis=1) == 1
+    return events, ch_mask & dm_mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def mt_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for ch_str in channels:
-        if ch_str != 'tautau':
-            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt <= 50), axis=1),False)
-    return events, mask
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_etau_a1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 10), axis=1) == 1
+    return events, ch_mask & dm_mask
 
-@categorizer(uses={"is_b_vetoed"})
-def b_veto(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ~events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
-    return events, mask
+# ---------------------------------------------------------- #
+#                             mu-tau                         #
+# ---------------------------------------------------------- #
 
-@categorizer(uses={"is_b_vetoed"})
-def b_veto_inv(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
-    return events, mask
+@categorizer(uses={"channel_id"})
+def sel_mutau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    return events, events["channel_id"] == ch.id
 
-@categorizer(uses={'event', 'hcand_*'})
-def deep_tau_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
-    
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for channel in channels:
-        tau = events[f'hcand_{channel}'].lep1 
-        channel_mask = ak.ones_like(events[f'hcand_{channel}'].lep1.rawIdx)
-        if channel == 'mutau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Tight"])
-        elif channel == 'etau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        elif "tautau":
-            tau0 = events[f'hcand_{channel}'].lep0
-            for the_tau in [tau, tau0]:
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
-    return events, mask
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_mutau_pion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 0), axis=1) == 1
+    return events, ch_mask & dm_mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def deep_tau_inv_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
-    
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for channel in channels:
-        tau = events[f'hcand_{channel}'].lep1 
-        channel_mask = ak.ones_like(events[f'hcand_{channel}'].lep1.rawIdx)
-        if channel == 'mutau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Tight"])
-        elif channel == 'etau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        elif "tautau":
-            tau0 = events[f'hcand_{channel}'].lep0
-            for the_tau in [tau, tau0]:
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        #from IPython import embed; embed()
-        mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
-    return events, mask
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_mutau_rho(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 1), axis=1) == 1
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_mutau_a1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode[:,1:2] == 10), axis=1) == 1
+    return events, ch_mask & dm_mask
+
+
+# ---------------------------------------------------------- #
+#                            tau-tau                         #
+# ---------------------------------------------------------- #
+
+@categorizer(uses={"channel_id"})
+def sel_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    return events, events["channel_id"] == ch.id
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_pionpion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode == 0), axis=1) == 2
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_rhorho(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum((events.hcand.decayMode == 1), axis=1) == 2
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_a1a1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    dm = events.hcand.decayMode == 10
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum(dm, axis=1) == 2
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_pionrho(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    dm_hcand1 = events.hcand.decayMode[:,0:1]
+    dm_hcand2 = events.hcand.decayMode[:,1:2]    
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum(((dm_hcand1 == 0) & (dm_hcand2 == 1)) | ((dm_hcand1 == 1) & (dm_hcand2 == 0)), axis=1) == 1
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_a1pion(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    dm_hcand1 = events.hcand.decayMode[:,0:1]
+    dm_hcand2 = events.hcand.decayMode[:,1:2]    
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum(((dm_hcand1 == 0) & (dm_hcand2 == 10)) | ((dm_hcand1 == 10) & (dm_hcand2 == 0)), axis=1) == 1
+    return events, ch_mask & dm_mask
+
+@categorizer(uses={"channel_id", "hcand.decayMode"})
+def sel_tautau_a1rho(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    dm_hcand1 = events.hcand.decayMode[:,0:1]
+    dm_hcand2 = events.hcand.decayMode[:,1:2]
+    ch_mask = events["channel_id"] == ch.id
+    dm_mask = ak.sum(((dm_hcand1 == 10) & (dm_hcand2 == 1)) | ((dm_hcand1 == 1) & (dm_hcand2 == 10)), axis=1) == 1
+    return events, ch_mask & dm_mask
+
+
+
+##################################
+### Cathegories for ABCD method### 
+##################################
+
+
+@categorizer(uses={"hcand.rel_charge", "Muon.pfRelIso04_all"})
+def cat_c(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    #Control region ( iso < 0.15, same sign pair)
+    sel = (events.hcand.rel_charge[:,0] > 0) & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) < 0.15)
+    return events, sel
+
+@categorizer(uses={"rel_charge", "Muon.pfRelIso04_all"})
+def cat_d(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    #Signal region ( iso < 0.15, opposite sign pair)
+    sel = (events.hcand.rel_charge[:,0] < 0) & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) < 0.15)
+    return events, sel
+
+@categorizer(uses={"rel_charge", "Muon.pfRelIso04_all"})
+def cat_a(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    #Region for transfer factor calculation( iso > 0.15, same sign pair)
+    sel = (events.hcand.rel_charge[:,0] > 0) & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) >= 0.15)  \
+        & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) <= 0.30)
+    return events, sel
+
+@categorizer(uses={"rel_charge", "Muon.pfRelIso04_all"})
+def cat_b(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    #Region for transfer factor calculation( iso > 0.15, opposite sign pair)
+    sel = (events.hcand.rel_charge[:,0] < 0) & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) >= 0.15) \
+        & (ak.firsts(events.Muon.pfRelIso04_all, axis=1) <= 0.30)
+    return events, sel

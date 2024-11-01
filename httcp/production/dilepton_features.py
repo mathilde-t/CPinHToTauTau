@@ -36,8 +36,11 @@ def hcand_fields(
         p4 = {}
         for the_lep in hcand.fields: p4[the_lep] = get_lep_p4(hcand[the_lep]) 
         
-        mass = (p4['lep0'] + p4['lep1']).mass
-        hcand['mass'] = ak.where(mass > 0, mass , EMPTY_FLOAT)
+        pair = p4['lep0'] + p4['lep1']
+        dilep_mass = pair.mass
+        hcand['mass'] = ak.where(dilep_mass > 0, dilep_mass , EMPTY_FLOAT)
+        dilep_pt = pair.pt
+        hcand['pt'] = ak.where(dilep_pt > 0, dilep_pt , EMPTY_FLOAT)
         
         delta_r = ak.flatten(p4['lep0'].metric_table(hcand.lep1), axis=2)
         hcand['delta_r'] = ak.where(delta_r > 0, delta_r , EMPTY_FLOAT)

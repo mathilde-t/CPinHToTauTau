@@ -1,7 +1,10 @@
+#
+#source $CF_BASE/sandboxes/venv_columnar_dev.sh
 import matplotlib.pyplot as plt
 import mplhep
 import pickle
 import numpy as np
+import sys
 
 
 def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection efficiency", title="", log=False, rel=False, save_path=None):
@@ -28,7 +31,7 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
     fig, ax = plt.subplots()
     if log: plt.yscale('log')
     # Plotting the cutflow histogram
-    color = ['black','red']
+    color = ['blue', 'black','red']
     
     for i, (name, n_evt) in enumerate(data.items()):
         
@@ -38,14 +41,37 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
         if rel:
             x = cuts[1:]
             y = n_evt[1:]/n_evt[:-1]
-        else:
+        elif not log:
             x = cuts
             y = n_evt/n_evt[0]
+        else:
+            x = cuts
+            y = n_evt
         print(f'Event numbers:')
-        ax.scatter(x, y , color=color[i], marker='o', alpha=0.8, label=f"Data {name}")
-        n_evt_prev = n_evt
+        #ax.scatter(x, y , color=color[i], marker='o', alpha=0.8, label=f"Data {name}")
+        ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label="data_mu_2022C") #label=r"H$_\text{ggf}~$H$\rightarrow \tau \tau$")
+        for i, txt in enumerate(y):
+            the_txt = f'{txt:.4f}' if rel else f'{txt:.0f}'
+            ax.annotate(the_txt, (x[i], y[i]),
+                        textcoords="offset points",
+                        xytext=(0,-20),
+                        ha='center',
+                        fontsize=10)
+            
+        for i, txt in enumerate(n_evt[1:]/n_evt[:-1]*100):
+            the_txt = f'{txt:.2f}%'
+            ax.annotate(the_txt, (x[i+1], y[i+1]),
+                        textcoords="offset points",
+                        xytext=(0,-40),
+                        ha='center',
+                        fontsize=10)
 
-    if log: ax.set_ylim((1*10**-2,2*10**0))
+    if log:
+        if rel: ax.set_ylim((1*10**-6,2*10**0))
+        else: 
+            pow_nevt = int(np.log10(n_evt[0]))+1
+            ax.set_ylim((1,10**pow_nevt))
+    
     # Set labels and title
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -71,10 +97,10 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
     }
     cms_label_kwargs = {
         "ax": ax,
-        "llabel": label_options.get("pw"),
+        "llabel": label_options.get("simwip"),
         "fontsize": 22,
         "data": True,
-        'rlabel': "Data to Data"
+        'rlabel': name
     }
     mplhep.cms.label(**cms_label_kwargs)
    
@@ -106,15 +132,12 @@ def get_hist_values(pickle_file):
  
 
 
-
-path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12/data_mu_g/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/condor_production/cutflow_hist__event.pickle"
-#path18 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run2_UL2018_nano_tau_v10_limited/data_ul2018_a_single_mu/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_mutau_os_mutau_dr_0p5_mutau_mt_50_single_pair/dev1/cutflow_hist__event.pickle"
-#path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12_limited/data_mu_f/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/multi_pair/cutflow_hist__event.pickle"
-cuts, values22 = get_hist_values(path22)
-#cuts, values18 = get_hist_values(path18)
+path = sys.argv[1]
+cuts, values = get_hist_values(path)
 
 create_cutflow_histogram(cuts, 
-                         data={"2022_postEE": values22},
-                         save_path="mutau_cutflow_histogram_l.pdf",
-                         log=False,
-                         rel=True)
+                         data={"": values},
+                         save_path="cutflow_histogram_2022_preEE_full.pdf",
+                         ylabel="N evt",
+                         log=True,
+                         rel=False)

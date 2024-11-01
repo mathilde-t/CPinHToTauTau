@@ -20,7 +20,7 @@ from columnflow.config_util import (
 ak = maybe_import("awkward")
 
 
-def add_run3_2022_preEE (ana: od.Analysis,
+def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
                       campaign: od.Campaign,
                       config_name           = None,
                       config_id             = None,
@@ -38,128 +38,30 @@ def add_run3_2022_preEE (ana: od.Analysis,
     cfg.x.year = campaign.x.year
     
     # add processes we are interested in
-    
     process_names = [
-        "data", 
-        "data_mu",
-        "data_tau",
-        "data_e",
-        #Drell-Yan
-        "dy_lep",
-        "dy_z2ee",
-        "dy_z2mumu",
-        "dy_z2tautau",
-        # "dy_z2tautau",
-        # "dy_z2ll",
-        # "dy_lep_m10to50",
-        #W + jets
-        "wj",
-        #diboson
-        "vv", #diboson inclusive
-        "ww",
-        "wz",
-        "zz",
-        #ttbar
-        "tt",#ttbar inclusive
-        "tt_sl",
-        "tt_dl",
-        "tt_fh",
-        #single top
-        "st",
-        #single top t-channel        
-        "st_tchannel_tbar",
-        "st_tchannel_t",
-        # single top tW channel
-        "st_twchannel_t_fh",
-        "st_twchannel_t_sl",
-        "st_twchannel_t_dl",
-        "st_twchannel_tbar_sl",
-        "st_twchannel_tbar_dl",
-        "st_twchannel_tbar_fh",
+        "h_ggf_htt", 
+        "zh_htt" 
     ]
     for process_name in process_names:
         # add the process
         proc = cfg.add_process(procs.get(process_name))
-        #for signal datasets create special tag
-        if process_name.startswith("h_"):
-            proc.add_tag("signal")
-            
-        #if proc.is_mc:
-            # Updated color mapping to avoid repetition and ensure unique colors
-            # if proc.name == "st"                  : proc.color1 = (63, 144, 218)  # Sky Blue
-            # if proc.name == "st_tchannel_t"       : proc.color1 = (63, 144, 218)  # Sky Blue
-            # if proc.name == "st_tchannel_tbar"    : proc.color1 = (87, 144, 252)  # Dodger Blue
-            # if proc.name == "st_twchannel_t_sl"   : proc.color1 = (146, 218, 221) # Pale Turquoise
-            # if proc.name == "st_twchannel_tbar_sl": proc.color1 = (148, 164, 162) # Cadet Grey
-            # if proc.name == "st_twchannel_t_dl"   : proc.color1 = (169, 107, 89)  # Rosy Brown
-            # if proc.name == "st_twchannel_tbar_dl": proc.color1 = (200, 73, 169)  # Medium Violet Red
-            # if proc.name == "st_twchannel_tbar_fh": proc.color1 = (131, 45, 182)  # Amethyst
-            # if proc.name == "tt"                  : proc.color1 = (255, 169, 14)  # Orange
-            # if proc.name == "tt_sl"               : proc.color1 = (255, 169, 14)  # Orange
-            # if proc.name == "tt_dl"               : proc.color1 = (248, 156, 32)  # Dark Golden Rod
-            # if proc.name == "tt_fh"               : proc.color1 = (228, 37, 54)   # Crimson Red
-            # if proc.name == "vv"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            # if proc.name == "ww"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            # if proc.name == "zz"                  : proc.color1 = (185, 172, 112) # Olive Drab
-            # if proc.name == "wz"                  : proc.color1 = (122, 33, 221)  # Blue Violet
-            # if proc.name == "dy_lep"              : proc.color1 = (156, 156, 161) # Dark Gray
-            # if proc.name == "wj"                  : proc.color1 = "#ff9f68"    # Orange Red
-            #if proc.name == "dy_lep": proc.color1 = color=(255,204,102)
-            #if proc.name == "h_ggf_tautau": proc.color1 = (51,53,204)
-            #if proc.name == "wj": proc.color1 = (201,89,84)
-            #if proc.name == "tt_sl": proc.color1 = (153,153,204)
-            #if proc.name == "tt_dl": proc.color1 = (184,184,227)
-            #if proc.name == "tt_fh": proc.color1 = (87,87,141)
-            #if proc.name == "ww" : proc.color1 = (102,204,102)
-            #if proc.name == "wz" : proc.color1 = (49,157,49)
-            #if proc.name == "zz" : proc.color1 = (120,214,120)
-            #if proc.name == "vv" : proc.color1 = (102,204,102)
-            #if proc.name == "zh_htt": proc.color1 = (223,102,72)
-            #if proc.name == "h_ggf_htt": proc.color1 = (51,53,204)
-            #if proc.name == "vv" : proc.color1 = (102,204,102)
-
+        if proc.is_mc:
+            if proc.name == "zh_htt": proc.color1 = (223,102,72)
+            if proc.name == "h_ggf_htt": proc.color1 = (51,53,204)
         # configuration of colors, labels, etc. can happen here
-       
+        
 
     # add datasets we need to study
     dataset_names = [
-        #data
-        "data_e_C",
-        "data_e_D",
-        "data_mu_C",
-        "data_mu_D",
-        "data_tau_C",
-        "data_tau_D",
-        #Drell-Yan
-        "dy_incl",
-        # "dy_lep_m10to50",
-        #W+jets
-        "wj_incl",
-        #Diboson
-        "ww",
-        "wz",
-        "zz",
-        #ttbar
-        "tt_sl",
-        "tt_dl",
-        "tt_fh",
-        #single top t-channel
-        "st_tchannel_tbar",
-        "st_tchannel_t",
-        # single top tW channel
-        "st_twchannel_t_fh",
-        "st_twchannel_t_sl",
-        "st_twchannel_t_dl",
-        "st_twchannel_tbar_sl",
-        "st_twchannel_tbar_dl",
-        "st_twchannel_tbar_fh",
+        'h_ggf_htt_filtered',
+        'h_ggf_htt_unfiltered',
+        'zh_htt_unfiltered'
         ]
     
     for dataset_name in dataset_names:
         # add the dataset
         dataset = cfg.add_dataset(campaign.get_dataset(dataset_name))
-        if dataset_name.startswith("h_"):
-            dataset.add_tag("signal")
+
         # for testing purposes, limit the number of files to 1
         for info in dataset.info.values():
             if limit_dataset_files:
@@ -180,20 +82,16 @@ def add_run3_2022_preEE (ana: od.Analysis,
     cfg.x.default_selector = "main"
     cfg.x.default_producer = "main"
     cfg.x.default_weight_producer = "main"
+
     cfg.x.default_ml_model = None
     cfg.x.default_inference_model = "example"
     cfg.x.default_categories = ("incl",)
+    #cfg.x.default_variables = ("n_jet", "jet1_pt")
     cfg.x.default_variables = ("event","channel_id")
 
     # process groups for conveniently looping over certain processs
     # (used in wrapper_factory and during plotting)
     cfg.x.process_groups = {
-        "data" : ["data_mu", "data_tau","data_e"],
-        "vv"   : ["ww", "wz", "zz"],
-        "tt"   : ["tt_sl","tt_dl","tt_fh"],
-        "st"   : ["st_tchannel_tbar","st_tchannel_t",
-               "st_twchannel_t_fh","st_twchannel_t_sl","st_twchannel_t_dl",
-               "st_twchannel_tbar_sl","st_twchannel_tbar_dl","st_twchannel_tbar_fh"]
     }
 
     # dataset groups for conveniently looping over certain datasets
@@ -236,7 +134,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
 
     # names of muon correction sets and working points
     # (used in the muon producer)
-   
+    #cfg.x.muon_sf_names = ("NUM_TightRelIso_DEN_TightIDandIPCut", f"{year}")
   
     cfg.x.deep_tau = DotDict.wrap({
         "tagger": "DeepTau2018v2p5",
@@ -296,9 +194,10 @@ def add_run3_2022_preEE (ana: od.Analysis,
         elif tag == "preVFP"    : out_tag = "preVFP_UL"
         elif tag == "postVFP"   : out_tag = "postVFP_UL"
         return out_tag
-
+    
     import os
     tag = tag_caster(campaign)
+    
     ### Jet energy correction and resolution configuration ###
     cfg.x.jec = DotDict.wrap({
         "campaign": f"{tag}_22Sep2023",

@@ -5,12 +5,10 @@ Prepare h-Candidate from SelectionResult: selected lepton indices & channel_id [
 """
 
 from typing import Optional
-from columnflow.selection import SelectionResult
+from columnflow.selection import Selector, SelectionResult, selector
 from columnflow.selection.util import create_collections_from_masks
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
-
-from hcp.util import invariant_mass, deltaR, transverse_mass
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -100,7 +98,7 @@ def get_sorted_pair(
         "Electron.charge", "Electron.pfRelIso03_all",
         "Muon.pt", "Muon.eta", "Muon.phi", "Muon.mass",
         "Muon.charge", "Muon.pfRelIso03_all",
-        "MET.pt", "MET.phi",
+        "PuppiMET.pt", "PuppiMET.phi",
     },
     exposed=False,
 )
@@ -123,9 +121,7 @@ def emu_selection(
     lep1_idx, lep2_idx = ak.unzip(lep_indices_pair)
 
     preselection = {
-        "is_os"         : (lep1.charge * lep2.charge) < 0,
-        "dr_0p5"        : deltaR(lep1, lep2) > 0.5,
-        "mT_50"         : transverse_mass(lep1, events.MET) < 50
+        "dr_0p5"        : lep1.metric_table(lep2) > 0.5,
     }
 
     good_pair_mask = lep1_idx >= 0

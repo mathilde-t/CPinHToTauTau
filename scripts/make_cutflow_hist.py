@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import mplhep
 import pickle
 import numpy as np
+import sys
 
 
 def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection efficiency", title="", log=False, rel=False, save_path=None):
@@ -48,7 +49,7 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
             y = n_evt
         print(f'Event numbers:')
         #ax.scatter(x, y , color=color[i], marker='o', alpha=0.8, label=f"Data {name}")
-        ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label='Data') #label=r"H$_\text{ggf}~$H$\rightarrow \tau \tau$")
+        ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label="data_mu_2022C") #label=r"H$_\text{ggf}~$H$\rightarrow \tau \tau$")
         for i, txt in enumerate(y):
             the_txt = f'{txt:.4f}' if rel else f'{txt:.0f}'
             ax.annotate(the_txt, (x[i], y[i]),
@@ -131,15 +132,11 @@ def get_hist_values(pickle_file):
  
 
 
-
-#path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12/data_mu_g/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/condor_production/cutflow_hist__event.pickle"
-#path22 = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_tau_spinner_limited/h_ggf_htt_filtered/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_trigobj_prematch_trigobj_postmatch_dilepton_veto_extra_lepton_veto_One_higgs_cand_per_event_has_proper_tau_decay_products/test/cutflow_hist__event.pickle"
-#path22 = "//afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_tau_spinner_limited/h_ggf_htt_filtered/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_trigobj_prematch_trigobj_postmatch_dilepton_veto_extra_lepton_veto_multiple_hcands_has_proper_tau_decay_products/test/cutflow_hist__event.pickle"
-path22 = "/afs/desy.de/user/s/stzakhar/nfs/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_limited/data_e_C/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_selected_hcand_selected_hcand_trigmatch_dilepton_veto_extra_lepton_veto_single_hcand_decay_prods_are_ok/trig_bug/cutflow_hist__event.pickle"
-cuts, values22 = get_hist_values(path22)
+path = sys.argv[1]
+cuts, values = get_hist_values(path)
 
 create_cutflow_histogram(cuts, 
-                         data={"2022 preEE": values22},
+                         data={"": values},
                          save_path="cutflow_histogram_2022_preEE_full.pdf",
                          ylabel="N evt",
                          log=True,

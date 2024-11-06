@@ -23,7 +23,6 @@ def main(self: WeightProducer, events: ak.Array, **kwargs) -> ak.Array:
     weight = ak.Array(np.ones(len(events), dtype=np.float32))
     for column in self.weight_columns:
         weight = weight * Route(column).apply(events)
-    print(self.weight_columns)
     return events, weight
 
 

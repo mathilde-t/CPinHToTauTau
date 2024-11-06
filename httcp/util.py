@@ -221,6 +221,7 @@ def hlt_path_matching(events, triggers, pair_objects):
             if is_single_mu:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 13
+
                 # pt requirement on the offline object before the trigger matching (leg 0)
                 pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
                 # eta requirement on the offline object before the trigger matching (leg 0)
@@ -357,12 +358,6 @@ def hlt_path_matching(events, triggers, pair_objects):
     triggerID_mu    = hlt_path_fired(events, hlt_path_fired_mu)
     triggerID_mutau = hlt_path_fired(events, hlt_path_fired_mutau)
     triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
-    
-    events = set_ak_column(events, "triggerID_e", triggerID_e)
-    events = set_ak_column(events, "triggerID_etau", triggerID_etau)
-    events = set_ak_column(events, "triggerID_mu", triggerID_mu)
-    events = set_ak_column(events, "triggerID_mutau", triggerID_mutau)
-    events = set_ak_column(events, "triggerID_tau", triggerID_tau)
 
     # Generate candidate pairs based on matching triggers
     etau_channel_mask = ((triggerID_e > 0) | (triggerID_etau > 0))
@@ -374,7 +369,7 @@ def hlt_path_matching(events, triggers, pair_objects):
         'mutau' : mutau_channel_mask,
         'tautau': tautau_channel_mask
     })
-    return matched_masks
+    return matched_masks, triggerID_e, triggerID_etau, triggerID_mu, triggerID_mutau, triggerID_tau
 
 
 

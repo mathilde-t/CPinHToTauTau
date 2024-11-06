@@ -10,7 +10,7 @@ from columnflow.util import maybe_import
 from columnflow.columnar_util import set_ak_column, has_ak_column, EMPTY_FLOAT, Route, flat_np_view, optional_column as optional
 from columnflow.util import DotDict
 
-from httcp.util import hlt_path_matching
+from httcp.util import hlt_path_matching, hlt_path_fired
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -38,7 +38,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
             ] 
         } | {optional("Tau.genPartFlav")},
     produces={
-        'hcand_*'
+        'hcand_*', "triggerID_e", "triggerID_etau", "triggerID_mu", "triggerID_mutau", "triggerID_tau", "all_triggers_id",
     },
     exposed=False,
 )
@@ -66,7 +66,20 @@ def new_higgscand(
     
     if domatch: 
         n_pairs_postmatch = ak.zeros_like(events.event)
-        matched_masks = hlt_path_matching(events, trigger_results, pair_objects)
+        matched_masks, triggerID_e, triggerID_etau, triggerID_mu, triggerID_mutau, triggerID_tau = hlt_path_matching(events, trigger_results, pair_objects)
+        # Define arrays in a dictionary for easy management
+        trigger_arrays = {
+            "triggerID_e": triggerID_e,
+            "triggerID_etau": triggerID_etau,
+            "triggerID_mu": triggerID_mu,
+            "triggerID_mutau": triggerID_mutau,
+            "triggerID_tau": triggerID_tau,
+        }
+        for column_name, array in trigger_arrays.items():
+            events = set_ak_column(events, column_name, array)
+        matched_trigger_array = hlt_path_fired(events, trigger_arrays)
+        events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
+       
         hcands = {}
         for the_ch in channels:
             matched_pairs = {}

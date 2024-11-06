@@ -153,7 +153,6 @@ def main(
                                               'mutau',
                                               good_muon_indices,
                                               good_tau_indices)
-    #from IPython import embed; embed()
     etau_indices_pair = self[pair_selection](events,
                                              'etau',
                                              good_ele_indices,

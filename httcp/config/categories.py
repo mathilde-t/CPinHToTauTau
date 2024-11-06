@@ -138,19 +138,8 @@ def add_categories(config: od.Config) -> None:
                    b_veto.selection],
         label=r"$\mu\tau$ signal region",
     )
-
-    mutau_nomt = add_category(
-        config,
-        name="mutau_nomt",
-        id=2100 + mutau.id,
-        selection=[mutau.selection,
-                   os_charge.selection,
-                   deep_tau_wp.selection,
-                   b_veto.selection],
-        label=r"$\mu\tau$ no mT cut",
-    )
-
-    mutau_inv_deeptau = add_category(
+    
+    mutau_inv_mt = add_category(
         config,
         name="mutau_inv_deeptau",
         id=1000 + mutau.id,
@@ -160,6 +149,39 @@ def add_categories(config: od.Config) -> None:
                    b_veto.selection,
                    deep_tau_inv_wp.selection],
         label=r"$\mu\tau$ inv DeepTau",
+    )
+    mutau_inv_mt = add_category(
+        config,
+        name="mutau_inv_mt",
+        id=3000 + mutau.id,
+        selection=[mutau.selection,
+                   os_charge.selection,
+                   mT_inv_cut.selection,
+                   b_veto.selection,
+                   deep_tau_wp.selection],
+        label=r"$\mu\tau$ inv mt",
+    )
+    mutau_no_mt = add_category(
+        config,
+        name="mutau_no_mt",
+        id=4000 + mutau.id,
+        selection=[mutau.selection,
+                   os_charge.selection,
+                   b_veto.selection,
+                   deep_tau_wp.selection],
+        label=r"$\mu\tau$ no mt",
+    )
+    
+    mutau_ff_control_reg = add_category(
+        config,
+        name="mutau_ff_control_reg",
+        id=5000 + mutau.id,
+        selection=[mutau.selection,
+                   ss_charge.selection,
+                   mT_cut.selection,
+                   deep_tau_wp.selection,
+                   b_veto.selection],
+        label=r"$\mu\tau$ control region",
     )
     
     #################################
@@ -181,6 +203,17 @@ def add_categories(config: od.Config) -> None:
                    b_veto.selection],
         label=r"$e\tau$ signal region",
     )
+    etau_ff_control_reg = add_category(
+        config,
+        name="etau_ff_control_reg",
+        id=5000 + etau.id,
+        selection=[etau.selection,
+                   ss_charge.selection,
+                   mT_cut.selection,
+                   deep_tau_wp.selection,
+                   b_veto.selection],
+        label=r"$e\tau$ control region",
+    )
     etau_inv_deeptau = add_category(
         config,
         name="etau_inv_deeptau",
@@ -191,6 +224,17 @@ def add_categories(config: od.Config) -> None:
                    b_veto.selection,
                    deep_tau_inv_wp.selection],
         label=r"$e\tau$ inv DeepTau",
+    )
+    
+    etau_no_mt = add_category(
+        config,
+        name="etau_no_mt",
+        id=2000 + etau.id,
+        selection=[etau.selection,
+                   os_charge.selection,
+                   b_veto.selection,
+                   deep_tau_wp.selection],
+        label=r"$e\tau$ no mt",
     )
     
     ################################

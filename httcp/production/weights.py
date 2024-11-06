@@ -3,7 +3,7 @@ from columnflow.production import Producer, producer
 from columnflow.util import maybe_import, safe_div, InsertableDict
 from columnflow.columnar_util import set_ak_column, has_ak_column, EMPTY_FLOAT, Route, flat_np_view, optional_column as optional
 from columnflow.production.util import attach_coffea_behavior
-
+from columnflow.selection.util import sorted_indices_from_mask
 
 ak     = maybe_import("awkward")
 np     = maybe_import("numpy")
@@ -42,9 +42,58 @@ def get_mc_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 
     return events
 
+###########################
+#### Z pt reweighting #####
+###########################
+@producer(
+    uses={
+        "GenZ.*",
+    },
+    produces={
+        "zpt_weight"
+    },
+    mc_only=True,
+)
+def zpt_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
+
+    # is within range
+    is_outside_range = (
+        ((events.GenZ.pt == 0.0) & (events.GenZ.mass == 0.0))
+        | ((events.GenZ.pt >= 600.0) | (events.GenZ.mass >= 1000.0))
+    )
+
+    sf_nom = ak.ones_like(events.event,dtype=np.float32)
+    
+    # for safety
+    zm  = ak.where(events.GenZ.mass > 1000.0, 999.99, events.GenZ.mass)
+    zpt = ak.where(events.GenZ.pt > 600.0, 599.99, events.GenZ.pt)
+
+    processes = self.dataset_inst.processes.names()
+    if ak.any(['dy' in proc for proc in processes]):
+        sf_nom = ak.where(is_outside_range,
+                          1.0,
+                          self.zpt_corrector(self,zm,zpt))
+
+    events = set_ak_column(events, "zpt_weight", sf_nom, value_type=np.float32)
+    return events
+
+@zpt_weight.setup
+def zpt_weight_setup(
+    self: Producer,
+    reqs: dict,
+    inputs: dict,
+    reader_targets: InsertableDict,
+) -> None:
+    from coffea.lookup_tools import extractor
+    ext = extractor()
+    full_fname = self.config_inst.x.external_files.zpt_weight
+    ext.add_weight_sets([f'zpt_weight zptmass_histo {full_fname}'])
+    ext.finalize()
+    self.evaluator = ext.make_evaluator()
+    self.zpt_corrector = lambda self, mass, pt: self.evaluator['zpt_weight'](mass,pt)
+                        
 
 ### MUON WEIGHT CALCULATOR ###
-
 
 @producer(
     uses={
@@ -223,7 +272,7 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
 
     #Helper function to deal with the case when two taus exist at the events. In that case one should multiply sf values to get the sf per event
     shape_sf = lambda sf: ak.prod(ak.unflatten(sf, 
-                                               ak.num(events.Tau.pt, axis=1)), 
+                                            ak.num(events.Tau.pt, axis=1)), 
                                   axis=1, 
                                   mask_identity=False)
     
@@ -260,15 +309,24 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                                                             syst)
                     else: #Run3 scale factor inputs:
                         args_vs_e = lambda mask, syst : (eta[mask],
-                                                        dm[mask],
-                                                        genmatch[mask],
-                                                        self.config_inst.x.deep_tau.vs_e, 
-                                                        syst)   
+                                                         dm[mask],
+                                                         genmatch[mask],
+                                                         self.config_inst.x.deep_tau.vs_e, 
+                                                         syst)   
                         args_vs_mu = lambda mask, syst : (eta[mask],
-                                                        genmatch[mask],
-                                                        self.config_inst.x.deep_tau.vs_mu, 
-                                                        syst)  
-                    tau_part_flav = {
+                                                          genmatch[mask],
+                                                          self.config_inst.x.deep_tau.vs_mu, 
+                                                          syst)  
+                        
+                        args_vs_jet = lambda mask, syst : (pt[mask],
+                                                           dm[mask],
+                                                           genmatch[mask],
+                                                           self.config_inst.x.deep_tau.vs_jet,
+                                                           self.config_inst.x.deep_tau.vs_e,
+                                                           syst,
+                                                           "dm")
+                        
+                        tau_part_flav = {
                         "prompt_e"  : 1,
                         "prompt_mu" : 2,
                         "tau->e"    : 3,
@@ -282,6 +340,10 @@ def tau_weight(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak.
                     #Calculate scale factors for tau vs muon classifier 
                     mu_mask = ((genmatch == tau_part_flav["prompt_mu"]) | (genmatch == tau_part_flav["tau->mu"])) & masked_dm
                     per_ch_sf[mu_mask] *= self.id_vs_mu_corrector.evaluate(*args_vs_mu(mu_mask,shift)) 
+                    #Calculate tau ID scale factors
+                    tau_mask = (genmatch == tau_part_flav["tau_had"]) & masked_dm
+                    per_ch_sf[tau_mask] *= self.id_vs_jet_corrector.evaluate(*args_vs_jet(tau_mask,shift))
+
                     ch_mask = ak.num(tau, axis=1) > 0
                     shaped_sf = ak.unflatten(per_ch_sf, ak.num(tau.pt, axis=1))
                     sf_values = sf_values * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)       

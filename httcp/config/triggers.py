@@ -274,10 +274,11 @@ def add_triggers_run3_2022_preEE(config: od.Config) -> None:
         # https://github.com/cms-sw/cmssw/blob/203834e3ae301f2564423dd1cc84bebf660519b9/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L118
         Trigger(
             name="HLT_IsoMu24",
-            id=131, #13 is for muon pdg_id, 1 because it's first muon trigger
+            id=132, #13 is for muon pdg_id, 1 because it's first muon trigger
             legs=[
                 TriggerLeg(
                     pdg_id=13,
+                    trigger_bits=[2,4],
                     min_pt=25.0,
                     min_eta=2.4,
                     trigger_bits= [2,4], 

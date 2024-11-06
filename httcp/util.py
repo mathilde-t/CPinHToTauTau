@@ -221,7 +221,8 @@ def hlt_path_matching(events, triggers, pair_objects):
             if is_single_mu:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 13
-
+                
+                dr_matching = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
                 # pt requirement on the offline object before the trigger matching (leg 0)
                 pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
                 # eta requirement on the offline object before the trigger matching (leg 0)
@@ -231,7 +232,6 @@ def hlt_path_matching(events, triggers, pair_objects):
                 
                 # Delta R matching
                 dr_matching = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
-                
                 single_mu_matches_leg0 = dr_matching
                 single_mu_matches_leg0 = ak.any(ak.flatten(single_mu_matches_leg0, axis=-1), axis=1)
                 single_muon_triggered = ak.where(trigger_fired & is_single_mu, True, single_muon_triggered)
@@ -242,6 +242,9 @@ def hlt_path_matching(events, triggers, pair_objects):
                 assert abs(trigger.legs[0].pdg_id) == 13
                 assert abs(trigger.legs[1].pdg_id) == 15
                 
+                dr_matching_mu = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
+                cross_mu_matches_leg0 = dr_matching_mu
+    
                 # pt requirement on the offline object before the trigger matching (leg 0)
                 pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
                 # eta requirement on the offline object before the trigger matching (leg 0)
@@ -261,7 +264,6 @@ def hlt_path_matching(events, triggers, pair_objects):
             
                 dr_matching_tau = trigger_object_matching(taus, events.TrigObj[leg_masks[1]])
                 cross_mu_tau_matches_leg1 = dr_matching_tau
-                
                 cross_mu_tau_matched = (ak.any(ak.flatten(cross_mu_matches_leg0, axis=-1), axis=1) & 
                                         ak.any(ak.flatten(cross_mu_tau_matches_leg1, axis=-1), axis=1))
                 cross_muon_triggered = ak.where(trigger_fired & is_cross_mu, True, cross_muon_triggered)
@@ -284,7 +286,6 @@ def hlt_path_matching(events, triggers, pair_objects):
                 electrons = electrons[pt_mask0 & eta_mask0]           
 
                 dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
-                
                 single_e_matches_leg0 =  dr_matching_e
                 single_e_matches_leg0 = ak.any(ak.flatten(single_e_matches_leg0, axis=-1), axis=1)
                 single_electron_triggered = ak.where(trigger_fired & is_single_el, True, single_electron_triggered)

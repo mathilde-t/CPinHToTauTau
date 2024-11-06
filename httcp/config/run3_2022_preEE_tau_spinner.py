@@ -280,6 +280,7 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
         #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}_{tag}/tau.json.gz", 
         "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
         "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
+        "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
     })
 
     # target file size after MergeReducedEvents in MB

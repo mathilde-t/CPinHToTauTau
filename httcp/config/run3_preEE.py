@@ -56,6 +56,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "dy_lep",
         "dy_z2ee",
         "dy_z2mumu",
+        "dy_z2tautau",
         # "dy_z2tautau",
         # "dy_z2ll",
         # "dy_lep_m10to50",
@@ -91,28 +92,27 @@ def add_run3_2022_preEE (ana: od.Analysis,
         if process_name.startswith("h_"):
             proc.add_tag("signal")
             
-        if proc.is_mc:
+        #if proc.is_mc:
             # Updated color mapping to avoid repetition and ensure unique colors
-            if proc.name == "st"                  : proc.color1 = (63, 144, 218)  # Sky Blue
-            if proc.name == "st_tchannel_t"       : proc.color1 = (63, 144, 218)  # Sky Blue
-            if proc.name == "st_tchannel_tbar"    : proc.color1 = (87, 144, 252)  # Dodger Blue
-            if proc.name == "st_twchannel_t_sl"   : proc.color1 = (146, 218, 221) # Pale Turquoise
-            if proc.name == "st_twchannel_tbar_sl": proc.color1 = (148, 164, 162) # Cadet Grey
-            if proc.name == "st_twchannel_t_dl"   : proc.color1 = (169, 107, 89)  # Rosy Brown
-            if proc.name == "st_twchannel_tbar_dl": proc.color1 = (200, 73, 169)  # Medium Violet Red
-            if proc.name == "st_twchannel_tbar_fh": proc.color1 = (131, 45, 182)  # Amethyst
-            if proc.name == "tt"                  : proc.color1 = (255, 169, 14)  # Orange
-            if proc.name == "tt_sl"               : proc.color1 = (255, 169, 14)  # Orange
-            if proc.name == "tt_dl"               : proc.color1 = (248, 156, 32)  # Dark Golden Rod
-            if proc.name == "tt_fh"               : proc.color1 = (228, 37, 54)   # Crimson Red
-            if proc.name == "vv"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            if proc.name == "ww"                  : proc.color1 = (101, 99, 100)  # Charcoal
-            if proc.name == "zz"                  : proc.color1 = (185, 172, 112) # Olive Drab
-            if proc.name == "wz"                  : proc.color1 = (122, 33, 221)  # Blue Violet
-            if proc.name == "dy_lep"              : proc.color1 = (156, 156, 161) # Dark Gray
-            if proc.name == "wj"                  : proc.color1 = (255, 94, 2)    # Orange Red
-			
-			#if proc.name == "dy_lep": proc.color1 = color=(255,204,102)
+            # if proc.name == "st"                  : proc.color1 = (63, 144, 218)  # Sky Blue
+            # if proc.name == "st_tchannel_t"       : proc.color1 = (63, 144, 218)  # Sky Blue
+            # if proc.name == "st_tchannel_tbar"    : proc.color1 = (87, 144, 252)  # Dodger Blue
+            # if proc.name == "st_twchannel_t_sl"   : proc.color1 = (146, 218, 221) # Pale Turquoise
+            # if proc.name == "st_twchannel_tbar_sl": proc.color1 = (148, 164, 162) # Cadet Grey
+            # if proc.name == "st_twchannel_t_dl"   : proc.color1 = (169, 107, 89)  # Rosy Brown
+            # if proc.name == "st_twchannel_tbar_dl": proc.color1 = (200, 73, 169)  # Medium Violet Red
+            # if proc.name == "st_twchannel_tbar_fh": proc.color1 = (131, 45, 182)  # Amethyst
+            # if proc.name == "tt"                  : proc.color1 = (255, 169, 14)  # Orange
+            # if proc.name == "tt_sl"               : proc.color1 = (255, 169, 14)  # Orange
+            # if proc.name == "tt_dl"               : proc.color1 = (248, 156, 32)  # Dark Golden Rod
+            # if proc.name == "tt_fh"               : proc.color1 = (228, 37, 54)   # Crimson Red
+            # if proc.name == "vv"                  : proc.color1 = (101, 99, 100)  # Charcoal
+            # if proc.name == "ww"                  : proc.color1 = (101, 99, 100)  # Charcoal
+            # if proc.name == "zz"                  : proc.color1 = (185, 172, 112) # Olive Drab
+            # if proc.name == "wz"                  : proc.color1 = (122, 33, 221)  # Blue Violet
+            # if proc.name == "dy_lep"              : proc.color1 = (156, 156, 161) # Dark Gray
+            # if proc.name == "wj"                  : proc.color1 = "#ff9f68"    # Orange Red
+            #if proc.name == "dy_lep": proc.color1 = color=(255,204,102)
             #if proc.name == "h_ggf_tautau": proc.color1 = (51,53,204)
             #if proc.name == "wj": proc.color1 = (201,89,84)
             #if proc.name == "tt_sl": proc.color1 = (153,153,204)
@@ -535,6 +535,8 @@ def add_run3_2022_preEE (ana: od.Analysis,
         #"electron_correction" : (f"{jsonpog_dir}EGM/{cfg.x.year}{tag}/electron.json.gz", "v2")
         #"tau_correction"  : f"{jsonpog_dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
         "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
+        "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
+        "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jetvetomaps.json.gz", "v2"),
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
@@ -672,5 +674,10 @@ def add_run3_2022_preEE (ana: od.Analysis,
         
     from httcp.config.variables import add_variables
     add_variables(cfg)
+    
+    from httcp.data_driven.hist_hooks import add_hist_hooks
+    add_hist_hooks(cfg)
+
+
     
     

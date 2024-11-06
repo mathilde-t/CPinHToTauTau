@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import mplhep
 import pickle
 import numpy as np
+import sys
 
 
 def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection efficiency", title="", log=False, rel=False, save_path=None):
@@ -46,6 +47,7 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
             x = cuts
             y = n_evt
         print(f'Event numbers:')
+
         #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Z $\rightarrow \ell \ell$")
         #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"W $\rightarrow \ell \nu$")
         #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"EGamma_2022C Data")
@@ -55,6 +57,7 @@ def create_cutflow_histogram(cuts, data, xlabel="Selections", ylabel="Selection 
         ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Tau_2022C Data")
         # ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"Tau_2022D Data")
         #ax.step(x, y , color=color[i], where='mid',marker='o', linewidth=1.2, alpha=0.8, label=r"$H_{ggf} \rightarrow \tau\tau$")        
+
         for i, txt in enumerate(y):
             the_txt = f'{txt:.4f}' if rel else f'{txt:.0f}'
             ax.annotate(the_txt, (x[i], y[i]),
@@ -125,9 +128,6 @@ def get_hist_values(pickle_file):
         cuts.append(f'{cut_name}')
         values.append(hist[0,f'{cut_name}',0,0].count)
     return cuts, values
-
- 
-
 
 #DY
 #path22 = '/afs/cern.ch/user/j/jmalvaso/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE/dy_incl/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_dilepton_veto_selected_hcand_selected_hcand_trigmatch_single_hcand_extra_lepton_veto_decay_prods_are_ok/dev/cutflow_hist__event.pickle'

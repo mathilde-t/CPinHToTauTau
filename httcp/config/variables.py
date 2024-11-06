@@ -17,9 +17,11 @@ def keep_columns(cfg: od.Config) -> None:
         "cf.ReduceEvents": {
             # TauProds
             "TauProd.*",
+            "GenPart.*",
+            "GenZ.*",
             # general event info
             "run", "luminosityBlock", "event",
-            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP", "HTXS_njets*", "LHE_Njets"
+            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP", "HTXS_njets*", "LHE_Njets","weight","zpt_weight","muon_weight_nom","mc_weight","tau_weight_nom",
         } | {
             f"PuppiMET.{var}" for var in [
                 "pt", "phi", "significance",
@@ -71,7 +73,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "0", "0_alt", "0p25", "0p25_alt", "0p375",
                 "0p375_alt", "0p5", "0p5_alt", "minus0p25", "minus0p25_alt"
             ]
-            } | {
+        } | {
             f"hcand.{var}" for var in [
                 "pt","eta","phi","mass", "charge", 
                 "decayMode", "rawIdx", "ip_sig", "IPx", "IPy","IPz"

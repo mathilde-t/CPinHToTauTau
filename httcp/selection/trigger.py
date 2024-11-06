@@ -16,7 +16,7 @@ ak = maybe_import("awkward")
 @selector(
     uses={
         # nano columns
-        "TrigObj.id", "TrigObj.pt", "TrigObj.eta", "TrigObj.phi", "TrigObj.filterBits",
+        "TrigObj.id", "TrigObj.pt", "TrigObj.eta", "TrigObj.phi", "TrigObj.filterBits","HLT.*"
     },
     produces={
         # new columns
@@ -39,34 +39,42 @@ def trigger_selection(
 
     # index of TrigObj's to repeatedly convert masks to indices
     index = ak.local_index(events.TrigObj)
-    
+
     for trigger in self.config_inst.x.triggers:
         # skip the trigger if it does not apply to the dataset
         #if not trigger.applies_to_dataset(self.dataset_inst):
         #    continue
         #perform leg-specific selections first
         leg_masks = []
-        all_legs_match = ak.ones_like(index, dtype=np.bool_)
+        all_legs_match = True
         
         for leg in trigger.legs:
             # start with a True mask
             leg_mask = abs(events.TrigObj.id) >= 0
+            leg_mask = ak.enforce_type(leg_mask, f"var * bool")
             # pdg id selection
             if leg.pdg_id is not None:
-                leg_mask = leg_mask & (abs(events.TrigObj.id) == leg.pdg_id)
-            # pt cut
-            if leg.min_pt is not None:
-                leg_mask = leg_mask & (events.TrigObj.pt >= leg.min_pt)
-            # pt eta
-            if leg.max_eta is not None:
-                leg_mask = leg_mask & (abs(events.TrigObj.eta) < leg.max_eta)
+                Trig_pdg_ID = (abs(events.TrigObj.id) == leg.pdg_id)
+                Trig_pdg_ID = ak.enforce_type(Trig_pdg_ID, f"var * bool")
+                leg_mask = leg_mask & Trig_pdg_ID
+            # # pt cut
+            # if leg.min_pt is not None:
+            #     Trig_pt = (events.TrigObj.pt >= leg.min_pt)
+            #     Trig_pt = ak.enforce_type(Trig_pt, f"var * bool")
+            #     leg_mask = leg_mask & (events.TrigObj.pt >= leg.min_pt)
+            # # eta cut
+            # if leg.min_eta is not None:
+            #     Trig_eta = (abs(events.TrigObj.eta) < leg.min_eta)
+            #     Trig_eta = ak.enforce_type(Trig_eta, f"var * bool")
+            #     leg_mask = leg_mask & Trig_eta
             # trigger bits match
             if leg.trigger_bits is not None:
-                # OR across bits themselves, AND between all decision in the list
                 bit_mask = 0
                 for bit in leg.trigger_bits:
-                    bit_mask += 1<<(bit-1) 
-                leg_mask = leg_mask & ((events.TrigObj.filterBits & bit_mask) == bit_mask)
+                    bit_mask += 1<<(bit-1)
+                    Filter_Bits = ((events.TrigObj.filterBits & bit_mask) != 0)
+                    Filter_Bits =  ak.enforce_type(Filter_Bits, f"var * bool")
+                    leg_mask = leg_mask & Filter_Bits
             leg_masks.append(index[leg_mask])
             # at least one object must match this leg
             all_legs_match = all_legs_match & ak.any(leg_mask, axis=1)
@@ -77,18 +85,17 @@ def trigger_selection(
         any_fired = any_fired | fired
         # final trigger decision
         fired_and_all_legs_match = fired & all_legs_match
-        any_fired_all_legs_match = any_fired_all_legs_match | fired_and_all_legs_match
+        any_fired_all_legs_match = (any_fired_all_legs_match | fired_and_all_legs_match)
         # store all intermediate results for subsequent selectors
         trigger_data.append((trigger, fired_and_all_legs_match, leg_masks))
 
         # store the trigger id
-        ids = ak.where(fired_and_all_legs_match, np.float32(trigger.id), np.float32(np.nan))
+        ids = ak.where(fired_and_all_legs_match, np.float64(trigger.id), np.float64(np.nan))
         trigger_ids.append(ak.singletons(ak.nan_to_none(ids)))
 
     # store the fired trigger ids
     trigger_ids = ak.concatenate(trigger_ids, axis=1)
-    events = set_ak_column(events, "trigger_ids", trigger_ids, value_type=np.int32)
-
+    events = set_ak_column(events, "trigger_ids", trigger_ids, value_type=np.int64)
     return events, SelectionResult(
         steps={
             "trigger": any_fired,
@@ -108,5 +115,9 @@ def trigger_selection_init(self: Selector) -> None:
     self.uses |= {
         opt(trigger.name)
         for trigger in self.config_inst.x.triggers
-        #if trigger.applies_to_dataset(self.dataset_inst)
+        if trigger.applies_to_dataset(self.dataset_inst)
     }
+
+
+
+

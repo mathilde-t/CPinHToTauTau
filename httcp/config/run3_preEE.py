@@ -5,7 +5,7 @@ Configuration of the higgs_cp analysis.
 """
 
 import functools
-
+import yaml
 import law
 import order as od
 from scinum import Number
@@ -36,6 +36,14 @@ def add_run3_2022_preEE (ana: od.Analysis,
 
     # gather campaign data
     cfg.x.year = campaign.x.year
+    
+    # validations
+    if campaign.x.year == 2022:
+        assert campaign.x.tag in ["preEE", "postEE"]
+    # gather campaign data
+    year = campaign.x.year
+    year2 = year % 100
+    
     
     # add processes we are interested in
     
@@ -223,6 +231,150 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # whether to validate the number of obtained LFNs in GetDatasetLFNs
     # (currently set to false because the number of files per dataset is truncated to 2)
     cfg.x.validate_dataset_lfns = False
+    
+    # jec configuration
+    # https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC?rev=201
+    jerc_postfix = ""
+    if year == 2016 and campaign.x.vfp == "post":
+        jerc_postfix = "APV"
+    elif year == 2022 and campaign.x.tag == "post":
+        jerc_postfix = "EE"
+    if cfg.campaign.x.run == 2:
+        jerc_campaign = f"Summer19UL{year2}{jerc_postfix}"
+        jet_type = "AK4PFchs"
+    elif cfg.campaign.x.run == 3:
+        jerc_campaign = f"Summer{year2}{jerc_postfix}_22Sep2023"
+        jet_type = "AK4PFPuppi"
+
+    cfg.x.jec = DotDict.wrap({
+        "campaign": jerc_campaign,
+        "version": {2016: "V7", 2017: "V5", 2018: "V5", 2022: "V2"}[year],
+        "jet_type": jet_type,
+        "levels_DATA": ["L2Relative", "L2L3Residual", "L3Absolute"], # "L1L2L3Res"
+        "levels_MC": ["L2Relative", "L3Absolute"], 
+        "levels_for_type1_met": ["L2Relative", "L2L3Residual", "L3Absolute", "L1L2L3Res"],
+        "uncertainty_sources": [
+            # "AbsoluteStat",
+            # "AbsoluteScale",
+            # "AbsoluteSample",
+            # "AbsoluteFlavMap",
+            # "AbsoluteMPFBias",
+            # "Fragmentation",
+            # "SinglePionECAL",
+            # "SinglePionHCAL",
+            # "FlavorQCD",
+            # "TimePtEta",
+            # "RelativeJEREC1",
+            # "RelativeJEREC2",
+            # "RelativeJERHF",
+            # "RelativePtBB",
+            # "RelativePtEC1",
+            # "RelativePtEC2",
+            # "RelativePtHF",
+            # "RelativeBal",
+            # "RelativeSample",
+            # "RelativeFSR",
+            # "RelativeStatFSR",
+            # "RelativeStatEC",
+            # "RelativeStatHF",
+            # "PileUpDataMC",
+            # "PileUpPtRef",
+            # "PileUpPtBB",
+            # "PileUpPtEC1",
+            # "PileUpPtEC2",
+            # "PileUpPtHF",
+            # "PileUpMuZero",
+            # "PileUpEnvelope",
+            # "SubTotalPileUp",
+            # "SubTotalRelative",
+            # "SubTotalPt",
+            # "SubTotalScale",
+            # "SubTotalAbsolute",
+            # "SubTotalMC",
+            "Total",
+            # "TotalNoFlavor",
+            # "TotalNoTime",
+            # "TotalNoFlavorNoTime",
+            # "FlavorZJet",
+            # "FlavorPhotonJet",
+            # "FlavorPureGluon",
+            # "FlavorPureQuark",
+            # "FlavorPureCharm",
+            # "FlavorPureBottom",
+            # # "TimeRunA",
+            # # "TimeRunB",
+            # # "TimeRunC",
+            # # "TimeRunD",
+            # "CorrelationGroupMPFInSitu",
+            # "CorrelationGroupIntercalibration",
+            # "CorrelationGroupbJES",
+            # "CorrelationGroupFlavor",
+            # "CorrelationGroupUncorrelated",
+        ],
+    })
+    
+    ###############################################################################################
+    # met settings
+    ################################################################################################
+
+    # name of the MET phi correction set
+    # (used in the met_phi calibrator)
+    #cfg.x.met_phi_correction_set = r"{variable}_metphicorr_pfmet_{data_source}"
+    
+    ###############################################################################################
+    # JER settings
+    ################################################################################################
+    
+    # # JER
+    # # https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution?rev=107
+    # # TODO: get jerc working for Run3
+    # cfg.x.jer = DotDict.wrap({
+    #     "campaign": jerc_campaign,
+    #     "version": {2016: "JRV3", 2017: "JRV2", 2018: "JRV2", 2022: "JRV1"}[year],
+    #     "jet_type": jet_type,
+    # })
+
+    # # JEC uncertainty sources propagated to btag scale factors
+    # # (names derived from contents in BTV correctionlib file)
+    # cfg.x.btag_sf_jec_sources = [
+    #     "",  # total
+    #     "Absolute",
+    #     "AbsoluteMPFBias",
+    #     "AbsoluteScale",
+    #     "AbsoluteStat",
+    #     f"Absolute_{year}",
+    #     "BBEC1",
+    #     f"BBEC1_{year}",
+    #     "EC2",
+    #     f"EC2_{year}",
+    #     "FlavorQCD",
+    #     "Fragmentation",
+    #     "HF",
+    #     f"HF_{year}",
+    #     "PileUpDataMC",
+    #     "PileUpPtBB",
+    #     "PileUpPtEC1",
+    #     "PileUpPtEC2",
+    #     "PileUpPtHF",
+    #     "PileUpPtRef",
+    #     "RelativeBal",
+    #     "RelativeFSR",
+    #     "RelativeJEREC1",
+    #     "RelativeJEREC2",
+    #     "RelativeJERHF",
+    #     "RelativePtBB",
+    #     "RelativePtEC1",
+    #     "RelativePtEC2",
+    #     "RelativePtHF",
+    #     "RelativeSample",
+    #     f"RelativeSample_{year}",
+    #     "RelativeStatEC",
+    #     "RelativeStatFSR",
+    #     "RelativeStatHF",
+    #     "SinglePionECAL",
+    #     "SinglePionHCAL",
+    #     "TimePtEta",
+    # ]
 
     # lumi values in inverse pb
     # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2?rev=2#Combination_and_correlations
@@ -370,18 +522,24 @@ def add_run3_2022_preEE (ana: od.Analysis,
     
     corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
+
+
     cfg.x.external_files = DotDict.wrap({
         # lumi files
         "lumi": {
             "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
             "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
-        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
-        #"tau_correction"  : f"{jsonpog-dir}TAU/{cfg.x.year}_{tag}/tau.json.gz", 
+        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
+        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
+        #"electron_correction" : (f"{jsonpog_dir}EGM/{cfg.x.year}{tag}/electron.json.gz", "v2")
+        #"tau_correction"  : f"{jsonpog_dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
         "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
         "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
+        "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jet_jerc.json.gz", "v2"),
+        "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jetvetomaps.json.gz", "v2"),
+        #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
 
     # target file size after MergeReducedEvents in MB
@@ -400,12 +558,57 @@ def add_run3_2022_preEE (ana: od.Analysis,
     cfg.add_shift(name="mu_down", id=4, type="shape")
     add_shift_aliases(cfg, "mu", {"muon_weight": "muon_weight_{direction}"})
     
-    
     cfg.add_shift(name="ts_up", id=5, type="shape") #cp-even
     cfg.add_shift(name="ts_down", id=7, type="shape") #cp-odd
     add_shift_aliases(cfg, "ts", {"tauspinner_weight": "tauspinner_weight_{direction}"})
     # event weight columns as keys in an OrderedDict, mapped to shift instances they depend on
-    get_shifts = functools.partial(get_shifts_from_sources, cfg)
+    get_shifts = functools.partial(get_shifts_from_sources, cfg)   
+
+    # thisdir = os.path.dirname(os.path.abspath(__file__))
+    
+    # with open(os.path.join(thisdir, "jec_sources.yaml"), "r") as f:
+    #     all_jec_sources = yaml.load(f, yaml.Loader)["names"]
+
+    # for jec_source in cfg.x.jec["uncertainty_sources"]:
+    #     idx = all_jec_sources.index(jec_source)
+    #     cfg.add_shift(
+    #         name=f"jec_{jec_source}_up",
+    #         id=5000 + 2 * idx,
+    #         type="shape",
+    #         tags={"jec"},
+    #         aux={"jec_source": jec_source},
+    #     )
+    #     cfg.add_shift(
+    #         name=f"jec_{jec_source}_down",
+    #         id=5001 + 2 * idx,
+    #         type="shape",
+    #         tags={"jec"},
+    #         aux={"jec_source": jec_source},
+    #     )
+    #     add_shift_aliases(
+    #         cfg,
+    #         f"jec_{jec_source}",
+    #         {"Jet.pt": "Jet.pt_{name}", "Jet.mass": "Jet.mass_{name}"},
+    #     )
+
+    #     if jec_source in ["Total", *cfg.x.btag_sf_jec_sources]:
+    #         # when jec_source is a known btag SF source, add aliases for btag weight column
+    #         add_shift_aliases(
+    #             cfg,
+    #             f"jec_{jec_source}",
+    #             {
+    #                 "btag_weight": f"btag_weight_jec_{jec_source}_" + "{direction}",
+    #                 "normalized_btag_weight": f"normalized_btag_weight_jec_{jec_source}_" + "{direction}",
+    #                 "normalized_njet_btag_weight": f"normalized_njet_btag_weight_jec_{jec_source}_" + "{direction}",
+    #             },
+    #         )
+
+    # cfg.add_shift(name="jer_up", id=6000, type="shape", tags={"jer"})
+    # cfg.add_shift(name="jer_down", id=6001, type="shape", tags={"jer"})
+    # add_shift_aliases(cfg, "jer", {"Jet.pt": "Jet.pt_{name}", "Jet.mass": "Jet.mass_{name}"})
+  
+    
+
     
     # versions per task family, either referring to strings or to callables receving the invoking
     # task instance and parameters to be passed to the task family

@@ -25,7 +25,7 @@ def keep_columns(cfg: od.Config) -> None:
         } | {
             f"PuppiMET.{var}" for var in [
                 "pt", "phi", "significance",
-                "covXX", "covXY", "covYY",
+                "covXX", "covXY", "covYY", "pt_no_jec", "eta_no_jec"
             ]
         } | {
             f"MET.{var}" for var in [
@@ -35,7 +35,7 @@ def keep_columns(cfg: od.Config) -> None:
         } | {
             f"Jet.{var}" for var in [
                 "pt", "eta", "phi", "mass", 
-                "btagDeepFlavB", "hadronFlavour"
+                "btagDeepFlavB", "hadronFlavour", "pt_no_jec", "phi_no_jec","eta_no_jec", "mass_no_jec",
             ] 
         } | {
             f"Tau.{var}" for var in [
@@ -79,7 +79,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "decayMode", "rawIdx", "ip_sig", "IPx", "IPy","IPz"
             ]
         } | {
-            "GenTau.*", "GenTauProd.*",
+            "GenTau.*", "GenTauProd.*", "nJet",
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
@@ -106,6 +106,13 @@ def add_common_features(cfg: od.config) -> None:
     cfg.add_variable(
         name="event",
         expression="event",
+        binning=(1, 0.0, 1.0e9),
+        x_title="Event number",
+        discrete_x=True,
+    )
+    cfg.add_variable(
+        name="N_events",
+        expression="N_events",
         binning=(1, 0.0, 1.0e9),
         x_title="Event number",
         discrete_x=True,
@@ -176,6 +183,13 @@ def add_jet_features(cfg: od.Config) -> None:
         discrete_x=True,
     )
     cfg.add_variable(
+        name="jets_pt_no_jec",
+        expression="Jet.pt_no_jec",
+        binning=(40, 0.0, 400.0),
+        unit="GeV",
+        x_title=r"$Uncorrected p_{T} of all jets$",
+    )      
+    cfg.add_variable(
         name="jets_pt",
         expression="Jet.pt",
         binning=(40, 0.0, 400.0),
@@ -204,6 +218,28 @@ def add_jet_features(cfg: od.Config) -> None:
             null_value=EMPTY_FLOAT,
             binning=(32, -3.2, 3.2),
             x_title=r"Jet $\varphi$",
+        )
+        cfg.add_variable(
+            name=f"jet_{i+1}_pt_no_jec",
+            expression=f"Jet.pt_no_jec[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(40, 0.0, 400.0),
+            unit="GeV",
+            x_title=r"Jet $p_{T} no jec $",
+        )
+        cfg.add_variable(
+            name=f"jet_{i+1}_eta_no_jec",
+            expression=f"Jet.eta_no_jec[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(30, -3.0, 3.0),
+            x_title=r"Jet $\eta$ no jec ",
+        )
+        cfg.add_variable(
+            name=f"jet_{i+1}_phi_no_jec",
+            expression=f"Jet.phi_no_jec[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(32, -3.2, 3.2),
+            x_title=r"Jet $\phi$ no jec",
         )
     cfg.add_variable(
         name="ht",
@@ -234,6 +270,21 @@ def add_highlevel_features(cfg: od.Config) -> None:
         x_title=r"MET",
     )
     cfg.add_variable(
+        name="puppi_met_pt_no_jec",
+        expression="PuppiMET.pt_no_jec",
+        null_value=EMPTY_FLOAT,
+        binning=(50, 0,100),
+        unit="GeV",
+        x_title=r"Uncorrected PuppiMET $p_T$",
+    )
+    cfg.add_variable(
+        name="puppi_met_phi_no_jec",
+        expression="PuppiMET.phi_no_jec",
+        null_value=EMPTY_FLOAT,
+        binning=(32, -3.2,3.2),
+        x_title=r"Uncorrected PuppiMET $\phi$",
+    )
+    cfg.add_variable(
         name="puppi_met_pt",
         expression="PuppiMET.pt",
         null_value=EMPTY_FLOAT,
@@ -247,8 +298,7 @@ def add_highlevel_features(cfg: od.Config) -> None:
         null_value=EMPTY_FLOAT,
         binning=(32, -3.2,3.2),
         x_title=r"PUPPI MET $\phi$",
-    )
-    
+    )  
     
     
     

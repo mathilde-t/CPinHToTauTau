@@ -138,6 +138,18 @@ def add_categories(config: od.Config) -> None:
                    b_veto.selection],
         label=r"$\mu\tau$ signal region",
     )
+
+    mutau_nomt = add_category(
+        config,
+        name="mutau_nomt",
+        id=2100 + mutau.id,
+        selection=[mutau.selection,
+                   os_charge.selection,
+                   deep_tau_wp.selection,
+                   b_veto.selection],
+        label=r"$\mu\tau$ no mT cut",
+    )
+
     mutau_inv_deeptau = add_category(
         config,
         name="mutau_inv_deeptau",

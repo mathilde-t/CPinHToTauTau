@@ -37,11 +37,11 @@ def split_dy(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         if ch_str == 'etau':
             fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_e"])
             fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->e"])
-            process_id = ak.where(ak.fill_none(fake_mask, False), 51001, 51005) #z->ee events
+            process_id = ak.where(ak.fill_none(fake_mask, False), 51003, 51002) #z->ee events
         elif ch_str == 'mutau':
             fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_mu"])
             fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->mu"])
-            process_id = ak.where(ak.fill_none(fake_mask, False), 51004, 51005) #z->mumu events
+            process_id = ak.where(ak.fill_none(fake_mask, False), 51001, 51002) #z->mumu events
     events = set_ak_column(events, "process_id", process_id, value_type=np.int64)
     return events
 

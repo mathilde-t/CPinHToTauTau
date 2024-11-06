@@ -472,4 +472,9 @@ def add_run3_2022_preEE (ana: od.Analysis,
     from httcp.config.variables import add_variables
     add_variables(cfg)
     
+    from httcp.data_driven.hist_hooks import add_hist_hooks
+    add_hist_hooks(cfg)
+
+
+    
     

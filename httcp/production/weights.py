@@ -37,7 +37,6 @@ def get_mc_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     mc_weight = np.sign(events.genWeight)
     if has_ak_column(events, "LHEWeight.originalXWGTUP") and ak.all(events.genWeight == 1.0):
         mc_weight = np.sign(events.LHEWeight.originalXWGTUP)
-
     # store the column
     events = set_ak_column(events, "mc_weight", mc_weight, value_type=np.float32)
 

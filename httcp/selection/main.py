@@ -34,6 +34,7 @@ from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from httcp.selection.higgscand import new_higgscand, mask_nans
 
 from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
+from columnflow.selection.cms.jets import jet_veto_map
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -69,6 +70,7 @@ coffea = maybe_import("coffea")
         gentau_selection,
         add_tau_prods,
         mask_nans,
+        jet_veto_map,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
@@ -96,6 +98,7 @@ coffea = maybe_import("coffea")
         add_tau_prods,
         mask_nans,
         "category_ids"
+        "N_events",
     },
     exposed=True,
 )
@@ -201,7 +204,12 @@ def main(
     #Check arrays for np.nan values and mask them
     events, nan_mask_res = self[mask_nans](events)
     results += nan_mask_res
-   
+    
+    # additional jet veto map, vetoing entire events
+    if self.has_dep(jet_veto_map):
+        events, jet_veto_map_result = self[jet_veto_map](events, **kwargs)
+        results += jet_veto_map_veto_result
+    
     # combined event selection after all steps
     event_sel = reduce(and_, results.steps.values())
     results.event = event_sel
@@ -240,5 +248,7 @@ def main(
 
     events, results = self[increment_stats](
         events, results, stats, weight_map=weight_map, group_map=group_map, **kwargs)
-
+    
+    events = set_ak_column(events, "N_events", ak.num(events.hcand))
+    
     return events, results

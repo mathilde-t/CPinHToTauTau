@@ -21,10 +21,10 @@ ak = maybe_import("awkward")
 
 
 def add_run3_2022_preEE (ana: od.Analysis,
-                      campaign: od.Campaign,
-                      config_name           = None,
-                      config_id             = None,
-                      limit_dataset_files   = None,) -> od.Config :
+                         campaign: od.Campaign,
+                         config_name           = None,
+                         config_id             = None,
+                         limit_dataset_files   = None,) -> od.Config :
 
     # get all root processes
     procs = get_root_processes_from_campaign(campaign)
@@ -36,6 +36,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
 
     # gather campaign data
     cfg.x.year = campaign.x.year
+    year = cfg.x.year
     
     # validations
     if campaign.x.year == 2022:
@@ -134,6 +135,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         #data
         "data_e_C",
         "data_e_D",
+        "data_singlemu_C",
         "data_mu_C",
         "data_mu_D",
         "data_tau_C",
@@ -387,14 +389,19 @@ def add_run3_2022_preEE (ana: od.Analysis,
     
 
     # names of muon correction sets and working points
-    # (used in the muon producer)
-   
+    # (used in the muon producer)   
   
     cfg.x.deep_tau = DotDict.wrap({
         "tagger": "DeepTau2018v2p5",
-        "vs_e"          : "VVLoose",
-        "vs_mu"         : "Tight",
-        "vs_jet"        : "Medium",
+        "vs_e"          : {"mutau": "VVLoose",
+                           "etau": "Tight",
+                           "tautau": "VVLoose"},        
+        "vs_mu"         : {"mutau": "Tight",
+                           "etau": "VLoose",
+                           "tautau": "VLoose"},
+        "vs_jet"        : {"mutau": "Medium",
+                           "etau": "Medium",
+                           "tautau": "Medium"},
         "vs_e_jet_wps"  : {'VVVLoose'   : 1,
                            'VVLoose'    : 2,
                            'VLoose'     : 3,
@@ -519,7 +526,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "version": "JRV1",
         "jet_type": "AK4PFPuppi",
         })
-    
+
     corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
 
@@ -530,11 +537,12 @@ def add_run3_2022_preEE (ana: od.Analysis,
             "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
             "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
-        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}{tag}/puWeights.json.gz", "v1"),
-        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}{tag}/muon_Z.json.gz",
-        #"electron_correction" : (f"{jsonpog_dir}EGM/{cfg.x.year}{tag}/electron.json.gz", "v2")
-        #"tau_correction"  : f"{jsonpog_dir}TAU/{cfg.x.year}{tag}/tau.json.gz", 
-        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
+
+        "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
+        "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
+        "electron_idiso"  : f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electron.json.gz",
+        "electron_trigger": f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electronHlt.json.gz",
+        "tau_correction"  : f"{corr_dir}TAU/{cfg.x.year}_{tag}/tau_DeepTau2018v2p5.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
         "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jet_jerc.json.gz", "v2"),
@@ -542,6 +550,50 @@ def add_run3_2022_preEE (ana: od.Analysis,
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
 
+    # --------------------------------------------------------------------------------------------- #
+    # electron settings
+    # names of electron correction sets and working points
+    # (used in the electron_sf producer)
+    # --------------------------------------------------------------------------------------------- #
+    
+    electron_sf_tags = {
+        {'Summer2022': '2022Re-recoBCD'},
+        {'Summer2022EE': '2022Re-recoE+PromptFG'},
+        {'Summer2023': '2023PromptC'},
+        {'Summer2023BPix': '2023PromptD'}
+    }
+
+    electron_sf_tag = electron_sf_tags[tag];
+    
+    cfg.x.electron_sf = DotDict.wrap({
+        'ID': {'corrector': "Electron-ID-SF",
+               'year': electron_sf_tag,
+               'wp':"wp80iso"},
+        'trig': {'corrector': "Electron-HLT-SF",
+                 'year': electron_sf_tag,
+                 'wp': "HLT_SF_Ele30_TightID"},
+        'xtrig': {'corrector': "Electron-HLT-SF",
+                  'year': electron_sf_tag,
+                  'wp': "HLT_SF_Ele24_TightID"}
+    })
+    
+    # --------------------------------------------------------------------------------------------- #
+    # muon settings
+    # names of muon correction sets and working points
+    # (used in the muon producer)
+    # --------------------------------------------------------------------------------------------- #
+
+    cfg.x.muon_sf = DotDict.wrap({ 
+        'ID': {'corrector': "NUM_MediumID_DEN_TrackerMuons",
+               'year': f"{year}_{tag}"},
+        'iso': {'corrector': "NUM_TightPFIso_DEN_MediumID",
+                'year': f"{year}_{tag}"},
+        'trig': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium",
+                 'year': f"{year}_{tag}"},
+        'xtrig': {'corrector': "NUM_IsoMu20_DEN_CutBasedIdMedium_and_PFIsoMedium",
+                  'year': f"{year}_{tag}"}
+    })
+    
     # target file size after MergeReducedEvents in MB
     cfg.x.reduced_file_size = 512.0
     

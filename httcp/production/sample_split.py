@@ -38,7 +38,6 @@ def split_dy(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_e"])
             fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->e"])
             process_id = ak.where(ak.fill_none(fake_mask, False), 51001, process_id) #z->ee events
-            
         elif ch_str == 'mutau':
             fake_mask = fake_mask | (tau_dm == tau_part_flav["prompt_mu"])
             fake_mask = fake_mask | (tau_dm == tau_part_flav["tau->mu"])

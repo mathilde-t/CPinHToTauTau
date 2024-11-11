@@ -2,7 +2,8 @@
 
 set_common_vars() {
 
-version="fixed_also_mutau_trigmatch"
+version="dev"
+
 case $1 in
     "run3ts_lim")
         config="run3_2022_preEE_tau_spinner_limited"
@@ -22,19 +23,67 @@ case $1 in
         processes='dy_z2mumu,dy_lep' 
         workflow='local'
     ;;
+    "run3_wj_lim")
+        config="run3_2022_preEE_limited"
+        datasets='wj_incl' 
+        processes='wj' 
+        workflow='local'
+    ;;
+    "run3_dy_lim")
+        config="run3_2022_preEE_limited"
+        datasets='dy_incl' 
+        processes='dy_lep' 
+        workflow='local'
+    ;;
+    "run3_dy_wj")
+        config="run3_2022_preEE"
+        datasets='dy_incl,wj_incl' 
+        processes='dy_lep,wj' 
+        workflow='htcondor'
+    ;;
     "run3_data")
         config="run3_2022_preEE"
-        datasets='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D'
+        datasets='data_mu_C,data_mu_D,data_e_C,data_e_D,data_tau_C,data_tau_d' 
         processes='data' 
         workflow='htcondor'
     ;;
-    "run3_data_lim")
+    "run3_data_tau_D")
         config="run3_2022_preEE_limited"
-        datasets='data_e_C'
-        processes='data' 
+        datasets='data_tau_D' 
+        processes='data_tau' 
         workflow='local'
     ;;
-    "run3preEE")
+    "run3_data_tau_C")
+        config="run3_2022_preEE_limited"
+        datasets='data_tau_C' 
+        processes='data_tau' 
+        workflow='local'
+    ;;
+    "run3_data_dy_wj")
+        config="run3_2022_preEE"
+        datasets='data_mu_C,data_mu_D,data_e_C,data_e_D,data_tau_C,data_tau_D,dy_incl,wj_incl' 
+        processes='data,dy_lep,wj' 
+        workflow='local'
+    ;;
+    "run3_data_bkg")
+    config="run3_2022_preEE"
+    datasets='data_mu_C,data_mu_D,data_e_C,data_e_D,data_tau_C,data_tau_d,dy_incl,wj_incl' 
+    processes='data,dy_lep,wj'
+    workflow='local'
+    ;;
+    "run3_data_lim")
+    config="run3_2022_preEE_limited"
+    datasets='data_mu_C' 
+    processes='data_mu' 
+    workflow='local'
+    ;;
+    "run3_top_lim")
+    config="run3_2022_preEE_limited"
+    datasets='tt_sl' 
+    processes='tt_sl' 
+    workflow='local'
+    ;;
+    "run3")
         config="run3_2022_preEE"
         data='data_mu_C,data_mu_D,data_tau_C,data_tau_D,data_e_C,data_e_D,'
         bkg_ewk='wj_incl,ww,wz,zz,dy_incl,'

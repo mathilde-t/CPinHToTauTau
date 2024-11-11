@@ -140,8 +140,9 @@ def muon_selection(
         # Electron nano columns
         "Electron.pt", "Electron.eta", "Electron.phi", "Electron.mass", "Electron.dxy", "Electron.dz", "Electron.pdgId",
         "Electron.pfRelIso03_all", "Electron.convVeto", #"lostHits",
-        IF_NANO_V9("Electron.mvaFall17V2Iso_WP80", "Electron.mvaFall17V2Iso_WP90", "Electron.mvaFall17V2noIso_WP90"),
-        IF_NANO_V11("Electron.mvaIso_WP80", "Electron.mvaIso_WP90", "Electron.mvaNoIso_WP90"),
+        # IF_NANO_V9("Electron.mvaFall17V2Iso_WP80", "Electron.mvaFall17V2Iso_WP90", "Electron.mvaFall17V2noIso_WP90"),
+        # IF_NANO_V11("Electron.mvaIso_WP80", "Electron.mvaIso_WP90", "Electron.mvaNoIso_WP90"),
+        "Electron.mvaIso_WP80", "Electron.mvaIso_WP90", "Electron.mvaNoIso_WP90",
         "Electron.cutBased",'Electron.sip3d',
     },
     produces={
@@ -290,7 +291,11 @@ def tau_selection(
 
     good_selections = {
         "tau_pt_40"     : events.Tau.pt > 20,
+<<<<<<< Updated upstream
         "tau_eta_2p1"   : abs(events.Tau.eta) < 2.5,
+=======
+        "tau_eta_2p1"   : abs(events.Tau.eta) < 2.1,
+>>>>>>> Stashed changes
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
         "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
         "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVVLoose"],
@@ -324,7 +329,7 @@ def tau_selection(
     uses={ f"Jet.{var}" for var in 
         [
             "pt", "eta", "phi", "mass",
-            "jetId", "btagDeepFlavB"
+            "jetId", "btagDeepFlavB",
         ]} | {optional("Jet.puId")} ,
     exposed=False,
 )

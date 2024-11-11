@@ -6,7 +6,7 @@ wrapper_args=(
     --configs $config
     --datasets $datasets
     --version $version
-    --cf.CalibrateEvents-workflow $workflow
+    --cf.CalibrateEvents-workflow local #$workflow
     --cf.SelectEvents-workflow $workflow
     --cf.ReduceEvents-workflow $workflow
     --cf.MergeReducedEvents-workflow local

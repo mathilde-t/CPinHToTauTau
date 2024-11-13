@@ -59,17 +59,17 @@ add_run3_2022_preEE_tau_spinner(
 
 #------------------------ Run3 2022 preEE samples without TauSpinner weights ----------------------- #
 from httcp.config.run3_preEE import add_run3_2022_preEE
-from cmsdb.campaigns.run3_2022_preEE_nano_tau_v12 import campaign_run3_2022_preEE_nano_tau_v12
+from cmsdb.campaigns.run3_2022_preEE_nano_tau_skim_v2 import campaign_run3_2022_preEE_nano_tau_skim_v2
 add_run3_2022_preEE(
     analysis_httcp,
-    campaign_run3_2022_preEE_nano_tau_v12.copy(),
+    campaign_run3_2022_preEE_nano_tau_skim_v2.copy(),
     config_name=f"run3_2022_preEE_limited",
     config_id=6,
     limit_dataset_files=1)
 
 add_run3_2022_preEE(
     analysis_httcp,
-    campaign_run3_2022_preEE_nano_tau_v12.copy(),
+    campaign_run3_2022_preEE_nano_tau_skim_v2.copy(),
     config_name=f"run3_2022_preEE",
     config_id=7,)
 # ------------------------------------------------------------- #

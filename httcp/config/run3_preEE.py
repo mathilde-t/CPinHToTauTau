@@ -8,6 +8,7 @@ import functools
 import yaml
 import law
 import order as od
+import os
 from scinum import Number
 
 from columnflow.util import DotDict, maybe_import, dev_sandbox
@@ -53,13 +54,13 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "data_mu",
         "data_tau",
         "data_e",
+        "data_singlemu",
         #Drell-Yan
         "dy_lep",
         "dy_z2ee",
         "dy_z2mumu",
-        "dy_z2tautau",
         # "dy_z2tautau",
-        # "dy_z2ll",
+        "dy_z2ll",
         # "dy_lep_m10to50",
         #W + jets
         "wj",
@@ -447,86 +448,25 @@ def add_run3_2022_preEE (ana: od.Analysis,
         year = campaign.x.year
         tag = campaign.x.tag
         out_tag = ''
+        electron_sf_tag = ''
         if year in [2017,2018]  : out_tag = 'UL'
-        elif tag == "preEE"     : out_tag = "Summer22"
-        elif tag == "postEE"    : out_tag = "Summer22EE"
-        elif tag == "preBpix"   : out_tag = "Summer23"
-        elif tag == "postBpix"  : out_tag = "Summer23BPix"
+        elif tag == "preEE"     : 
+            out_tag = "Summer22"
+            electron_sf_tag = "2022Re-recoBCD"
+        elif tag == "postEE"    : 
+            out_tag = "Summer22EE"
+            electron_sf_tag = "2022Re-recoE+PromptFG"
+        elif tag == "preBpix"   : 
+            out_tag = "Summer23"
+            electron_sf_tag = "2023PromptC"
+        elif tag == "postBpix"  : 
+            out_tag = "Summer23BPix"
+            electron_sf_tag = "2023PromptD"
         elif tag == "preVFP"    : out_tag = "preVFP_UL"
-        elif tag == "postVFP"   : out_tag = "postVFP_UL"
-        return out_tag
-
-    import os
-    tag = tag_caster(campaign)
-    ### Jet energy correction and resolution configuration ###
-    cfg.x.jec = DotDict.wrap({
-        "campaign": f"{tag}_22Sep2023",
-        "version":  "V2",
-        "jet_type": "AK4PFPuppi",
-        "levels": ["L1FastJet", "L2Relative", "L2L3Residual", "L3Absolute"],
-        "levels_for_type1_met": ["L1FastJet"],
-        "uncertainty_sources": [
-            # "AbsoluteStat",
-            # "AbsoluteScale",
-            # "AbsoluteSample",
-            # "AbsoluteFlavMap",
-            # "AbsoluteMPFBias",
-            # "Fragmentation",
-            # "SinglePionECAL",
-            # "SinglePionHCAL",
-            # "FlavorQCD",
-            # "TimePtEta",
-            # "RelativeJEREC1",
-            # "RelativeJEREC2",
-            # "RelativeJERHF",
-            # "RelativePtBB",
-            # "RelativePtEC1",
-            # "RelativePtEC2",
-            # "RelativePtHF",
-            # "RelativeBal",
-            # "RelativeSample",
-            # "RelativeFSR",
-            # "RelativeStatFSR",
-            # "RelativeStatEC",
-            # "RelativeStatHF",
-            # "PileUpDataMC",
-            # "PileUpPtRef",
-            # "PileUpPtBB",
-            # "PileUpPtEC1",
-            # "PileUpPtEC2",
-            # "PileUpPtHF",
-            # "PileUpMuZero",
-            # "PileUpEnvelope",
-            # "SubTotalPileUp",
-            # "SubTotalRelative",
-            # "SubTotalPt",
-            # "SubTotalScale",
-            # "SubTotalAbsolute",
-            # "SubTotalMC",
-            "Total",
-            # "TotalNoFlavor",
-            # "TotalNoTime",
-            # "TotalNoFlavorNoTime",
-            # "FlavorZJet",
-            # "FlavorPhotonJet",
-            # "FlavorPureGluon",
-            # "FlavorPureQuark",
-            # "FlavorPureCharm",
-            # "FlavorPureBottom",
-            "CorrelationGroupMPFInSitu",
-            "CorrelationGroupIntercalibration",
-            "CorrelationGroupbJES",
-            "CorrelationGroupFlavor",
-            "CorrelationGroupUncorrelated",
-        ],
-    })
+        elif tag == "postVFP"   : out_tag = "postVFP_UL"    
+        return out_tag, electron_sf_tag    
+    tag, electron_sf_tag = tag_caster(campaign)
     
-    cfg.x.jer = DotDict.wrap({
-        "campaign": f"{tag}_22Sep2023",
-        "version": "JRV1",
-        "jet_type": "AK4PFPuppi",
-        })
-
     corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
 
@@ -542,11 +482,10 @@ def add_run3_2022_preEE (ana: od.Analysis,
         "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
         "electron_idiso"  : f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electron.json.gz",
         "electron_trigger": f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electronHlt.json.gz",
-        "tau_correction"  : f"{corr_dir}TAU/{cfg.x.year}_{tag}/tau_DeepTau2018v2p5.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
-        "jet_jerc"        : f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz",
+        "tau_correction"  : f"{corr_dir}tau_DeepTau2018v2p5_2022_preEE.json.gz", #FIXME: this sf json is not from the jsonpog-integration dir!
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
-        "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jet_jerc.json.gz", "v2"),
-        "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/jetvetomaps.json.gz", "v2"),
+        "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
+        "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
 
@@ -555,16 +494,6 @@ def add_run3_2022_preEE (ana: od.Analysis,
     # names of electron correction sets and working points
     # (used in the electron_sf producer)
     # --------------------------------------------------------------------------------------------- #
-    
-    electron_sf_tags = {
-        {'Summer2022': '2022Re-recoBCD'},
-        {'Summer2022EE': '2022Re-recoE+PromptFG'},
-        {'Summer2023': '2023PromptC'},
-        {'Summer2023BPix': '2023PromptD'}
-    }
-
-    electron_sf_tag = electron_sf_tags[tag];
-    
     cfg.x.electron_sf = DotDict.wrap({
         'ID': {'corrector': "Electron-ID-SF",
                'year': electron_sf_tag,

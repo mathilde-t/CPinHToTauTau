@@ -290,12 +290,8 @@ def tau_selection(
     deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
 
     good_selections = {
-        "tau_pt_40"     : events.Tau.pt > 20,
-<<<<<<< Updated upstream
-        "tau_eta_2p1"   : abs(events.Tau.eta) < 2.5,
-=======
+        "tau_pt_20"     : events.Tau.pt > 20,
         "tau_eta_2p1"   : abs(events.Tau.eta) < 2.1,
->>>>>>> Stashed changes
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
         "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
         "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVVLoose"],

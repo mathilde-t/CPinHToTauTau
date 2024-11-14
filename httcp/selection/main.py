@@ -97,8 +97,8 @@ coffea = maybe_import("coffea")
         gentau_selection,
         add_tau_prods,
         mask_nans,
-        "category_ids"
-        "N_events",
+        jet_veto_map,
+        "category_ids",
     },
     exposed=True,
 )
@@ -208,7 +208,7 @@ def main(
     # additional jet veto map, vetoing entire events
     if self.has_dep(jet_veto_map):
         events, jet_veto_map_result = self[jet_veto_map](events, **kwargs)
-        results += jet_veto_map_veto_result
+        results += jet_veto_map_result
     
     # combined event selection after all steps
     event_sel = reduce(and_, results.steps.values())
@@ -248,7 +248,5 @@ def main(
 
     events, results = self[increment_stats](
         events, results, stats, weight_map=weight_map, group_map=group_map, **kwargs)
-    
-    events = set_ak_column(events, "N_events", ak.num(events.hcand))
     
     return events, results

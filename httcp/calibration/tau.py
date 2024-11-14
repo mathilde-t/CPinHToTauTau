@@ -54,9 +54,10 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
                                                             dm[mask],
                                                             match[mask],
                                                             deep_tau_obj.tagger,
-                                                            deep_tau_obj.vs_jet,
-                                                            deep_tau_obj.vs_e,
+                                                            'Medium',
+                                                            'VVLoose',
                                                             syst)
+    #These values are good only for mutau channel, this problem need to be fixed
     else:
         tes_args = lambda events, mask, deep_tau_obj, syst: (pt[mask],
                                                             abseta[mask],
@@ -65,6 +66,7 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
                                                             deep_tau_obj.tagger,
                                                             syst)
         
+   
     tes_nom[mask2prong] = self.tes_corrector.evaluate(*tes_args(events, mask2prong,deep_tau, syst))
     
     tes_nom     = np.asarray(tes_nom)

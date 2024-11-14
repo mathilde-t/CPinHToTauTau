@@ -4,8 +4,8 @@ Calibration methods.
 import functools
 
 from columnflow.calibration import Calibrator, calibrator
-from columnflow.calibration.cms.jets import jets, jec, jer
-from columnflow.calibration.cms.met import met_phi
+from httcp.calibration.jets import jets, jec, jer
+from httcp.calibration.met import met_phi
 from httcp.calibration.tau import tau_energy_scale
 from columnflow.production.cms.seeds import deterministic_seeds
 from columnflow.util import maybe_import

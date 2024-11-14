@@ -516,9 +516,9 @@ def add_run3_2022_preEE (ana: od.Analysis,
                'year': f"{year}_{tag}"},
         'iso': {'corrector': "NUM_TightPFIso_DEN_MediumID",
                 'year': f"{year}_{tag}"},
-        'trig': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium",
+        'trig': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
                  'year': f"{year}_{tag}"},
-        'xtrig': {'corrector': "NUM_IsoMu20_DEN_CutBasedIdMedium_and_PFIsoMedium",
+        'xtrig': {'corrector': "NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight",
                   'year': f"{year}_{tag}"}
     })
     

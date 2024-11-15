@@ -7,6 +7,7 @@ from columnflow.calibration import Calibrator, calibrator
 from httcp.calibration.jets import jets, jec, jer
 from httcp.calibration.met import met_phi
 from httcp.calibration.tau import tau_energy_scale
+from httcp.calibration.electron import electron_scaling, electron_smearing, electron_smearing_scaling
 from columnflow.production.cms.seeds import deterministic_seeds
 from columnflow.util import maybe_import
 from columnflow.columnar_util import set_ak_column
@@ -17,11 +18,11 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 @calibrator(
     uses={
-        jec, tau_energy_scale, deterministic_seeds, #met_phi,
+        jec, tau_energy_scale, electron_smearing_scaling, deterministic_seeds, 
     },
     produces={
-        jec, tau_energy_scale, deterministic_seeds, "Jet.pt_no_jec", "Jet.eta_no_jec",
-        "Jet.phi_no_jec", "Jet.mass_no_jec", "PuppiMET.pt_no_jec", "PuppiMET.phi_no_jec", "nJet", #met_phi
+        jec, tau_energy_scale, electron_smearing_scaling, deterministic_seeds, "Jet.pt_no_jec", "Jet.eta_no_jec",
+        "Jet.phi_no_jec", "Jet.mass_no_jec", "PuppiMET.pt_no_jec", "PuppiMET.phi_no_jec", "nJet", "Electron.pt_no_scaling_smearing",
     },
 )
 def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
@@ -45,8 +46,11 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
 
     #events = self[met_phi](events, **kwargs)
     #events = self[jer](events, **kwargs)
+    events = set_ak_column_f32(events, "Electron.pt_no_scaling_smearing", events.Electron.pt)
     
-   
+    print("Performing electron scaling and smearing correction...")
+    events = self[electron_smearing_scaling](events, **kwargs) 
+    
     if self.dataset_inst.is_mc: 
     #Apply tau energy scale correction
         print("Performing tau energy scale correction...")

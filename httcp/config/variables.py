@@ -52,7 +52,7 @@ def keep_columns(cfg: od.Config) -> None:
         } | {
             f"Electron.{var}" for var in [
                 "pt","eta","phi","mass","dxy","dz", "charge", 
-                "decayMode", "pfRelIso03_all", "mT", "rawIdx", "IPx", "IPy", "IPz","ip_sig"
+                "decayMode", "pfRelIso03_all", "mT", "rawIdx", "IPx", "IPy", "IPz","ip_sig", "pt_no_scaling_smearing",
             ] 
         } | {
             f"{var}_triggerd" for var in [ #Trigger variables to have a track of a particular trigger fired
@@ -137,6 +137,15 @@ def add_lepton_features(cfg: od.Config) -> None:
     """
     Adds lepton features only , ex electron_1_pt
     """
+    cfg.add_variable(
+        name=f"electron_1_pt_no_scaling_smearing",
+        expression="Electron.pt_no_scaling_smearing[:,0]",
+        null_value=EMPTY_FLOAT,
+        binning=(40, 0., 200.),
+        unit="GeV",
+        x_title= r" Electron $p_{T}$ no scaling or smearing",
+    )
+    
     for obj in ["Electron", "Muon", "Tau"]:
         for i in range(2):
             cfg.add_variable(

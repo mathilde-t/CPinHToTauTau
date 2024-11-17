@@ -78,6 +78,9 @@ def add_run3_2022_preEE (ana: od.Analysis,
         #single top t-channel        
         "st_tchannel_tbar",
         "st_tchannel_t",
+        #single top s-channel   
+        "st_schannel_t",
+        "st_schannel_tbar",
         # single top tW channel
         "st_twchannel_t_fh",
         "st_twchannel_t_sl",
@@ -156,6 +159,9 @@ def add_run3_2022_preEE (ana: od.Analysis,
         #single top t-channel
         "st_tchannel_tbar",
         "st_tchannel_t",
+        #single top s-channel
+        "st_schannel_tbar",
+        "st_schannel_t",
         # single top tW channel
         "st_twchannel_t_fh",
         "st_twchannel_t_sl",

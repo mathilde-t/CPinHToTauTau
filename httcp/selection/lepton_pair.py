@@ -3,161 +3,104 @@
 """
 Prepare h-Candidate from SelectionResult: selected lepton indices & channel_id [trigger matched] 
 """
-
+import copy
 from typing import Optional
 from columnflow.selection import Selector, SelectionResult, selector
 from columnflow.selection.util import create_collections_from_masks
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
-
+from httcp.util import get_lep_p4
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
 coffea = maybe_import("coffea")
 maybe_import("coffea.nanoevents.methods.nanoaod")
 
-
-
-def get_sorted_pair(
-        dtrpairs: ak.Array,
-        dtrpairindices: ak.Array
+def select_best_pair(
+        lep0: ak.Array,
+        lep1: ak.Array,
+        vars4sorting: dict,
 )->ak.Array:
-
-    sorted_idx = ak.argsort(dtrpairs["0"].pfRelIso03_all, ascending=True)
-
-    # Sort the pairs based on pfRelIso03_all of the first object in each pair
-    dtrpairs = dtrpairs[sorted_idx]
-    dtrpairindices = dtrpairindices[sorted_idx]
-
-    # Check if the pfRelIso03_all values are the same for the first two objects in each pair
-    where_same_iso_1 = (
-        ak.firsts(dtrpairs["0"].pfRelIso03_all[:,:1], axis=1)
-        ==
-        ak.firsts(dtrpairs["0"].pfRelIso03_all[:,1:2], axis=1)
-    )
-    # Sort the pairs based on pt if pfRelIso03_all is the same for the first two objects
-    sorted_idx = ak.where(where_same_iso_1,
-                          ak.argsort(dtrpairs["0"].pt, ascending=False),
-                          sorted_idx)
-    dtrpairs = dtrpairs[sorted_idx]
-    dtrpairindices = dtrpairindices[sorted_idx]
-
-    # Check if the pt values are the same for the first two objects in each pair    
-    where_same_pt_1 = (
-        ak.firsts(dtrpairs["0"].pt[:,:1], axis=1)
-        ==
-        ak.firsts(dtrpairs["0"].pt[:,1:2], axis=1)
-    )
-
-    # if so, sort the pairs with tau rawDeepTau2017v2p1VSjet
-    sorted_idx = ak.where(where_same_pt_1,
-                          ak.argsort(dtrpairs["1"].rawDeepTau2018v2p5VSjet, ascending=False),
-                          sorted_idx)
-    dtrpairs = dtrpairs[sorted_idx]
-    dtrpairindices = dtrpairindices[sorted_idx]
-
-    # check if the first two pairs have taus with same rawDeepTau2017v2p1VSjet
-    where_same_iso_2 = (
-        ak.firsts(dtrpairs["1"].rawDeepTau2018v2p5VSjet[:,:1], axis=1)
-        ==
-        ak.firsts(dtrpairs["1"].rawDeepTau2018v2p5VSjet[:,1:2], axis=1)
-    )
-    # Sort the pairs based on pt if rawDeepTau2017v2p1VSjet is the same for the first two objects
-    sorted_idx = ak.where(where_same_iso_2,
-                          ak.argsort(dtrpairs["1"].pt, ascending=False),
-                          sorted_idx)
-    # finally, the pairs are sorted
-    dtrpairs = dtrpairs[sorted_idx]
-    dtrpairindices = dtrpairindices[sorted_idx]
-
-    # Extract the first object in each pair (lep1) and the second object (lep2)
-    lep1 = ak.singletons(ak.firsts(dtrpairs["0"], axis=1))
-    lep2 = ak.singletons(ak.firsts(dtrpairs["1"], axis=1))
-
-    lep1idx = ak.singletons(ak.firsts(dtrpairindices["0"], axis=1))
-    lep2idx = ak.singletons(ak.firsts(dtrpairindices["1"], axis=1))
-
-    # Concatenate lep1 and lep2 to create the final dtrpair
-    dtrpair    = ak.concatenate([lep1, lep2], axis=1)
-    dtrpairidx = ak.concatenate([lep1idx, lep2idx], axis=1)
-
-    return dtrpairidx
+    def leading_lep(lep):
+        return ak.firsts(lep[:,:1], axis=1)
+    empty_lep = ak.zeros_like(lep0.obj_idx, dtype=np.int32)[..., :0]
+    lep0_idx = empty_lep
+    lep1_idx = empty_lep
+    for (var_str, sort_dir) in vars4sorting.items():
+        the_var = eval(var_str)
+        sorted_idx = ak.argsort(the_var, ascending=(sort_dir == 'ascending'))
+        sorted_var = the_var[sorted_idx]
+        vars_not_equal = ak.fill_none((ak.firsts(sorted_var[:,:1], axis=1) != ak.firsts(sorted_var[:,1:2], axis=1)),False)
+        lep0_leading_idx = lep0.obj_idx[sorted_idx[:,:1]]
+        lep0_idx = ak.where(vars_not_equal,lep0_leading_idx, lep0_idx)
+        lep1_leading_idx = lep1.obj_idx[sorted_idx[:,:1]]
+        lep1_idx = ak.where(vars_not_equal,lep1_leading_idx, lep1_idx)
+    pairs = ak.zip({'lep0': lep0_idx,
+                    'lep1': lep1_idx})
+    return pairs
 
 @selector(
     uses=
-        {
+        {f"Electron.{var}" for var in [
+            "pt", "eta", "phi", "mass","pfRelIso03_all", "rawIdx"]
+        } | {
             f"Muon.{var}" for var in [
-                "pt","eta","phi","mass", "charge", "pfRelIso03_all"
-            ] 
+                "pt","eta","phi","mass", "pfRelIso04_all"] 
         } | {
             f"Tau.{var}" for var in [
                 "pt","eta","phi","mass","charge", 
                 "idDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSe","idDeepTau2018v2p5VSmu","rawDeepTau2018v2p5VSjet"
             ] 
-        } | {   
-        # met
-        "PuppiMET.pt", "PuppiMET.phi",
-    },
+        },
     exposed=False,
 )
-def mutau_selection(
+def pair_selection(
         self: Selector,
         events: ak.Array,
-        lep1_indices: ak.Array,
-        lep2_indices: ak.Array,
+        channel: str,
+        lep0_idxs: ak.Array,
+        lep1_idxs: ak.Array,
         **kwargs,
 ) -> tuple[ak.Array, SelectionResult, ak.Array]:
-
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
-
-   
-    lep2_indices = lep2_indices[good_selections]
-
-    # Sorting lep1 [Electron] by isolation [ascending]
-    lep1_sort_key       = events.Muon[lep1_indices].pfRelIso03_all
-    lep1_sorted_indices = ak.argsort(lep1_sort_key, axis=-1, ascending=True)
-    lep1_indices        = lep1_indices[lep1_sorted_indices]
-    # Sorting lep2 [Tau] by DeepTau [descending]
-    lep2_sort_key       = events.Tau[lep2_indices].rawDeepTau2018v2p5VSjet
-    lep2_sorted_indices = ak.argsort(lep2_sort_key, axis=-1, ascending=False)
-    lep2_indices        = lep2_indices[lep2_sorted_indices]
-
-    leps_pair        = ak.cartesian([events.Muon[lep1_indices], 
-                                     events.Tau[lep2_indices]], axis=1)
-    lep_indices_pair = ak.cartesian([lep1_indices, lep2_indices], axis=1)
-    
-    # pair of leptons: probable higgs candidate -> leps_pair
-    # and their indices                         -> lep_indices_pair 
-    lep1, lep2 = ak.unzip(leps_pair)
-    lep1_idx, lep2_idx = ak.unzip(lep_indices_pair)
-
-    preselection = {
-        "mutau_dr_0p5"        : lep1.metric_table(lep2) > 0.5,  #deltaR(lep1, lep2) > 0.5,
-        "mutau_invmass_40"    : (1*lep1 + 1*lep2).mass > 40,  # invariant_mass(lep1, lep2) > 40
-    }
-
-    good_pair_mask = lep1_idx >= 0
-    pair_selection_steps = {}
-    for cut in preselection.keys():
-        good_pair_mask = good_pair_mask & preselection[cut]
-        pair_selection_steps[cut] = good_pair_mask
-        
-    leps_pair_sel = leps_pair[good_pair_mask]
-    lep_indices_pair_sel = lep_indices_pair[good_pair_mask]
-
-    lep1idx = ak.singletons(ak.firsts(lep_indices_pair_sel["0"], axis=1))
-    lep2idx = ak.singletons(ak.firsts(lep_indices_pair_sel["1"], axis=1))
-
-    lep_indices_pair_sel_single = ak.concatenate([lep1idx, lep2idx], axis=1)
-
-
-    where_many   = ak.num(lep_indices_pair_sel, axis=1) > 1
-    pair_indices = ak.where(where_many, 
-                            get_sorted_pair(leps_pair_sel,
-                                            lep_indices_pair_sel),
-                            lep_indices_pair_sel_single)
-
-    return SelectionResult(
-        aux = pair_selection_steps,
-    ), pair_indices
+    print(f'Selecting dilepton pairs for {channel}')
+    ch_objects = self.config_inst.x.ch_objects
+    presel_leps = []
+    for idx in range(2):
+        the_lep = eval(f"events[ch_objects[channel].lep{idx}][lep{idx}_idxs]")
+        the_lep['obj_idx'] = eval(f"lep{idx}_idxs")
+        presel_leps.append(the_lep)
+    pairs = ak.cartesian(presel_leps, axis=1)
+    lep0, lep1 = ak.unzip(pairs)
+    #Can be the case that this line is not needed, but it is better to explicitly define 4-vectors so the methods of coffea work properly
+    [lep0_p4,lep1_p4] = [get_lep_p4(the_lep) for the_lep in [lep0,lep1]]
+    if channel =='mutau': 
+        vars4sorting = {'lep0.pfRelIso04_all'           : 'ascending', 
+                        'lep0.pt'                       : 'descending',
+                        'lep1.rawDeepTau2018v2p5VSjet'  : 'ascending',
+                        'lep1.pt'                       : 'descending'}
+        pair_cuts = {"dr_0p5"        : lep0_p4.delta_r(lep1_p4) > 0.5, 
+                     "invmass_40"    : (lep0_p4 + lep1_p4).mass > 40, }
+    if channel =='etau': 
+        vars4sorting = {'lep0.pfRelIso03_all'           : 'ascending', 
+                        'lep0.pt'                       : 'descending',
+                        'lep1.rawDeepTau2018v2p5VSjet'  : 'ascending',
+                        'lep1.pt'                       : 'descending'}
+        pair_cuts = {"dr_0p5"        : lep0_p4.delta_r(lep1_p4) > 0.5}
+    if channel =='tautau': 
+        vars4sorting = {'lep0.rawDeepTau2018v2p5VSjet'  : 'ascending', 
+                        'lep1.rawDeepTau2018v2p5VSjet'  : 'ascending',
+                        'lep0.pt'                       : 'descending',
+                        'lep1.pt'                       : 'descending'}
+        pair_cuts = {"is_pt_40"   : (lep0.pt > 40) & (lep1.pt > 40),
+                     "eta_2p1"    : (np.abs(lep0.eta) < 2.1) & (np.abs(lep1.eta) < 2.1),
+                     "dr_0p5"     : lep0.delta_r(lep1) > 0.5}
+    mask = ak.ones_like(lep0_p4.pt, dtype=np.bool_)
+    for cut in pair_cuts.values():
+        mask = mask & cut
+    [presel_lep0,presel_lep1] = [the_lep[mask] for the_lep in [lep0,lep1]]
+    has_multiple_pairs = ak.num(lep0.pt, axis=1) > 1
+    pair_idxs = ak.where(has_multiple_pairs,
+                         select_best_pair(presel_lep0,presel_lep1,vars4sorting),
+                         ak.zip({'lep0': presel_lep0.obj_idx,
+                                 'lep1': presel_lep1.obj_idx}))
+    return pair_idxs

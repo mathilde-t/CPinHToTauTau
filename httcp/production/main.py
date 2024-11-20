@@ -56,18 +56,18 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         # nano columns
         "hcand.*", optional("GenTau.*"), optional("GenTauProd.*"),
         "Jet.pt",
-        #reArrangeDecayProducts,
-        #reArrangeGenDecayProducts,
-        #ProduceGenPhiCP, #ProduceGenCosPsi, 
-        #ProduceDetPhiCP, #ProduceDetCosPsi,
+        reArrangeDecayProducts,
+        reArrangeGenDecayProducts,
+        ProduceGenPhiCP, #ProduceGenCosPsi, 
+        ProduceDetPhiCP, #ProduceDetCosPsi,
     },
     produces={
         # new columns
         "hcand_invm",
         "hcand_dr",
         "n_jet",
-        #ProduceGenPhiCP, #ProduceGenCosPsi,
-        #ProduceDetPhiCP, #ProduceDetCosPsi,
+        ProduceGenPhiCP, #ProduceGenCosPsi,
+        ProduceDetPhiCP, #ProduceDetCosPsi,
     },
 )
 def hcand_features(
@@ -89,7 +89,6 @@ def hcand_features(
 
     events = set_ak_column_i32(events, "n_jet", ak.num(events.Jet.pt, axis=1))
     
-    """
     events, P4_dict     = self[reArrangeDecayProducts](events)
     events              = self[ProduceDetPhiCP](events, P4_dict)
     #from IPython import embed; embed()
@@ -101,7 +100,7 @@ def hcand_features(
             events, P4_gen_dict = self[reArrangeGenDecayProducts](events)
             events = self[ProduceGenPhiCP](events, P4_gen_dict)
             #events = self[ProduceGenCosPsi](events, P4_gen_dict)
-    """
+    
     return events
 
 
@@ -156,6 +155,7 @@ def hcand_features(
         category_ids,
         #ff_weight,
     },
+    #exposed = true or false
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 

@@ -57,6 +57,9 @@ def stylize_processes(config: od.Config) -> None:
     if (p := config.get_process("dy_lep_m50", default=None)):
         p.color1 = cfg.x.colors.brown
         p.label = r"$Z\to \ell \ell (e/\mu/\tau)$"
+    if (p := config.get_process("dy_m50toinf", default=None)):
+        p.color1 = cfg.x.colors.bright_blue
+        p.label = r"$Z\to \ell \ell (e/\mu/\tau)$"
     if (p := config.get_process("dy_z2ll", default=None)):
         p.color1 = cfg.x.colors.light_blue
         p.label = r"$Z\to \ell \ell ~(ee/\mu\mu)$"

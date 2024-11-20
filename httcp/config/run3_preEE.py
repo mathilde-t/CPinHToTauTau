@@ -466,7 +466,7 @@ def add_run3_2022_preEE (ana: od.Analysis,
         return out_tag, electron_sf_tag    
     tag, electron_sf_tag = tag_caster(campaign)
     
-    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
+    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
 
 

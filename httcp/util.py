@@ -14,6 +14,7 @@ from columnflow.util import maybe_import
 from columnflow.columnar_util import ArrayFunction, deferred_column
 from columnflow.util import DotDict
 from columnflow.columnar_util import set_ak_column
+from columnflow.production import Producer, producer
 
 
 np = maybe_import("numpy")
@@ -190,7 +191,15 @@ def has_pt_greater_equal(obj_1, obj_2, pt_offset):
     obj_1_br, obj_2_br = ak.unzip(pairs)
     return obj_1_br.pt >= (obj_2_br.pt + pt_offset)
 
-def hlt_path_matching(events, triggers, pair_objects):
+
+@producer(
+    uses={'event'},
+    produces={
+        "triggerID_*", "all_triggers_id",
+    },
+    exposed=False,
+)
+def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair_objects: ak.Array, **kwags):
     # Initialize masks and dictionaries
     false_mask = ak.zeros_like(ak.local_index(events.event), dtype=np.bool_)
     single_electron_triggered = false_mask
@@ -204,6 +213,9 @@ def hlt_path_matching(events, triggers, pair_objects):
     hlt_path_fired_mu    = {}
     hlt_path_fired_mutau = {}
     hlt_path_fired_tau   = {}
+    
+    matched_masks = {}
+    trigger_ID = {}
 
     # Perform each lepton election step separately per trigger
     for trigger, trigger_fired, leg_masks in triggers.x.trigger_data:
@@ -213,8 +225,7 @@ def hlt_path_matching(events, triggers, pair_objects):
         is_single_mu = trigger.has_tag("single_mu")
         is_cross_mu  = trigger.has_tag("cross_mu_tau")
         is_cross_tau = trigger.has_tag("cross_tau_tau")
-        
-        if is_single_mu or is_cross_mu:
+        if (is_single_mu or is_cross_mu) & ('mutau' in pair_objects.keys()):
             muons = pair_objects.mutau.lep0
             taus = pair_objects.mutau.lep1
             
@@ -268,8 +279,15 @@ def hlt_path_matching(events, triggers, pair_objects):
                                         ak.any(ak.flatten(cross_mu_tau_matches_leg1, axis=-1), axis=1))
                 cross_muon_triggered = ak.where(trigger_fired & is_cross_mu, True, cross_muon_triggered)
                 hlt_path_fired_mutau[trigger.hlt_field] = ak.where(cross_mu_tau_matched, trigger.id, -1)
+        
+            triggerID_mu    = hlt_path_fired(events, hlt_path_fired_mu)
+            triggerID_mutau = hlt_path_fired(events, hlt_path_fired_mutau)
+            matched_masks['mutau'] = ((triggerID_mu > 0) | (triggerID_mutau > 0))
+            trigger_ID["triggerID_mu"]    = triggerID_mu
+            trigger_ID["triggerID_mutau"] = triggerID_mutau
+                
 
-        if is_single_el or is_cross_el:
+        if (is_single_el or is_cross_el) & ('etau' in pair_objects.keys()) :
             electrons =  pair_objects.etau.lep0
             taus =  pair_objects.etau.lep1
 
@@ -320,8 +338,14 @@ def hlt_path_matching(events, triggers, pair_objects):
                                        ak.any(ak.flatten(cross_e_tau_matches_leg1, axis=-1), axis=1))
                 cross_electron_triggered = ak.where(trigger_fired & is_cross_el, True, cross_electron_triggered)
                 hlt_path_fired_etau[trigger.hlt_field] = ak.where(cross_e_tau_matched, trigger.id, -1)
-        
-        if is_cross_tau:
+            
+            triggerID_e     = hlt_path_fired(events, hlt_path_fired_e)
+            triggerID_etau  = hlt_path_fired(events, hlt_path_fired_etau)
+            matched_masks['etau'] = ((triggerID_e > 0) | (triggerID_etau > 0))
+            trigger_ID["triggerID_e"]    = triggerID_e
+            trigger_ID["triggerID_etau"] = triggerID_etau
+
+        if is_cross_tau & ('mutau' in pair_objects.keys()) :
             assert trigger.n_legs == len(leg_masks) == 2
             assert abs(trigger.legs[0].pdg_id) == 15
             assert abs(trigger.legs[1].pdg_id) == 15
@@ -352,25 +376,16 @@ def hlt_path_matching(events, triggers, pair_objects):
                                      ak.any(ak.flatten(cross_tau2_matches_leg1, axis=-1), axis=1))
             cross_tau_triggered = ak.where(trigger_fired & is_cross_tau, True, cross_tau_triggered)
             hlt_path_fired_tau[trigger.hlt_field] = ak.where(cross_tau_tau_matched, trigger.id, -1)
-    
-    # Process trigger IDs for each type of lepton pair
-    triggerID_e     = hlt_path_fired(events, hlt_path_fired_e)
-    triggerID_etau  = hlt_path_fired(events, hlt_path_fired_etau)
-    triggerID_mu    = hlt_path_fired(events, hlt_path_fired_mu)
-    triggerID_mutau = hlt_path_fired(events, hlt_path_fired_mutau)
-    triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
-
-    # Generate candidate pairs based on matching triggers
-    etau_channel_mask = ((triggerID_e > 0) | (triggerID_etau > 0))
-    mutau_channel_mask = ((triggerID_mu > 0) | (triggerID_mutau > 0))
-    tautau_channel_mask = (triggerID_tau > 0)
-    
-    matched_masks = DotDict.wrap({
-        'etau'  : etau_channel_mask,
-        'mutau' : mutau_channel_mask,
-        'tautau': tautau_channel_mask
-    })
-    return matched_masks, triggerID_e, triggerID_etau, triggerID_mu, triggerID_mutau, triggerID_tau
+        
+        triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
+        matched_masks['tautau'] = (triggerID_tau > 0)
+        trigger_ID["triggerID_tau"]    = triggerID_tau
+        
+        for column_name, array in trigger_ID.items():
+            events = set_ak_column(events, column_name, array)
+        matched_trigger_array = hlt_path_fired(events, trigger_ID)
+        events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
+    return events, matched_masks
 
 
 

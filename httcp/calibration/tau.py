@@ -42,7 +42,11 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
     syst = "nom" # TODO define this systematics inside config file
      #Get working points of the DeepTau tagger
     deep_tau = self.config_inst.x.deep_tau
-    
+    channel = self.config_inst.channels.names()
+    if len(channel) > 1:
+        ch_str = ' '.join([str(ch) for ch in channel])
+        raise ValueError(f"attempt to process more than one channel: {ch_str}")
+    else: channel = channel[0]
     #Create get energy scale correction for each tau
     tes_nom = np.ones_like(pt, dtype=np.float32)
     #Calculate tau ID scale factors for genuine taus
@@ -54,8 +58,8 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
                                                             dm[mask],
                                                             match[mask],
                                                             deep_tau_obj.tagger,
-                                                            'Medium',
-                                                            'VVLoose',
+                                                            deep_tau.vs_jet[channel],
+                                                            deep_tau.vs_e[channel],
                                                             syst)
     #These values are good only for mutau channel, this problem need to be fixed
     else:

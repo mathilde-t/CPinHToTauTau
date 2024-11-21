@@ -37,7 +37,7 @@ def apply_evt_mask(array: ak.Array, mask: ak.Array) -> ak.Array:
     
 @producer(
     uses={
-        "hcand_mutau.*", "tau_decay_prods_mutau*", "event"
+        "hcand_*", "tau_decay_prods_*", "event"
     },
     produces={""} 
 )

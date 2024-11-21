@@ -36,10 +36,10 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
                 "pt","eta","phi","mass","dxy","dz", "charge", 
                 "pfRelIso03_all", "rawIdx", "IPx", "IPy", "IPz","ip_sig", "jetIdx"
             ] 
-        } | {optional("Tau.genPartFlav")},
+        } | {optional("Tau.genPartFlav")} | {hlt_path_matching},
     produces={
-        'hcand_*', "triggerID_e", "triggerID_etau", "triggerID_mu", "triggerID_mutau", "triggerID_tau", "all_triggers_id",
-    },
+        'hcand_*'
+    } | {hlt_path_matching},
     exposed=False,
 )
 def new_higgscand(
@@ -66,20 +66,8 @@ def new_higgscand(
     
     if domatch: 
         n_pairs_postmatch = ak.zeros_like(events.event)
-        matched_masks, triggerID_e, triggerID_etau, triggerID_mu, triggerID_mutau, triggerID_tau = hlt_path_matching(events, trigger_results, pair_objects)
+        events, matched_masks = self[hlt_path_matching](events, trigger_results, pair_objects, **kwargs)
         # Define arrays in a dictionary for easy management
-        trigger_arrays = {
-            "triggerID_e": triggerID_e,
-            "triggerID_etau": triggerID_etau,
-            "triggerID_mu": triggerID_mu,
-            "triggerID_mutau": triggerID_mutau,
-            "triggerID_tau": triggerID_tau,
-        }
-        for column_name, array in trigger_arrays.items():
-            events = set_ak_column(events, column_name, array)
-        matched_trigger_array = hlt_path_fired(events, trigger_arrays)
-        events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
-       
         hcands = {}
         for the_ch in channels:
             matched_pairs = {}

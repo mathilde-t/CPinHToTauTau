@@ -25,10 +25,7 @@ from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
 from httcp.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
 from httcp.selection.trigger import trigger_selection
-from httcp.selection.lepton_pair_etau import etau_selection
-from httcp.selection.lepton_pair_mutau import pair_selection
-from httcp.selection.lepton_pair_tautau import tautau_selection
-from httcp.selection.lepton_pair_emu import emu_selection
+from httcp.selection.lepton_pair import pair_selection
 from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from httcp.selection.higgscand import new_higgscand, mask_nans
@@ -58,9 +55,7 @@ coffea = maybe_import("coffea")
         tau_selection,
         jet_selection,
         jet_veto,
-        etau_selection,
         pair_selection,
-        tautau_selection,
         channel_id,
         extra_lepton_veto,
         double_lepton_veto,
@@ -85,9 +80,7 @@ coffea = maybe_import("coffea")
         tau_selection,
         jet_selection,
         jet_veto,
-        etau_selection,
         pair_selection,
-        tautau_selection,
         channel_id,
         extra_lepton_veto,
         double_lepton_veto,
@@ -183,7 +176,8 @@ def main(
     events, hcand_res = self[new_higgscand](events,
                                  trigger_results,
                                  pair_idxs,
-                                 domatch=True)
+                                 domatch=True,
+                                 **kwargs)
     results += hcand_res
     #produce is_b_vetoed columnd
     events = self[jet_veto](events, **kwargs)

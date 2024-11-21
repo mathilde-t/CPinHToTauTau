@@ -267,7 +267,7 @@ def add_run3_2022_preEE_tau_spinner (ana: od.Analysis,
         "jet_type": "AK4PFPuppi",
         })
     
-    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "httcp/corrections/")
+    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "corrections/")
     jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
     cfg.x.external_files = DotDict.wrap({
         # lumi files

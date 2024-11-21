@@ -6,9 +6,17 @@ wrapper_args=(
     --configs $config
     --datasets $datasets
     --version $version
-    --cf.CalibrateEvents-workflow local #$workflow
+    
+   
+    --cf.CalibrateEvents-workflow $workflow
+    --cf.CalibrateEvents-htcondor-memory 4096 
+    --cf.CalibrateEvents-max-runtime 2
     --cf.SelectEvents-workflow $workflow
+    --cf.SelectEvents-htcondor-memory 4096
+    --cf.SelectEvents-max-runtime 2
     --cf.ReduceEvents-workflow $workflow
+    --cf.ReduceEvents-htcondor-memory 8192
+    --cf.ReduceEvents-max-runtime 2
     --cf.MergeReducedEvents-workflow local
     "${@:2}"
     )

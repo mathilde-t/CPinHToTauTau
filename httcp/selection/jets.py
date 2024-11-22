@@ -66,7 +66,7 @@ def jet_veto_map(
     )
 
     # apply loose Jet puId in Run 2 to jets with pt below 50 GeV
-    if self.config_inst.campaign.x.run == 2:
+    if self.config_inst.campaign.x.year < 2022:
         jet_pu_mask = (events.Jet.puId >= 4) | (events.Jet.pt >= 50)
         jet_mask = jet_mask & jet_pu_mask
 

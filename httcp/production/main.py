@@ -95,5 +95,13 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
     print("Producing phi_cp...") 
-    events = self[phi_cp](events, **kwargs) 
+
+    # TEMPORARY FIX. CHANGE AFTERWARDS
+    channel = self.config_inst.channels.names()
+    if len(channel) > 1:
+        ch_str = ' '.join([str(ch) for ch in channel])
+        raise ValueError(f"attempt to process more than one channel: {ch_str}")
+    else: channel = channel[0]
+    if channel=='mutau':
+        events = self[phi_cp](events, **kwargs) 
     return events

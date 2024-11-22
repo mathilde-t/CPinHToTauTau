@@ -5,13 +5,14 @@ era     : 2022
 postfix : PreEE
 wrapper : true
 limited : false
-workers : 3
+workers : 6
 
 args:
   config    : run3_2022_preEE_nano_cp_tau_v12
   workflow  : htcondor
   branch    : -1
-  version   : dummy
+  # version   : dummy
+  version : Run3_skim2024_2022PreEE_v2
 
   datasets  :
     ## == data ==
@@ -19,9 +20,9 @@ args:
     - data_tau_D
     - data_mu_C
     - data_mu_D
-    - data_single_mu_C
-    - data_e_C
-    - data_e_D
+    # - data_single_mu_C
+    # - data_e_C
+    # - data_e_D
     ## == wj ==
     - wj_incl_madgraph
     ## == dy ==
@@ -32,20 +33,21 @@ args:
     - tt_sl
     - tt_fh
     ## == st ==
-    - st_tchannel_t
-    - st_tchannel_tbar
-    - st_tw_t_sl
-    - st_tw_t_dl
-    - st_tw_t_fh
-    - st_tw_tb_sl
-    - st_tw_tb_dl
-    - st_tw_tb_fh
+    # - st_tchannel_t
+    # - st_tchannel_tbar
+    # - st_tw_t_sl
+    # - st_tw_t_dl
+    # - st_tw_t_fh
+    # - st_tw_tb_sl
+    # - st_tw_tb_dl
+    # - st_tw_tb_fh
     ## == vv ==
-    - ww
-    - wz
-    - zz
+    # - ww
+    # - wz
+    # - zz
     ## == signal ==
-    - h_ggf_tautau_prod_cp_even_sm
+    # - h_ggf_tautau_prod_cp_even_sm
+    - h_ggf_tautau_uncorrelated
 
   processes :
     - data
@@ -55,8 +57,8 @@ args:
     - tt
     #- st_tchannel
     #- st_twchannel
-    - st
-    - vv
+    # - st
+    # - vv
     - h_ggf_tautau
 
   categories:
@@ -90,9 +92,9 @@ args:
     #- tautau__ss__noniso1__noniso2__nobjet # B0    
     #- tautau__ss__iso1__iso2__nobjet       # A
     #- tautau__ss__noniso1__iso2__nobjet    # B
-    - etau*
+    # - etau*
     - mutau*
-    - tautau*
+    # - tautau*
 
   variables:
     ## -- electron -- #
@@ -155,4 +157,7 @@ args:
     #- PhiCP_IPDP_alpha_gt_piby4
 
   extras:
-    - process-settings "h_ggf_tautau,unstack,500000"
+    - process-settings "h_ggf_htt,unstack,scale=stack"
+    - cf.CreateHistograms-workflow htcondor
+    - cf.CreateHistograms-max-runtime 2
+    

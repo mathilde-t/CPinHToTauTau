@@ -481,8 +481,12 @@ def add_run3(ana: od.Analysis,
         cfg.x.luminosity = Number(26_671.7, {
             "lumi_13p6TeV_correlated": 0.014j,
         })
-    elif year == 2023:
-        cfg.x.luminosity = Number(27_208, {
+    elif year == 2023 and campaign.x.tag =="preBpix":
+        cfg.x.luminosity = Number(17_794, {
+            "lumi_13p6TeV_correlated": 0.0j,
+        })
+    elif year == 2023 campaign.x.tag =="postBpix":
+        cfg.x.luminosity = Number(9_451, {
             "lumi_13p6TeV_correlated": 0.0j,
         })
     elif year == 2024:

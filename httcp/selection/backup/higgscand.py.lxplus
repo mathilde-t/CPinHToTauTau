@@ -133,7 +133,7 @@ def assign_tauprod_mass_charge(
     },
     produces={
         "hcand.pt", "hcand.eta", "hcand.phi", "hcand.mass", "hcand.charge", "hcand.rawIdx", "hcand.decayMode",
-        #"hcand.IPx", "hcand.IPy", "hcand.IPz",
+        "hcand.IPx", "hcand.IPy", "hcand.IPz",
         "hcandprod.pt", "hcandprod.eta", "hcandprod.phi", "hcandprod.mass", "hcandprod.charge", "hcandprod.pdgId", "hcandprod.tauIdx",
         assign_tauprod_mass_charge,
     },

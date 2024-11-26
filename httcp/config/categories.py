@@ -100,7 +100,7 @@ def add_etau_mutau_categories(config: od.Config) -> None:
                     config.get_category("lepA0"), config.get_category("lepB0"),
                     config.get_category("lepA1"), config.get_category("lepB1"),
                     config.get_category("lepC"),  config.get_category("lepD")],
-        "TorF"   : [config.get_category("real_2"),  config.get_category("fake_2")],
+        #"TorF"   : [config.get_category("real_2"),  config.get_category("fake_2")],
         #"abcd"   : [config.get_category("lepC"),  config.get_category("lepD")],
         "cp"     : [config.get_category("pi_2"),
                     config.get_category("rho_2"),
@@ -154,7 +154,7 @@ def add_tautau_categories(config: od.Config) -> None:
             config.get_category("hadC0"), config.get_category("hadD0"),
             config.get_category("hadC"),  config.get_category("hadD"),
         ],
-        "TorF"   : [config.get_category("real_1"), config.get_category("fake_1")],
+        #"TorF"   : [config.get_category("real_1"), config.get_category("fake_1")],
         "cp"     : [
             config.get_category("pi_1"),
             config.get_category("rho_1"),

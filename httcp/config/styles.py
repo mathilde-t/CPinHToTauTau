@@ -37,16 +37,19 @@ def stylize_processes(config: od.Config) -> None:
     )
 
     if (p := config.get_process("h_ggf_tautau", default=None)):
-        p.color1 = cfg.x.colors.black
-        p.label = (
-            r"$H_{ggf} \rightarrow \tau\tau$"
-        )
+        p.color1 = cfg.x.colors.maroon
+        p.label = r"$H_{ggf} \rightarrow \tau\tau$"
         
+    if (p := config.get_process("h_ggf_htt", default=None)):
+        p.color1 = cfg.x.colors.maroon
+        p.label = r"$H_{ggf} \rightarrow \tau\tau$"
+        
+    
     if (p := config.get_process("h", default=None)):
         p.color1 = cfg.x.colors.purple
 
     if (p := config.get_process("tt", default=None)):
-        p.color1 = cfg.x.colors.light_purple
+        p.color1 = cfg.x.colors.yellow
         p.label = r"$t\bar{t}$"
 
     if (p := config.get_process("st", default=None)):
@@ -81,11 +84,11 @@ def stylize_processes(config: od.Config) -> None:
         p.color1 = cfg.x.colors.yellow
 
     if (p := config.get_process("w", default=None)):
-        p.color1 = cfg.x.colors.bright_orange
+        p.color1 = cfg.x.colors.dark_orange
         p.label = "W"
     if (p := config.get_process("w_lnu", default=None)):
         p.color1 = cfg.x.colors.bright_orange
-        p.label = "W"
+        p.label = r"$W\to \ell \nu$"
 
     if (p := config.get_process("ewk", default=None)):
         p.color1 = cfg.x.colors.brown

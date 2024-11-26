@@ -224,7 +224,8 @@ def electron_selection(
     events = set_ak_column(events, "Electron.rawIdx",    ak.local_index(events.Electron))
     events = set_ak_column(events, "Electron.decayMode", -1)
     # make sure that there is no nan sip3d 
-    ipsig_dummy = ak.min(ak.flatten(events.Electron.sip3d)) - 10.0 # going to set nan values to (min value - 10)
+    #print(events.Electron.sip3d)
+    ipsig_dummy = ak.min(ak.flatten(ak.fill_none(events.Electron.sip3d, 0.0))) - 10.0 # going to set nan values to (min value - 10), if none set to 0
     events = set_ak_column(events, "Electron.IPsig", ak.nan_to_num(events.Electron.sip3d, ipsig_dummy))
     events = set_ak_column(events, "Electron.idVsJet", -1.0)
     

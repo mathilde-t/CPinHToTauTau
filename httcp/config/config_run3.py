@@ -463,16 +463,39 @@ def add_run3(ana: od.Analysis,
     #     "TimePtEta",
     # ]
 
+
+    ################################
+    # luminosity and normalization #
+    ################################
+
     # lumi values in inverse pb
     # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2?rev=2#Combination_and_correlations
-    #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis#DATA_AN2
-    #Only F and G eras
-    cfg.x.luminosity = Number(7980, {
-        "lumi_13p6TeV_2022": 0.014j,
-        
-    })
+    # https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis
+    # difference pre-post VFP: https://cds.cern.ch/record/2854610/files/DP2023_006.pdf
     
-
+    if year == 2022 and campaign.x.tag =="preEE":
+        cfg.x.luminosity = Number(7_980.4, {
+            "lumi_13p6TeV_correlated": 0.014j,
+        })
+    elif year == 2022 and campaign.x.tag =="postEE":
+        cfg.x.luminosity = Number(26_671.7, {
+            "lumi_13p6TeV_correlated": 0.014j,
+        })
+    elif year == 2023 and campaign.x.tag =="preBpix":
+        cfg.x.luminosity = Number(17_794, {
+            "lumi_13p6TeV_correlated": 0.0j,
+        })
+    elif year == 2023 campaign.x.tag =="postBpix":
+        cfg.x.luminosity = Number(9_451, {
+            "lumi_13p6TeV_correlated": 0.0j,
+        })
+    elif year == 2024:
+        cfg.x.luminosity = Number(0, {
+            "lumi_13p6TeV_correlated": 0.0j,
+        })
+    else:
+        assert False
+    
     # names of muon correction sets and working points
     # (used in the muon producer)   
   

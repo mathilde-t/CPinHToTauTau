@@ -4,13 +4,17 @@ Calibration methods.
 import functools
 
 from columnflow.calibration import Calibrator, calibrator
-from httcp.calibration.jets import jets, jec, jer
+from httcp.calibration.jets import jec
 from httcp.calibration.met import met_phi
 from httcp.calibration.tau import tau_energy_scale
 from httcp.calibration.electron import electron_smearing_scaling
 from columnflow.production.cms.seeds import deterministic_seeds
 from columnflow.util import maybe_import
 from columnflow.columnar_util import set_ak_column
+
+import law
+
+logger = law.logger.get_logger(__name__)
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -29,27 +33,32 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
 
     events = self[deterministic_seeds](events, **kwargs)
     
+    non_finite_mask = ~np.isfinite(events.PuppiMET.pt)
     #Jets variables before applying energy corrections
     events = set_ak_column_f32(events, "Jet.pt_no_jec", events.Jet.pt)
     events = set_ak_column_f32(events, "Jet.phi_no_jec", events.Jet.phi)
     events = set_ak_column_f32(events, "Jet.eta_no_jec", events.Jet.eta)
     events = set_ak_column_f32(events, "Jet.mass_no_jec", events.Jet.mass)
     events = set_ak_column_f32(events, "nJet", events.nJet)
-    
+
     #PuppiMET variables before applying energy corrections
     events = set_ak_column_f32(events, "PuppiMET.pt_no_jec", events.PuppiMET.pt)
     events = set_ak_column_f32(events, "PuppiMET.phi_no_jec", events.PuppiMET.phi)
-
-    #events = self[jets](events, **kwargs)
     
+    
+    print("Performing Jet Energy Correction...")
     events = self[jec](events, **kwargs)
-
-    #events = self[met_phi](events, **kwargs)
-    #events = self[jer](events, **kwargs)
+    print("Jet Energy Correction...SUCCEDED")
+    
     events = set_ak_column_f32(events, "Electron.pt_no_scaling_smearing", events.Electron.pt)
     
     print("Performing electron scaling and smearing correction...")
-    events = self[electron_smearing_scaling](events, **kwargs) 
+    events = self[electron_smearing_scaling](events, **kwargs)
+    print("Electron scaling and smearing correction...SUCCEDED")
+    
+    #events = self[met_phi](events, **kwargs)
+    #events = self[jer](events, **kwargs)
+    #events = self[jets](events, **kwargs)
     
     if self.dataset_inst.is_mc: 
     #Apply tau energy scale correction

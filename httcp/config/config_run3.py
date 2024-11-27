@@ -46,7 +46,7 @@ def add_run3(ana: od.Analysis,
     # gather campaign data
     year = campaign.x.year
     year2 = year % 100
-    
+
     def tag_caster(campaign: od.Campaign) -> str:
         #Helper function to cast campaign tags to the tags used in POG groups for the scale factors
         year = campaign.x.year
@@ -78,7 +78,8 @@ def add_run3(ana: od.Analysis,
             e_smearing_corrector = "2022Re-recoE+PromptFG_SmearingJSON"
         elif tag == "preVFP"    : out_tag = "preVFP_UL"
         elif tag == "postVFP"   : out_tag = "postVFP_UL"    
-        return out_tag, e_sf_tag, e_scale_corrector, e_smearing_corrector    
+        return out_tag, e_sf_tag, e_scale_corrector, e_smearing_corrector
+        
     tag, e_sf_tag, e_scale_corrector, e_smearing_corrector = tag_caster(campaign)
     
     # add processes we are interested in
@@ -113,8 +114,8 @@ def add_run3(ana: od.Analysis,
         "st_tchannel_tbar",
         "st_tchannel_t",
         #single top s-channel   
-        #"st_schannel_t",
-        #"st_schannel_tbar",
+        "st_schannel_t_lep",
+        "st_schannel_tbar_lep",
         # single top tW channel
         "st_twchannel_t_fh",
         "st_twchannel_t_sl",
@@ -194,8 +195,8 @@ def add_run3(ana: od.Analysis,
         "st_tchannel_tbar",
         "st_tchannel_t",
         #single top s-channel
-        #"st_schannel_tbar",
-        #"st_schannel_t",
+        "st_schannel_tbar_lep",
+        "st_schannel_t_lep",
         # single top tW channel
         "st_twchannel_t_fh",
         "st_twchannel_t_sl",
@@ -233,8 +234,8 @@ def add_run3(ana: od.Analysis,
         "st_tchannel_tbar",
         "st_tchannel_t",
         #single top s-channel
-        #"st_schannel_tbar",
-        #"st_schannel_t",
+        "st_schannel_tbar_lep",
+        "st_schannel_t_lep",
         # single top tW channel
         "st_twchannel_t_fh",
         "st_twchannel_t_sl",
@@ -485,7 +486,7 @@ def add_run3(ana: od.Analysis,
         cfg.x.luminosity = Number(17_794, {
             "lumi_13p6TeV_correlated": 0.0j,
         })
-    elif year == 2023 campaign.x.tag =="postBpix":
+    elif year == 2023 and campaign.x.tag =="postBpix":
         cfg.x.luminosity = Number(9_451, {
             "lumi_13p6TeV_correlated": 0.0j,
         })
@@ -495,7 +496,7 @@ def add_run3(ana: od.Analysis,
         })
     else:
         assert False
-    
+ 
     # names of muon correction sets and working points
     # (used in the muon producer)   
   

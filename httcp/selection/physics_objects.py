@@ -77,7 +77,7 @@ def muon_selection(
         "muon_dz_0p2"         : abs(muons.dz) < 0.2,
         "muon_iso_0p15"       : muons.pfRelIso04_all < 0.15,
         "muon_ipsig_safe"     : muons.IPsig > ipsig_dummy,
-        #"muon_ipsig_1p5"      : np.abs(muons.IPsig) > 1.5,
+        "muon_ipsig_1p5"      : np.abs(muons.IPsig) > 1.5,
     }
     single_veto_selections = {
         "muon_pt_10"          : muons.pt > 10,

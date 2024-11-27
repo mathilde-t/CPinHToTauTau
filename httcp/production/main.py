@@ -122,7 +122,7 @@ def hcand_features(
         electron_xtrigger_weights,
         # -- tau -- #
         tau_weights,
-        #tauspinner_weights,
+        tauspinner_weights,
         IF_DATASET_IS_DY_LO(zpt_reweight),
         hcand_features,
         hcand_mass,
@@ -146,7 +146,7 @@ def hcand_features(
         electron_xtrigger_weights,
         # -- tau -- #
         tau_weights,
-        #tauspinner_weights,
+        tauspinner_weights,
         IF_DATASET_IS_DY_LO(zpt_reweight),
         hcand_features,
         hcand_mass,

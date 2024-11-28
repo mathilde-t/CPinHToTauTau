@@ -405,6 +405,7 @@ def add_config (ana: od.Analysis,
     else:
         raise RuntimeError(f"Wrong year: {year}")
 
+    #from IPython import embed; embed() # to check lumi with 
 
     # minimum bias cross section in mb (milli) for creating PU weights, values from
     # https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData?rev=45#Recommended_cross_section
@@ -556,7 +557,6 @@ def add_config (ana: od.Analysis,
         "NUM_IsoMu20_DEN_CutBasedIdMedium_and_PFIsoMedium",
         f"{year}_{postfix}"
     )
-    
 
     # --------------------------------------------------------------------------------------------- #
     # jet settings

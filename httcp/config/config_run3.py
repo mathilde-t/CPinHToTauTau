@@ -39,7 +39,7 @@ def add_run3(ana: od.Analysis,
     # gather campaign data
     cfg.x.year = campaign.x.year
     year = cfg.x.year
-    
+
     # validations
     if campaign.x.year == 2022:
         assert campaign.x.tag in ["preEE", "postEE"]

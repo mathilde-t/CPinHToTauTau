@@ -375,7 +375,8 @@ def tauspinner_weights(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
        #if  "TauSpinner" in list(events.fields):
        if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
        #elif the_name == "":  the_weight = ak.ones_like(events.TauSpinner.weight_cp_0p#5)
-       elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
+       #elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
+       elif the_name == "":  the_weight =  events.TauSpinner.weight_cp_0p25 # maximal CP mixing
        elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
        else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner #weight producer!')   
        buf = ak.to_numpy(the_weight)
@@ -401,7 +402,7 @@ def tauspinner_weights(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 #         "tauspinner_weight_down", # same as cpodd 
 #         "tauspinner_weight_cpeven",    # 0
 #         "tauspinner_weight_cpeven_alt",# 0
-#         "tauspinner_weight_cpmix",     # 0.25
+#         "tauspinner_weight_cpmix",     # 0.25 : maximal CP mixing
 #         "tauspinner_weight_cpmix_alt", # 0.25_alt
 #         "tauspinner_weight_cpmixm",    # -0.25
 #         "tauspinner_weight_cpmixm_alt",# -0.25_alt

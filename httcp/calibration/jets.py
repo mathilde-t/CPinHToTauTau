@@ -46,7 +46,6 @@ def get_evaluators(
     """
     available_keys = set(correction_set.keys()).union(correction_set.compound.keys())
     corrected_names = []
-
     for name in names:
         if name not in available_keys:
             # Find the closest match using difflib
@@ -61,7 +60,7 @@ def get_evaluators(
                 raise RuntimeError(f"Correction '{name}' not found and no close match available.")
         else:
             corrected_names.append(name)
-
+    
     # Retrieve the evaluators
     return [
         correction_set.compound[name]
@@ -242,7 +241,7 @@ def jec(
     # calculate uncorrected pt, mass
     events = set_ak_column_f32(events, "Jet.pt_raw", events.Jet.pt * (1 - events.Jet.rawFactor))
     events = set_ak_column_f32(events, "Jet.mass_raw", events.Jet.mass * (1 - events.Jet.rawFactor))
-
+    
     def correct_jets(pt, area, eta, rho, evaluator_key="jec"):
         # variable naming convention
         variable_map = {
@@ -288,7 +287,7 @@ def jec(
             rho=rho,
             evaluator_key="jec_subset_type1_met",
         )
-
+        
         # temporarily apply the new factors with only subset of corrections
         events = set_ak_column_f32(events, "Jet.pt", events.Jet.pt_raw * jec_factors_subset_type1_met)
         events = set_ak_column_f32(events, "Jet.mass", events.Jet.mass_raw * jec_factors_subset_type1_met)
@@ -522,7 +521,6 @@ def jec_setup(self: Calibrator, reqs: dict, inputs: dict, reader_targets: Insert
         "jec_subset_type1_met": get_evaluators(correction_set, jec_keys_subset_type1_met),
         "junc": dict(zip(sources, get_evaluators(correction_set, junc_keys))),
     }
-
 
 # custom jec calibrator that only runs nominal correction
 jec_nominal = jec.derive("jec_nominal", cls_dict={"uncertainty_sources": []})

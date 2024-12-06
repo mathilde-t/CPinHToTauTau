@@ -173,7 +173,7 @@ def electron_selection(
     mva_noniso_wp90 = events.Electron.mvaNoIso_WP90
 
     good_selections = {
-        "electron_pt_25"          : events.Electron.pt > 25,
+        "electron_pt_32"          : events.Electron.pt > 32, #We are using HLT_Ele30 so this cut is needed
         "electron_eta_2p1"        : abs(events.Electron.eta) < 2.1,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
         "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,

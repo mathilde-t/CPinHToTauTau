@@ -325,7 +325,7 @@ def jec(
 
         # propagate changes to PuppiMET, starting from jets corrected with subset of JEC levels
         # (recommendation is to propagate only L2 corrections and onwards)
-        from IPython import embed; embed() 
+
         met_pt, met_phi = propagate_met(
             jetsum_pt_subset_type1_met,
             jetsum_phi_subset_type1_met,

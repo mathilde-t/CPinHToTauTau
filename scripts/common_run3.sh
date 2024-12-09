@@ -2,7 +2,7 @@
 
 set_common_vars() {
 
-version="desy_dev"
+version="dev"
     
 categories_mutau="mutau_signal_reg" 
 variables_mutau='mutau_lep0_pt,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep1_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
@@ -97,7 +97,7 @@ case $1 in
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
 	    categories=$categories_etau
 	    variables=$variables_etau
-	    workflow='local'
+	    workflow='htcondor'
     ;;
     "run3_2022postEE_mutau")
         config="run3_2022_postEE_mutau"

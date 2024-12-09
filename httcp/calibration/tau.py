@@ -61,7 +61,6 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
                                                             deep_tau.vs_jet[channel],
                                                             deep_tau.vs_e[channel],
                                                             syst)
-    #These values are good only for mutau channel, this problem need to be fixed
     else:
         tes_args = lambda events, mask, deep_tau_obj, syst: (pt[mask],
                                                             abseta[mask],

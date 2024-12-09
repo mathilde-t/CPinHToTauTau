@@ -55,12 +55,14 @@ ana.x.config_groups = {}
 #    campaign_run3_2022_preEE_tau_spinner.copy(),
 #    config_name=f"{campaign_run3_2022_preEE_tau_spinner.name}",
 #    config_id=5,)
+
+
+from httcp.config.config_run3 import add_run3
 # ------------------------------------------------------------- #
 
 channels = ['mutau','etau','tautau']
 
 #------------------------ Run3 2022 preEE samples ----------------------- #
-from httcp.config.config_run3 import add_run3
 from cmsdb.campaigns.run3_2022_preEE_nano_tau_skim_v2 import campaign_run3_2022_preEE_nano_tau_skim_v2
 for counter, value in enumerate(channels):
     add_run3(
@@ -80,7 +82,6 @@ for counter, value in enumerate(channels):
 # -------------------------------------------------------------------------------------------------- #
 
 #------------------------ Run3 2022 postEE samples ------------------------------------------------- #
-from httcp.config.config_run3 import add_run3
 from cmsdb.campaigns.run3_2022_postEE_v2_nano_tau_v14 import campaign_run3_2022_postEE_v2_nano_tau_v14
 for counter, value in enumerate(channels): 
     add_run3(
@@ -98,4 +99,3 @@ for counter, value in enumerate(channels):
         config_name=f"run3_2022_postEE_{value}",
         config_id=15+counter,)
 # -------------------------------------------------------------------------------------------------- #
-

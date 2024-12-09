@@ -242,5 +242,4 @@ def main(
 
     events, results = self[increment_stats](
         events, results, stats, weight_map=weight_map, group_map=group_map, **kwargs)
-    
     return events, results

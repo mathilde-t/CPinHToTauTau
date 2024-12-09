@@ -12,7 +12,11 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 def hcand_mt(lep: ak.Array, MET: ak.Array) -> ak.Array:
     print("producing mT...")
-    cos_dphi = np.cos(lep.delta_phi(MET))
+    delta_phi = lep.phi - MET.phi
+    delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
+    delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)
+    #cos_dphi = np.cos(lep.delta_phi(MET))
+    cos_dphi = np.cos(delta_phi)
     mT_values = np.sqrt(2*lep.pt*MET.pt * (1 - cos_dphi))
     return ak.fill_none(mT_values, EMPTY_FLOAT)
 
@@ -41,8 +45,7 @@ def hcand_fields(
         hcand['mass'] = ak.where(dilep_mass > 0, dilep_mass , EMPTY_FLOAT)
         dilep_pt = pair.pt
         hcand['pt'] = ak.where(dilep_pt > 0, dilep_pt , EMPTY_FLOAT)
-        
-        delta_r = ak.flatten(p4['lep0'].metric_table(hcand.lep1), axis=2)
+        delta_r = ak.flatten(p4['lep0'].metric_table(p4['lep1']), axis=2)
         hcand['delta_r'] = ak.where(delta_r > 0, delta_r , EMPTY_FLOAT)
         hcand['rel_charge'] = hcand.lep0.charge * hcand.lep1.charge
         if ch_str !=' tautau':

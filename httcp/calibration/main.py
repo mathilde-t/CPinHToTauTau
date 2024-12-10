@@ -47,9 +47,8 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
 
     print("Performing Jet Energy Correction...")
     events = self[jec](events, **kwargs)
-    print("Jet Energy Correction...SUCCEDED")
     events = set_ak_column_f32(events, "Electron.pt_no_scaling_smearing", events.Electron.pt)
-
+    
     print("Performing electron scaling and smearing correction...")
     events = self[electron_smearing_scaling](events, **kwargs)
     print("Electron scaling and smearing correction...SUCCEDED")
@@ -61,6 +60,7 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
     if self.dataset_inst.is_mc: 
     #Apply tau energy scale correction
         print("Performing tau energy scale correction...")
+        
         events = self[tau_energy_scale](events, **kwargs)
 
     return events

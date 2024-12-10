@@ -133,3 +133,19 @@ def deep_tau_inv_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.A
         #from IPython import embed; embed()
         mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
     return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def tau_endcap(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+            mask = mask | ak.fill_none(ak.firsts((np.abs(events[f'hcand_{ch_str}'].lep1.eta) > 1.2), axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def tau_barrel(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for ch_str in channels:
+            mask = mask | ak.fill_none(ak.firsts((np.abs(events[f'hcand_{ch_str}'].lep1.eta) <= 1.2), axis=1),False)
+    return events, mask

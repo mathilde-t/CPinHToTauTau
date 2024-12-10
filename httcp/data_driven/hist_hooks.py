@@ -58,14 +58,12 @@ def add_hist_hooks(config: od.Config) -> None:
                 category_ids.add(cat_ax.value(cat_index))
 
         # create qcd groups
-        qcd_groups: dict[str, dict[str, od.Category]] = defaultdict(DotDict)
-        for cat_id in category_ids:
-            cat_inst = config.get_category(cat_id)
-            if 'signal_reg' in cat_inst.name:
-                qcd_groups['signal_reg'] = cat_inst
-            if 'ff_control_reg' in cat_inst.name:
-                qcd_groups['ff_control_reg'] = cat_inst
-
+        signal_categories : dict[str, dict[str, od.Category]] = defaultdict(DotDict)
+        #Filling the dictionay with signal histograms
+        for the_name in config.categories.names():
+            if 'signal_reg' in the_name:
+                signal_categories[the_name] = config.get_category(the_name)
+        
 
         # sum up mc and data histograms, stop early when empty
         mc_hists = [h for p, h in hists.items() if p.is_mc and not p.has_tag("signal")]
@@ -76,22 +74,31 @@ def add_hist_hooks(config: od.Config) -> None:
         # start by copying the mc hist and reset it, then fill it at specific category slices
         hists[qcd] = qcd_hist = mc_hist.copy().reset()
         
-        def get_hist (h, region): 
-            return h[{"category": hist.loc(region.id)}]
-        data_array = hist_to_num(get_hist(data_hist, qcd_groups['ff_control_reg']))
-        mc_array = hist_to_num(get_hist(mc_hist, qcd_groups['ff_control_reg']))
-        qcd_array = data_array - mc_array
+        def get_hist (h, category): 
+            return h[{"category": hist.loc(category.id)}]
         
-        neg_mask = qcd_array() < 0 
-        qcd_values = qcd_array()
-        qcd_values[neg_mask] = 0
-        qcd_variances = qcd_array(sn.UP, sn.ALL, unc=True)**2
         
-        cat_axis = qcd_hist.axes["category"]
-        for cat_index in range(cat_axis.size):
-            qcd_hist.view().value[cat_index, ...] = qcd_values
-            qcd_hist.view().variance[cat_index, ...] = qcd_variances
+        def find_by_id(hist, cat_id):
+            cat_axis = hist.axes["category"]
+            for  the_idx, the_id in enumerate(cat_axis): 
+                if the_id == cat_id: return the_idx
+            return -1
+
+        for (the_name, the_category) in signal_categories.items():
+            control_cat = config.get_category(the_category.aux['control_reg'])
+            data_array = hist_to_num(get_hist(data_hist, control_cat))
+            mc_array = hist_to_num(get_hist(mc_hist, control_cat))
+            qcd_array = data_array - mc_array
+            qcd_values = qcd_array()
+            qcd_values[qcd_array() < 0] = 0
+            qcd_variances = qcd_array(sn.UP, sn.ALL, unc=True)**2
+            
+            cat_idx = find_by_id(qcd_hist, the_category.id)
+            qcd_hist.view().value[cat_idx, ...] = qcd_values
+            qcd_hist.view().variance[cat_idx, ...] = qcd_variances
+        #from IPython import embed; embed()            
         # for group_name in complete_groups:
+        
         #     group = qcd_groups[group_name]
 
         #     # get the corresponding histograms and convert them to number objects,

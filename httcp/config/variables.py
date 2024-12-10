@@ -460,6 +460,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
         'tautau' : {'lep0' : 'Tau',
                     'lep1' : 'Tau'},
     })
+    bin_split_factor = 4 #Used to define histograms for kinematic variables with finer binning
     for ch_str in channels:
         cfg.add_variable(
                 name=f"{ch_str}_mvis",
@@ -560,6 +561,29 @@ def add_dilepton_features(cfg: od.Config) -> None:
                     unit="",
                     x_title= rf"{lep_str} $IP_{proj}$",
                 )
+            #Variables with finer binning
+            cfg.add_variable(
+                name=f"{ch_str}_{lep}_pt_fine_binning",
+                expression=f"hcand_{ch_str}.{lep}.pt",
+                null_value=EMPTY_FLOAT,
+                binning=(30*bin_split_factor, 20, 80.),
+                unit="GeV",
+                x_title= rf"{lep_str} $p_{{T}}$",
+            )
+            cfg.add_variable(
+                name=f"{ch_str}_{lep}_eta_fine_binning",
+                expression=f"hcand_{ch_str}.{lep}.eta",
+                null_value=EMPTY_FLOAT,
+                binning=(32*bin_split_factor, -3.2, 3.2),
+                x_title=rf"{lep_str} $\eta$",
+            )
+            cfg.add_variable(
+                name=f"{ch_str}_{lep}_phi_fine_binning",
+                expression=f"hcand_{ch_str}.{lep}.phi",
+                null_value=EMPTY_FLOAT,
+                binning=(32*bin_split_factor, -3.2, 3.2),
+                x_title=rf"{lep_str} $\phi$",
+            )
 
 
 def add_variables(cfg: od.Config) -> None:

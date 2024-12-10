@@ -45,9 +45,8 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
     events = set_ak_column_f32(events, "PuppiMET.pt_no_jec", events.PuppiMET.pt)
     events = set_ak_column_f32(events, "PuppiMET.phi_no_jec", events.PuppiMET.phi)
 
-    #events = self[jets](events, **kwargs)
-    
-    #events = self[jec](events, **kwargs)
+    print("Performing Jet Energy Correction...")
+    events = self[jec](events, **kwargs)
     events = set_ak_column_f32(events, "Electron.pt_no_scaling_smearing", events.Electron.pt)
     
     print("Performing electron scaling and smearing correction...")

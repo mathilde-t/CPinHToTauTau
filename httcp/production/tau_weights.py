@@ -149,7 +149,8 @@ def tau_weights(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak
     args_vs_mu  = lambda mask, id_vs_m_wp, syst  : (abseta[mask], genmatch[mask], id_vs_m_wp, syst)    
     args_vs_jet = lambda mask, id_vs_j_wp, id_vs_e_wp, syst : (pt[mask], dm[mask], genmatch[mask], id_vs_j_wp, id_vs_e_wp, syst, "dm")
     
-    trig_eval_args = lambda mask, type, discr, syst: (pt[mask], dm[mask], type, discr, "sf", syst)
+    trig_eval_args     = lambda mask, type, discr, syst: (pt[mask], dm[mask], type, discr, "sf", syst)
+    trig_eff_eval_args = lambda mask, type, discr, node, syst: (pt[mask], dm[mask], type, discr, node, syst)
 
 
 
@@ -294,6 +295,7 @@ def tau_weights(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak
                 events = set_ak_column(events, wt_name, reduce_mul(sf_values_dm[the_shift]), value_type=np.float32)
 
         # trig sf
+        """
         trig_tau_mask = (channel_id_flat == ch_tautau.id) & flat_np_view((dm_mask & (events.Tau.pt >= 40.0)), axis=1) & cross_tau_triggered & ~cross_tau_jet_triggered
         trig_sf_values[the_shift][trig_tau_mask] = self.trig_corrector.evaluate(*trig_eval_args(trig_tau_mask,
                                                                                                 'ditau',
@@ -304,7 +306,52 @@ def tau_weights(self: Producer, events: ak.Array, do_syst: bool, **kwargs) -> ak
                                                                                                     'ditaujet',
                                                                                                     wp_config["vs_j"]["tautau"],
                                                                                                     the_shift))
-       
+        """
+        # Inclusive OR
+        #trig_tau_mask = (channel_id_flat == ch_tautau.id) & flat_np_view((dm_mask & (events.Tau.pt >= 40.0)), axis=1) & (cross_tau_triggered | cross_tau_jet_triggered)
+        #from IPython import embed; embed()
+
+        trig_tautau_mask = (channel_id_flat == ch_tautau.id) & flat_np_view((dm_mask & (events.Tau.pt >= 40.0)), axis=1) & cross_tau_triggered
+        trig_tautaujet_mask = (channel_id_flat == ch_tautau.id) & flat_np_view((dm_mask & (events.Tau.pt >= 40.0)), axis=1) & cross_tau_jet_triggered
+        trig_mask = (trig_tautau_mask | trig_tautaujet_mask)
+        
+
+        #from IPython import embed; embed()
+
+        
+        tautau_trig_eff_data = self.trig_corrector.evaluate(*trig_eff_eval_args(trig_mask,
+                                                                                'ditau',
+                                                                                wp_config["vs_j"]["tautau"],
+                                                                                "eff_data",
+                                                                                the_shift))
+        tautau_trig_eff_mc  = self.trig_corrector.evaluate(*trig_eff_eval_args(trig_mask,
+                                                                               'ditau',
+                                                                               wp_config["vs_j"]["tautau"],
+                                                                               "eff_mc",
+                                                                               the_shift))
+        tautaujet_trig_eff_data = self.trig_corrector.evaluate(*trig_eff_eval_args(trig_mask,
+                                                                                   'ditaujet',
+                                                                                   wp_config["vs_j"]["tautau"],
+                                                                                   "eff_data",
+                                                                                   the_shift))
+        tautaujet_trig_eff_mc  = self.trig_corrector.evaluate(*trig_eff_eval_args(trig_mask,
+                                                                                  'ditaujet',
+                                                                                  wp_config["vs_j"]["tautau"],
+                                                                                  "eff_mc",
+                                                                                  the_shift))
+        trig_tautau_mask_int = trig_tautau_mask.astype(int)[trig_mask]
+        trig_tautaujet_mask_int = trig_tautaujet_mask.astype(int)[trig_mask]
+
+        eff_data = trig_tautau_mask_int*tautau_trig_eff_data + trig_tautaujet_mask_int*tautaujet_trig_eff_data \
+            - (trig_tautau_mask_int * trig_tautaujet_mask_int * tautau_trig_eff_data * tautaujet_trig_eff_data)
+        eff_mc = trig_tautau_mask_int*tautau_trig_eff_mc + trig_tautaujet_mask_int*tautaujet_trig_eff_mc \
+            - (trig_tautau_mask_int * trig_tautaujet_mask_int * tautau_trig_eff_mc * tautaujet_trig_eff_mc)
+
+        sf = eff_data/eff_mc
+
+        trig_sf_values[the_shift][trig_mask] = sf
+
+        
         trig_wt_name = "tau_trigger_weight" if the_shift == "nom" else f"tau_trigger_weight_{the_shift}"
         events = set_ak_column(events, trig_wt_name, reduce_mul(trig_sf_values[the_shift]), value_type=np.float32)
         ##############################################################
@@ -355,12 +402,60 @@ def tau_weights_setup(self: Producer, reqs: dict, inputs: dict, reader_targets: 
 # Calculate Tau-Spinner weights
 # ------------------------------------------------- #
 
+#@producer(
+#    uses={
+#        f"TauSpinner*" 
+#    },
+#    produces={
+#        "tauspinner_weight_up", "tauspinner_weight", "tauspinner_weight_down"
+#    },
+#    mc_only=True,
+#)
+#def tauspinner_weights(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
+#    """
+#    A simple function that sets tauspinner_weight according to the cp_hypothesis
+#    # https://github.com/hephysicist/CPinHToTauTau/blob/desy_dev/httcp/production/weigh#ts.py#L411
+#    """
+#    names = ["_up", "", "_down"]
+#
+#    for the_name in names:
+#        #if  "TauSpinner" in list(events.fields):
+#        if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
+#        #elif the_name == "":  the_weight = ak.ones_like(events.TauSpinner.weight_cp_0p#5)
+#        elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.T#auSpinner.weight_cp_0)/2.
+#        elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
+#        else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner #weight producer!')   
+#        buf = ak.to_numpy(the_weight)
+#        if any(np.isnan(buf)):
+#            warn.warn("tauspinner_weight contains NaNs. Imputing them with zeros.")
+#            buf[np.isnan(buf)] = 0
+#            the_weight = buf
+#    
+#        events = set_ak_column_f32(events, f"tauspinner_weight{the_name}", the_weight)
+#    return events
+
+
 @producer(
     uses={
         f"TauSpinner*" 
     },
     produces={
-        "tauspinner_weight_up", "tauspinner_weight", "tauspinner_weight_down"
+        # Version with _alt are duplicated weights computed with different setup of
+        # neutral currents parameterization and can be used to estimate uncertainty
+        # of the weighting. However it was neglected in the Run-2 analysis
+        "tauspinner_weight",
+        "tauspinner_weight_up",   # same as cpeven
+        "tauspinner_weight_down", # same as cpodd 
+        "tauspinner_weight_cpeven",    # 0
+        "tauspinner_weight_cpeven_alt",# 0
+        "tauspinner_weight_cpmix",     # 0.25
+        "tauspinner_weight_cpmix_alt", # 0.25_alt
+        "tauspinner_weight_cpmixm",    # -0.25
+        "tauspinner_weight_cpmixm_alt",# -0.25_alt
+        "tauspinner_weight_cpalpha0p375",     # 0.375
+        "tauspinner_weight_cpalpha0p375_alt", # 0.375_alt
+        "tauspinner_weight_cpodd",     # 0.5
+        "tauspinner_weight_cpodd_alt", # 0.5
     },
     mc_only=True,
 )
@@ -369,20 +464,51 @@ def tauspinner_weights(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     A simple function that sets tauspinner_weight according to the cp_hypothesis
     # https://github.com/hephysicist/CPinHToTauTau/blob/desy_dev/httcp/production/weights.py#L411
     """
-    names = ["_up", "", "_down"]
-    for the_name in names:
-        #if  "TauSpinner" in list(events.fields):
-        if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
-        #elif the_name == "":  the_weight = ak.ones_like(events.TauSpinner.weight_cp_0p5)
-        #elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
-        elif the_name == "":  the_weight =  events.TauSpinner.weight_cp_0p25
-        elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
-        else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner weight producer!')   
-        buf = ak.to_numpy(the_weight)
+    wt_names     = ['nom',
+                    'cpeven',
+                    'cpeven_alt',
+                    'cpmix',
+                    'cpmix_alt',
+                    'cpmixm',
+                    'cpmixm_alt',
+                    'cpalpha0p375',
+                    'cpalpha0p375_alt',
+                    'cpodd',
+                    'cpodd_alt']
+
+    branch_names = ['',
+                    'weight_cp_0',
+                    'weight_cp_0_alt',
+                    'weight_cp_0p25',
+                    'weight_cp_0p25_alt',
+                    'weight_cp_minus0p25',
+                    'weight_cp_minus0p25_alt',
+                    'weight_cp_0p375',
+                    'weight_cp_0p375_alt',
+                    'weight_cp_0p5',
+                    'weight_cp_0p5_alt']
+    
+    weight_map   = zip(wt_names, branch_names)
+    
+    for (wt_name, branch) in weight_map:
+        _name = ""
+        if wt_name == "nom":
+            weight = (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
+        else:
+            _name = f"_{wt_name}"
+            weight = events.TauSpinner[branch]
+
+        buf = ak.to_numpy(weight)
         if any(np.isnan(buf)):
             warn.warn("tauspinner_weight contains NaNs. Imputing them with zeros.")
             buf[np.isnan(buf)] = 0
-            the_weight = buf
+            weight = buf
+        
+        events = set_ak_column_f32(events, f"tauspinner_weight{_name}", weight)
+        if _name == "_cpeven": # redundant, needs to be resolved later
+            events = set_ak_column_f32(events, f"tauspinner_weight_up", weight)
+        elif _name == "_cpodd": # redundant, needs to be resolved later
+            events = set_ak_column_f32(events, f"tauspinner_weight_down", weight)
 
-        events = set_ak_column_f32(events, f"tauspinner_weight{the_name}", the_weight)
     return events
+

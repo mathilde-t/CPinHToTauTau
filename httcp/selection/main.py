@@ -4,6 +4,8 @@
 Exemplary selection methods.
 """
 
+import law
+
 from typing import Optional
 from operator import and_
 from functools import reduce
@@ -17,7 +19,7 @@ from columnflow.selection.cms.met_filters import met_filters
 from columnflow.production.processes import process_ids
 from columnflow.production.cms.mc_weight import mc_weight
 from columnflow.production.util import attach_coffea_behavior
-from columnflow.production.categories import category_ids
+#from columnflow.production.categories import category_ids
 
 from columnflow.util import maybe_import
 from columnflow.columnar_util import optional_column as optional
@@ -28,7 +30,7 @@ from httcp.selection.trigger import trigger_selection
 from httcp.selection.lepton_pair_etau import etau_selection
 from httcp.selection.lepton_pair_mutau import mutau_selection
 from httcp.selection.lepton_pair_tautau import tautau_selection
-from httcp.selection.event_category import get_categories, build_abcd_masks
+from httcp.selection.event_category import get_categories #, build_abcd_masks
 #from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.trigobject_matching import match_trigobj
 from httcp.selection.lepton_veto import *
@@ -36,13 +38,15 @@ from httcp.selection.higgscand import higgscand, higgscandprod
 
 #from httcp.production.main import cutflow_features
 #from httcp.production.weights import scale_mc_weight
+from httcp.production.processes import process_ids_dy, process_ids_w
 from httcp.production.extra_weights import scale_mc_weight
 from httcp.production.dilepton_features import hcand_mass, mT, rel_charge #TODO: rename mutau_vars -> dilepton_vars
 
-from httcp.util import filter_by_triggers, get_objs_p4, trigger_object_matching_deep, IF_DATASET_IS_DY_LO
+from httcp.util import filter_by_triggers, get_objs_p4, trigger_object_matching_deep, IF_DATASET_IS_DY, IF_DATASET_IS_W, IF_DATASET_IS_SIGNAL
 
 from httcp.selection.debug import debug_main
 
+logger = law.logger.get_logger(__name__)
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -60,43 +64,38 @@ def custom_increment_stats(
     """
     Unexposed selector that does not actually select objects but instead increments selection
     *stats* in-place based on all input *events* and the final selection *mask*.
+    This function saves the nevents/nfiles (from campaign) per file, so that at 
+    the time of merging, the total nevents produced can be used for normalization.
+    instead of nevents, the sum_mc_weights will be used actually.
+    ** the same nevents or sum_wt will be saved for each process id.
+    e.g. In an inclusive dataset, if three different processes are there,
+    all of those will have the same number. After merging, all processes
+    eventually will have same numbers.
     """
     # get event masks
     event_mask = results.event
 
     # get a list of unique process ids present in the chunk
     unique_process_ids = np.unique(events.process_id)
+
     # increment plain counts
-    n_evt_per_file = self.dataset_inst.n_events/self.dataset_inst.n_files
-    stats["num_events"] = n_evt_per_file
-    stats["num_events_selected"] += float(ak.sum(event_mask, axis=0))
-    #print(f"stats : {stats}")
-    #from IPython import embed; embed()
+    n_evt_per_file = self.dataset_inst.aux['n_events']/self.dataset_inst.n_files # new
+    sumwt_per_file = self.dataset_inst.n_events/self.dataset_inst.n_files     # new
+
+    stats["num_events"] = int(n_evt_per_file)
+    stats.setdefault(f"num_events_per_process", defaultdict(int))
+    for p in unique_process_ids:
+        # for splitting, each process will have the same number of events
+        stats[f"num_events_per_process"][int(p)] = int(n_evt_per_file)
+        
+        
     if self.dataset_inst.is_mc:
-        stats[f"sum_mc_weight"] = n_evt_per_file
+        stats[f"sum_mc_weight"] = sumwt_per_file
         stats.setdefault(f"sum_mc_weight_per_process", defaultdict(float))
         for p in unique_process_ids:
-            stats[f"sum_mc_weight_per_process"][int(p)] = n_evt_per_file
+            # for splitting, each process will have the same sumwt 
+            stats[f"sum_mc_weight_per_process"][int(p)] = sumwt_per_file
         
-    # create a map of entry names to (weight, mask) pairs that will be written to stats
-    weight_map = OrderedDict()
-    if self.dataset_inst.is_mc:
-        # mc weight for selected events
-        weight_map["mc_weight_selected"] = (events.mc_weight, event_mask)
-
-    # get and store the sum of weights in the stats dictionary
-    for name, (weights, mask) in weight_map.items():
-        joinable_mask = True if mask is Ellipsis else mask
-
-        # sum of different weights in weight_map for all processes
-        stats[f"sum_{name}"] += float(ak.sum(weights[mask]))
-        # sums per process id
-        stats.setdefault(f"sum_{name}_per_process", defaultdict(float))
-        for p in unique_process_ids:
-            stats[f"sum_{name}_per_process"][int(p)] += float(ak.sum(
-                weights[(events.process_id == p) & joinable_mask],
-            ))
-
     return events, results
 
 
@@ -125,7 +124,7 @@ def get_2n_pairs(etau_indices_pair,
         scale_mc_weight, 
         process_ids,
         trigger_selection,
-        IF_DATASET_IS_DY_LO(genZ_selection),
+        IF_DATASET_IS_DY(genZ_selection),
         muon_selection, 
         electron_selection, 
         tau_selection, 
@@ -143,14 +142,14 @@ def get_2n_pairs(etau_indices_pair,
         gentau_selection,
         higgscandprod,
         rel_charge,
-        category_ids,
-        build_abcd_masks,
+        #category_ids,
+        #build_abcd_masks,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
         scale_mc_weight, 
         trigger_selection,
-        IF_DATASET_IS_DY_LO(genZ_selection),
+        IF_DATASET_IS_DY(genZ_selection),
         muon_selection, 
         electron_selection, 
         tau_selection, 
@@ -166,7 +165,9 @@ def get_2n_pairs(etau_indices_pair,
         higgscandprod,
         gentau_selection,
         rel_charge,
-        category_ids,
+        #category_ids,
+        increment_stats, 
+        custom_increment_stats,
         "trigger_ids",
         "single_triggered",
         "cross_triggered",
@@ -176,7 +177,7 @@ def get_2n_pairs(etau_indices_pair,
         "cross_mu_triggered",
         "cross_tau_triggered",
         "cross_tau_jet_triggered",
-        build_abcd_masks,
+        #build_abcd_masks,
     },
     exposed=True,
 )
@@ -187,13 +188,16 @@ def main(
     **kwargs,
 ) -> tuple[ak.Array, SelectionResult]:
     
-    # ################### ensure coffea behaviors are loaded ################### #
+    # ensure coffea behaviors are loaded
     events = self[attach_coffea_behavior](events, **kwargs)
 
     # prepare the selection results that are updated at every step
     results = SelectionResult()
 
-    # ############# Sel : Good Lumi JSON for DATA only ############# #
+    # add the mc weight --> need to move to calibration main?
+    if self.dataset_inst.is_mc:
+        events = self[scale_mc_weight](events, **kwargs)
+    
     # filter bad data events according to golden lumi mask
     if self.dataset_inst.is_data:
         events, json_filter_results = self[json_filter](events, **kwargs)
@@ -201,21 +205,16 @@ def main(
     else:
         results += SelectionResult(steps={"json": np.ones(len(events), dtype=bool)})
 
-
-    # -------- Sel : Met Filters -------- #
     # met filter selection
     events, met_filter_results = self[met_filters](events, **kwargs)
     results += met_filter_results
 
-
-    # --------- Sel : Trigger Selection -------- #
     # trigger selection
     events, trigger_results = self[trigger_selection](events, **kwargs)
     results += trigger_results
 
-
-    # -------- Get genZ collection for Zpt reweight
-    if self.dataset_inst.has_tag("is_dy_LO"):
+    # Get genZ collection for Zpt reweighting
+    if self.dataset_inst.has_tag("is_dy"):
         events = self[genZ_selection](events, **kwargs)
         
     # electron selection
@@ -235,6 +234,7 @@ def main(
 
 
     # tau selection
+    # three times for three channels
     # e.g. tau_idx: [ [1], [0,1], [1,2], [], [0,1] ]
     good_tau_indices = None
     good_tau_indices_mutau = None
@@ -294,44 +294,6 @@ def main(
     )
     results += match_pair_result
 
-    """
-    # Trigger objects matching
-    # ################## W A R N I N G ################# #
-    # Mind the SWITCH: True  -> TriggerObject matching ON 
-    #                  False -> TriggerObject matching OFF
-    # although, the trigger requirement per channel is automatic
-    # ################################################## #
-    events, matchedResults = self[match_trigobj](events,
-                                                 trigger_results,
-                                                 etau_pair,
-                                                 mutau_pair,
-                                                 tautau_pair,
-                                                 True)
-
-    #print("before +")
-    #from IPython import embed; embed()
-
-    results += matchedResults
-
-    
-    etau_pair    = matchedResults.x.etau["pairs"]
-    mutau_pair   = matchedResults.x.mutau["pairs"]
-    tautau_pair  = matchedResults.x.tautau["pairs"]
-
-    #print("after +")
-    #from IPython import embed; embed()
-
-    
-    post_match_at_least_one_pair = get_2n_pairs(etau_pair.rawIdx,
-                                                mutau_pair.rawIdx,
-                                                tautau_pair.rawIdx)
-    post_match_pair_result = SelectionResult(
-        steps = {
-            "has_at_least_1_pair_after_trigobj_matching"  : post_match_at_least_one_pair,
-        },
-    )
-    results += post_match_pair_result
-    """
     
     # channel selection
     # channel_id is now in columns
@@ -341,19 +303,7 @@ def main(
                                                    mutau_pair.rawIdx,
                                                    tautau_pair.rawIdx)
     results += channel_results
-    """
-    etau_trigger_types = matchedResults.x.etau["trigger_types"]
-    etau_trigger_ids   = matchedResults.x.etau["trigger_ids"]
 
-    mutau_trigger_types = matchedResults.x.mutau["trigger_types"]
-    mutau_trigger_ids   = matchedResults.x.mutau["trigger_ids"]
-    
-    tautau_trigger_types = matchedResults.x.tautau["trigger_types"]
-    tautau_trigger_ids   = matchedResults.x.tautau["trigger_ids"]
-    """
-
-    #from IPython import embed; embed()
-    
     
     trigger_types = ak.concatenate([etau_trig_types, mutau_trig_types, tautau_trig_types], axis=1)
     # save single_triggered and cross_triggered
@@ -372,8 +322,6 @@ def main(
     events = set_ak_column(events, "cross_tau_jet_triggered", cross_tau_jet_triggered)
     events = set_ak_column(events, "single_triggered", (single_e_triggered | single_mu_triggered))
     events = set_ak_column(events, "cross_triggered", (cross_e_triggered | cross_mu_triggered | cross_tau_triggered | cross_tau_jet_triggered))
-
-
 
     trigger_ids   = ak.concatenate([etau_trig_ids, mutau_trig_ids, tautau_trig_ids], axis=1)
     trigger_ids = ak.values_astype(ak.fill_none(ak.firsts(trigger_ids, axis=1), 999), np.uint64)
@@ -412,24 +360,27 @@ def main(
     # this is moved here, because now the jets are
     # cleaned against the tau cadidates of hacnd
     # -------------------------------------------- #
-    events, bjet_veto_result, bjet_veto_mask = self[jet_selection](events, 
-                                                                   call_force=True, 
-                                                                   **kwargs)
+    #events, bjet_veto_result, bjet_veto_mask, good_jet_indices = self[jet_selection](events,
+    #                                                                                 call_force=True, 
+    #                                                                                 **kwargs)
+    events, bjet_veto_result = self[jet_selection](events,
+                                                   call_force=True, 
+                                                   **kwargs)
     results += bjet_veto_result
     
 
-    events = self[build_abcd_masks](events,
-                                    bjet_veto_mask,
-                                    call_force=True,
-                                    **kwargs)
-    
+    #events = self[build_abcd_masks](events,
+    #                                good_jet_indices, # this is VERY Essential to make categories with njets
+    #                                bjet_veto_mask,
+    #                                call_force=True,
+    #                                **kwargs)
     
     # gen particles info
     # ############################################ #
     # After building the higgs candidates, one can
     # switch on the production of GenTau. Those gentaus
-    # will be selected which get matched to the hcand
-    # hcand-gentau match = True/False
+    # will be selected which are matched to the hcand
+    # hcand-gentau match = True/False (via config)
     # ############################################ #
     if self.config_inst.x.extra_tags.genmatch:
         if "is_signal" in list(self.dataset_inst.aux.keys()):
@@ -442,28 +393,126 @@ def main(
     event_sel = reduce(and_, results.steps.values())
     results.event = event_sel
     
-    # add the mc weight
-    if self.dataset_inst.is_mc:
-        events = self[scale_mc_weight](events, **kwargs)
-
     # rel-charge
     events = self[rel_charge](events, **kwargs)
 
-    # add cutflow features, passing per-object masks
-    #events = self[cutflow_features](events, results.objects, **kwargs)
-
-    events = self[process_ids](events, **kwargs)
-    events = self[category_ids](events, **kwargs)     
-    #events = set_ak_column(events, 'category_ids', ak.ones_like(events.event, dtype=np.uint8))
+    outliers_mask_for_stitching = None
     
+    if self.process_ids_dy is not None:
+        events, outliers_mask_for_stitching = self[self.process_ids_dy](events, **kwargs)
+    elif self.process_ids_w is not None:
+        events, outliers_mask_for_stitching = self[self.process_ids_w](events, **kwargs)
+    else:
+        events = self[process_ids](events, **kwargs)
+
+    if outliers_mask_for_stitching is not None:
+        n_outliers = ak.sum(outliers_mask_for_stitching)
+        if n_outliers > 0:
+            logger.warning(f"{self.dataset_inst} has {ak.sum(outliers_mask_for_stitching)} outlier events. Removing those events only")
+        outliers_result_for_stitching = SelectionResult(
+            steps = {"reject_stitching_outliers": ~outliers_mask_for_stitching}
+        )
+        results += outliers_result_for_stitching
+
+        
+    #events, category_ids_debug_dict = self[category_ids](events, debug=True)
+
+
     events, results = self[custom_increment_stats]( 
         events,
         results,
         stats,
     )
 
+    # On top of custom stats, the incremet_stat from columnflow is used here, just to save the
+    # number of selected events per process and sum_mc_weight as well. At the time of stitching,
+    # the fraction of sum_wt_selected/total_sum_wt per process can be multiplied to the total
+    # sum_wt produced to get the fraction of that particular exclusive process embeded into the
+    # inclusive process.
+    weight_map = {
+        "num_filtered_events": Ellipsis,
+        "num_events_selected": event_sel,
+    }
+    group_map = {}
+    group_combinations = []
+    if self.dataset_inst.is_mc:
+        weight_map["sum_filtered_mc_weight"] = events.mc_weight
+        weight_map["sum_mc_weight_selected"] = (events.mc_weight, event_sel)
+        # groups
+        group_map = {
+            **group_map,
+            # per process
+            "process": {
+                "values": events.process_id,
+                "mask_fn": (lambda v: events.process_id == v),
+            },
+        }
+        # combinations
+        #group_combinations.append(("process"))
+
+    events, results = self[increment_stats](
+        events,
+        results,
+        stats,
+        weight_map=weight_map,
+        group_map=group_map,
+        #group_combinations=group_combinations,
+        **kwargs,
+    )
+    
+
     # inspect cuts
     if self.config_inst.x.verbose.selection.main:
-        debug_main(events, results, self.config_inst.x.triggers)
+        debug_main(events,
+                   results,
+                   self.config_inst.x.triggers)
         
     return events, results
+
+
+@main.init
+def main_init(self: Selector) -> None:
+    if getattr(self, "dataset_inst", None) is None:
+        return
+
+    self.process_ids_dy: process_ids_dy | None = None
+    if self.dataset_inst.has_tag("is_dy"):
+        if self.config_inst.x.allow_dy_stitching:
+            #print(f"stitching: {self.config_inst.x.dy_stitching.items()}")
+            # check if this dataset is covered by any dy id producer
+            for name, dy_cfg in self.config_inst.x.dy_stitching.items():
+                #print(f"dataset : {name}, {dy_cfg}")
+                dataset_inst = dy_cfg["inclusive_dataset"]
+                # the dataset is "covered" if its process is a subprocess of that of the dy dataset
+                if dataset_inst.has_process(self.dataset_inst.processes.get_first()):
+                    self.process_ids_dy = process_ids_dy.derive(f"process_ids_dy_{name}", cls_dict={
+                        "dy_inclusive_dataset": dataset_inst,
+                        "dy_leaf_processes": dy_cfg["leaf_processes"],
+                    })
+
+                    # add it as a dependency
+                    self.uses.add(self.process_ids_dy)
+                    self.produces.add(self.process_ids_dy)
+                    
+                    # stop after the first match
+                    break
+            
+    self.process_ids_w: process_ids_w | None = None
+    if self.dataset_inst.has_tag("is_w"):
+        if self.config_inst.x.allow_w_stitching:
+            # check if this dataset is covered by any dy id producer
+            for name, w_cfg in self.config_inst.x.w_stitching.items():
+                dataset_inst = w_cfg["inclusive_dataset"]
+                # the dataset is "covered" if its process is a subprocess of that of the dy dataset
+                if dataset_inst.has_process(self.dataset_inst.processes.get_first()):
+                    self.process_ids_w = process_ids_w.derive(f"process_ids_w_{name}", cls_dict={
+                        "w_inclusive_dataset": dataset_inst,
+                        "w_leaf_processes": w_cfg["leaf_processes"],
+                    })
+
+                    # add it as a dependency
+                    self.uses.add(self.process_ids_w)
+                    self.produces.add(self.process_ids_w)
+
+                    # stop after the first match
+                    break

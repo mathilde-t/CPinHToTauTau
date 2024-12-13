@@ -39,6 +39,21 @@ def cat_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array,
 
 
 # ---------------------------------------------------------- #
+#                          For nJets                         #
+# ---------------------------------------------------------- #
+@categorizer(uses={"has_0jet"})
+def cat_0j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, events.has_0jet
+
+@categorizer(uses={"has_1jet"})
+def cat_1j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, events.has_1jet
+
+@categorizer(uses={"has_2jet"})
+def cat_2j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, events.has_2jet
+
+# ---------------------------------------------------------- #
 #                          For PhiCP                         #
 # ---------------------------------------------------------- #
 
@@ -51,6 +66,9 @@ def cat_pi_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, a
 @categorizer(uses={"is_rho_1"})
 def cat_rho_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, events.is_rho_1
+#@categorizer(uses={"is_pi_1", "is_rho_1"})
+#def cat_pi_rho_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+#    return events, (events.is_pi_1 | events.is_rho_1)
 # tau -> a1 (DM2)
 @categorizer(uses={"is_a1_1pr_2pi0_1"})
 def cat_a1dm2_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
@@ -63,6 +81,13 @@ def cat_a1dm10_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Arra
 @categorizer(uses={"is_a1_3pr_1pi0_1"})
 def cat_a1dm11_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, events.is_a1_3pr_1pi0_1
+
+
+@categorizer(uses={"channel_id", "is_real_1", "has_1jet", "is_rho_1", "is_os", "is_iso_1", "is_iso_2", "is_b_veto"})
+def cat_tautau_test11(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    return events, (events["channel_id"] == ch.id) & events.is_real_1 & events.has_1jet & events.is_rho_1 & events.is_os & events.is_iso_1 & events.is_iso_2 & events.is_b_veto
+
 
 
 # ---------- >>> for e/mu-tauh
@@ -87,6 +112,13 @@ def cat_a1dm10_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Arra
 def cat_a1dm11_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, events.is_a1_3pr_1pi0_2
 
+# IPSig
+@categorizer(uses={"is_ipsig_0to1_1"})
+def cat_ipsig_0to1_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, events.is_ipsig_0to1_1
+@categorizer(uses={"is_ipsig_0to1_1"})
+def cat_ipsig_1toany_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, ~events.is_ipsig_0to1_1
 
 
 # ----- >>>> to make less combinatorics for tautau
@@ -178,7 +210,39 @@ def cat_real_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array,
 def cat_fake_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, events.is_fake_2
 
+# TODO : need to fix this later
+@categorizer(uses={"channel_id","is_real_1"})
+def cat_tautau_real_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_real_1
+@categorizer(uses={"channel_id","is_fake_1"})
+def cat_tautau_fake_1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("tautau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_fake_1
 
+@categorizer(uses={"channel_id","is_real_2"})
+def cat_etau_real_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_real_2
+@categorizer(uses={"channel_id","is_fake_2"})
+def cat_etau_fake_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("etau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_fake_2
+
+@categorizer(uses={"channel_id","is_real_2"})
+def cat_mutau_real_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_real_2
+@categorizer(uses={"channel_id","is_fake_2"})
+def cat_mutau_fake_2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    ch = self.config_inst.get_channel("mutau")
+    ch_mask = events["channel_id"] == ch.id
+    return events, ch_mask & events.is_fake_2
 
 
 # ---------------------------------------------------------- #
@@ -313,3 +377,16 @@ def cat_os_iso2_bveto_lowmt(self: Categorizer, events: ak.Array, **kwargs) -> tu
 @categorizer(uses={"is_os", "is_iso_2", "is_b_veto", "is_low_mt"})
 def cat_os_noniso2_bveto_lowmt(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, events.is_os & ~events.is_iso_2 & events.is_b_veto & events.is_low_mt
+
+
+
+# test
+@categorizer(uses={"channel_id", "has_0jet"})
+def cat_tautau_0j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, (events.channel_id == 4) & events.has_0jet
+@categorizer(uses={"channel_id", "has_1jet"})
+def cat_tautau_1j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, (events.channel_id == 4) & events.has_1jet
+@categorizer(uses={"channel_id", "has_2jet"})
+def cat_tautau_2j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, (events.channel_id == 4) & events.has_2jet

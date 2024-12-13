@@ -28,8 +28,6 @@ def match_trigobjs(
         trigger_results: SelectionResult,
         **kwargs,
 ) -> tuple[ak.Array, ak.Array]:
-
-    print("match trigger objects")
     #leps1, leps2 = ak.unzip(leps_pair)
 
     # extract the trigger names, types & others from trigger_results.x (aux)
@@ -237,8 +235,8 @@ def mutau_selection(
     vs_jet_wp       = self.config_inst.x.deep_tau_info[tau_tagger].vs_j["mutau"]
     
     is_good_tau     = (
-        (taus.idDeepTau2018v2p5VSjet   >= tau_tagger_wps.vs_j[vs_jet_wp])
-        & (taus.idDeepTau2018v2p5VSe   >= tau_tagger_wps.vs_e[vs_e_wp])
+        #(taus.idDeepTau2018v2p5VSjet   >= tau_tagger_wps.vs_j[vs_jet_wp])
+        (taus.idDeepTau2018v2p5VSe   >= tau_tagger_wps.vs_e[vs_e_wp])
         & (taus.idDeepTau2018v2p5VSmu  >= tau_tagger_wps.vs_m[vs_mu_wp])
     )
 
@@ -289,10 +287,6 @@ def mutau_selection(
     # sort the pairs if many
     leps_pair = ak.where(npair > 1, sort_pairs(leps_pair), leps_pair)
     
-    print("mutau")
-    #from IPython import embed; embed()
-
-
     # match trigger objects for all pairs
     leps_pair, trigIds, trigTypes = match_trigobjs(leps_pair, trigger_results)
 

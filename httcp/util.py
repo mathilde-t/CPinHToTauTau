@@ -72,15 +72,43 @@ def IF_DATASET_HAS_LHE_WEIGHTS(
     return None if func.dataset_inst.has_tag("no_lhe_weights") else self.get()
 
 @deferred_column
-def IF_DATASET_IS_DY_LO(
+def IF_DATASET_IS_DY(
     self: ArrayFunction.DeferredColumn,
     func: ArrayFunction,
 ) -> Any | set[Any]:
     if getattr(func, "dataset_inst", None) is None:
         return self.get()
+    return None if not func.dataset_inst.has_tag("is_dy") else self.get()
 
-    return None if not func.dataset_inst.has_tag("is_dy_LO") else self.get()
+@deferred_column
+def IF_DATASET_IS_W(
+    self: ArrayFunction.DeferredColumn,
+    func: ArrayFunction,
+) -> Any | set[Any]:
+    if getattr(func, "dataset_inst", None) is None:
+        return self.get()
+    return None if not func.dataset_inst.has_tag("is_w") else self.get()
 
+@deferred_column
+def IF_DATASET_IS_SIGNAL(
+    self: ArrayFunction.DeferredColumn,
+    func: ArrayFunction,
+) -> Any | set[Any]:
+    if getattr(func, "dataset_inst", None) is None:
+        return self.get()
+    return None if not (func.dataset_inst.has_tag("is_ggf_signal") | func.dataset_inst.has_tag("is_vh_signal")) else self.get()
+
+@deferred_column
+def IF_ALLOW_STITCHING(
+        self: ArrayFunction.DeferredColumn,
+        func: ArrayFunction,
+) -> Any | set[Any]:
+    if getattr(func, "dataset_inst", None) is None:
+        return self.get()
+    allow_dy = func.dataset_inst.has_tag("is_dy") & func.config_inst.x.allow_dy_stitching
+    allow_w  = func.dataset_inst.has_tag("is_w") & func.config_inst.x.allow_w_stitching
+    #return None if not (func.dataset_inst.has_tag("is_w") | func.dataset_inst.has_tag("is_dy")) else self.get()
+    return None if not (allow_dy | allow_w) else self.get()
 
 def transverse_mass(lepton: ak.Array, met: ak.Array) -> ak.Array:
     dphi_lep_met = lepton.delta_phi(met)
@@ -300,7 +328,8 @@ def getGenTauDecayMode(prod: ak.Array):
                                     -9)
                        )
               )
-
+    
+    dm = ak.fill_none(dm, -3) # just to make ?int64 to int64
     return dm
 
 
@@ -402,3 +431,41 @@ def call_once_on_config(include_hash=False):
             return func(config, *args, **kwargs)
         return inner
     return outer
+
+
+def setp4(name="LorentzVector", *args, verbose: Optional[bool] = False):
+    if len(args) < 4:
+        raise RuntimeError ("Need at least four components")
+
+    if name == "PtEtaPhiMLorentzVector":
+        if verbose:
+            print(f" --- pT  : {args[0]}")
+            print(f" --- eta : {args[1]}")
+            print(f" --- phi : {args[2]}")
+            print(f" --- mass: {args[3]}")
+        return ak.zip(
+            {
+                "pt": args[0],
+                "eta": args[1],
+                "phi": args[2],
+                "mass": args[3],
+            },
+            with_name=name,
+            behavior=coffea.nanoevents.methods.vector.behavior
+        )
+    else:
+        if verbose:
+            print(f" --- px     : {args[0]}")
+            print(f" --- py     : {args[1]}")
+            print(f" --- pz     : {args[2]}")
+            print(f" --- energy : {args[3]}")
+        return ak.zip(
+            {
+                "x": args[0],
+                "y": args[1],
+                "z": args[2],
+                "t": args[3],
+            },
+            with_name=name,
+            behavior=coffea.nanoevents.methods.vector.behavior
+        )

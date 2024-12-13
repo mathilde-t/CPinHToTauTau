@@ -11,61 +11,60 @@ coffea = maybe_import("coffea")
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 
+
 @producer(
-    uses={f"Tau.{var}" for var in [
-                "decayMode", "genPartFlav"
-                ] 
-    } | {"process_id"},
-    produces={
-        "process_id"
-    },
+    uses={"hcand.decayMode", "hcand.genPartFlav",
+          "process_id", "channel_id"},
+    produces={"process_id"},
     mc_only=True,
 )
 def split_dy(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-    
-
     tau_part_flav = {
+        "unknown"   : 0,
         "prompt_e"  : 1,
         "prompt_mu" : 2,
-        "tau->e"    : 3,
-        "tau->mu"   : 4,
-        "tau_had"   : 5
+        "e->tau"    : 3,
+        "mu->tau"   : 4,
+        "tau_had"   : 5,
+        "jet->tau"  : 6,
     }
-    hcand_ele_mu_DM = events.hcand.decayMode[:,0]
-    # hcand_Tau_idx = events.hcand.rawIdx[:,1:2]
-    # mask_hcand_tau_idx = ak.flatten(hcand_Tau_idx)
-    match = events.Tau.genPartFlav
-    #### The ak.any() is a nasty fix that need to be removed, we have tautau that needs to be taken into account properly
-    mu2tau_fakes_mask = ak.any(((match == tau_part_flav["prompt_mu"]) | (match == tau_part_flav["tau->mu"])),axis=1)
-    e2tau_fakes_mask = ak.any(((match == tau_part_flav["prompt_e"]) | (match == tau_part_flav["tau->e"])),axis=1)
-    genuine_tau_mask = ak.any((match == tau_part_flav["tau_had"]),axis=1)
 
-    z_proc_id = self.dataset_inst.processes.values()[0].id
-    ztoee_proc_id = 51101
-    ztomm_proc_id = 51102
-    ztott_proc_id = 51104
-    ztoll_proc_id = 51103
+    ch_etau_id = self.config_inst.get_channel("etau").id
+    ch_mutau_id = self.config_inst.get_channel("mutau").id
+    ch_tautau_id = self.config_inst.get_channel("tautau").id
+    
+    h1_DM = events.hcand.decayMode[:,0]
+    h2_DM = events.hcand.decayMode[:,1]
 
-    #from IPython import embed; embed()
-    
-    #process_id = np.array(events.process_id, dtype=np.int64)
+    h1_genflv = events.hcand.genPartFlav[:,0]
+    h2_genflv = events.hcand.genPartFlav[:,1]
 
-    ztoeeormm = (
-        (events.process_id == z_proc_id)
-        & ((mu2tau_fakes_mask & (hcand_ele_mu_DM == -2)) | (e2tau_fakes_mask & (hcand_ele_mu_DM == -1)))
-    )
-    ztotautau = (
-        (events.process_id == z_proc_id)
-        & genuine_tau_mask
-    )
+    h2_match_m = (h2_genflv == tau_part_flav["prompt_mu"]) | (h2_genflv == tau_part_flav["mu->tau"])
+    h2_match_e = (h2_genflv == tau_part_flav["prompt_e"]) | (h2_genflv == tau_part_flav["e->tau"])
+    h2_match_j = (h2_genflv == tau_part_flav["unknown"]) | (h2_genflv == tau_part_flav["jet->tau"]) 
+    h2_genuine = h2_genflv == tau_part_flav["tau_had"]
+
+    h1_match_m = (h1_genflv == tau_part_flav["prompt_mu"]) | (h1_genflv == tau_part_flav["mu->tau"])
+    h1_match_e = (h1_genflv == tau_part_flav["prompt_e"]) | (h1_genflv == tau_part_flav["e->tau"])
+    h1_match_j = (h1_genflv == tau_part_flav["unknown"]) | (h1_genflv == tau_part_flav["jet->tau"]) 
+    h1_genuine = h1_genflv == tau_part_flav["tau_had"]
     
-    process_id = ak.where(ztoeeormm, ztoll_proc_id, events.process_id)
-    process_id = ak.where(ztotautau, ztott_proc_id, events.process_id)
     
-    #process_id = ak.where((mu2tau_fakes_mask & (hcand_ele_mu_DM == -2)), 51001, 51004)
-    #process_id = ak.where((e2tau_fakes_mask & (hcand_ele_mu_DM == -1)), 51003, process_id)
+    # N.B. For tau-tau channel, lets assume the leading tau is true
+    # hardcoded : BAD
+    z_j2tau_proc_id = 51097 # if the hcand2 i.e. tauh is from jet or not
+    z_t2tau_proc_id = 51098 # if the hcand2 i.e. tauh is true or not
+    z_l2tau_proc_id = 51099 # if the hcand2 i.e. tauh is from e/mu or not
+
+    z_t2tau_mask = ak.where(events.channel_id == ch_tautau_id, h1_genuine, h2_genuine)
+    z_l2tau_mask = ak.where(events.channel_id == ch_tautau_id, (h1_match_m | h1_match_e), (h2_match_m | h2_match_e))
+    z_j2tau_mask = ak.where(events.channel_id == ch_tautau_id, h1_match_j, h2_match_j)
+    
+    process_id = ak.where(z_l2tau_mask, z_l2tau_proc_id, events.process_id)
+    process_id = ak.where(z_j2tau_mask, z_j2tau_proc_id, process_id)
+    process_id = ak.where(z_t2tau_mask, z_t2tau_proc_id, process_id)
+
     events = remove_ak_column(events, "process_id")
     events = set_ak_column(events, "process_id", process_id, value_type=np.int64)
 
     return events
-

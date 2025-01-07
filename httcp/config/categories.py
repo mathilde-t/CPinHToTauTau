@@ -75,7 +75,8 @@ def add_categories(config: od.Config,
                        "deep_tau_wp",
                        "b_veto"     ,
                        ],
-            label=r"$mu\tau$ no mt",
+            label=r"$\mu\tau$ no mt",
+            aux={'control_reg': "mutau_control_reg_no_mt"} 
         )
         mutau_control_reg_no_mt = add_category(
             config,

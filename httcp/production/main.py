@@ -48,7 +48,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         get_mc_weight,
         hcand_fields,
         tauspinner_weight,
-        phi_cp,
+        #phi_cp,
         category_ids,
         "Jet.pt",
         "Jet.pt_no_jec",
@@ -65,7 +65,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         zpt_weight,
         hcand_fields,
         tauspinner_weight,
-        phi_cp,
+        #phi_cp,
         category_ids,
         "Jet.jec_no_jec_diff",
         "Jet.number_of_jets",
@@ -108,6 +108,6 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         ch_str = ' '.join([str(ch) for ch in channel])
         raise ValueError(f"attempt to process more than one channel: {ch_str}")
     else: channel = channel[0]
-    if channel=='mutau':
-        events = self[phi_cp](events, **kwargs) 
+#    if channel=='mutau':
+        #events = self[phi_cp](events, **kwargs) 
     return events

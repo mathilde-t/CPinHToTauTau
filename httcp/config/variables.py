@@ -421,34 +421,34 @@ def phi_cp_variables(cfg: od.Config) -> None:
             x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha \geq \pi/4$ (rad)",
         )
         # 2-bin histograms
-        cfg.add_variable(
-            name=f"phi_cp_{the_ch}_2bin",
-            expression=f"phi_cp_{the_ch}_2bin",
-            null_value=EMPTY_FLOAT,
-            binning=(2, 0, 2*np.pi), 
-            x_title=rf"$\varphi_{{CP}} [{title_str}]$ (rad)",
-        )
-        cfg.add_variable(
-            name=f"phi_cp_{the_ch}_reg1_2bin",
-            expression=f"phi_cp_{the_ch}_reg1_2bin",
-            null_value=EMPTY_FLOAT,
-            binning=(2, 0, 2*np.pi),
-            x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha < \pi/4$ (rad)",
-        )
-        cfg.add_variable(
-            name=f"phi_cp_{the_ch}_reg2_2bin",
-            expression=f"phi_cp_{the_ch}_reg2_2bin",
-            null_value=EMPTY_FLOAT,
-            binning=(2, 0, 2*np.pi),
-            x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha \geq \pi/4$ (rad)",
-        )
-        cfg.add_variable(
-            name=f"alpha_{the_ch}",
-            expression=f"alpha_{the_ch}",
-            null_value=EMPTY_FLOAT,
-            binning=(6, 0, np.pi/2),
-            x_title=rf"$ \alpha [{title_str}] $(rad)",
-        )
+#        cfg.add_variable(
+#            name=f"phi_cp_{the_ch}_2bin",
+#            expression=f"phi_cp_{the_ch}_2bin",
+#            null_value=EMPTY_FLOAT,
+#            binning=(2, 0, 2*np.pi), 
+#            x_title=rf"$\varphi_{{CP}} [{title_str}]$ (rad)",
+#        )
+#        cfg.add_variable(
+#            name=f"phi_cp_{the_ch}_reg1_2bin",
+#            expression=f"phi_cp_{the_ch}_reg1_2bin",
+#            null_value=EMPTY_FLOAT,
+#            binning=(2, 0, 2*np.pi),
+#            x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha < \pi/4$ (rad)",
+#        )
+#        cfg.add_variable(
+#            name=f"phi_cp_{the_ch}_reg2_2bin",
+#            expression=f"phi_cp_{the_ch}_reg2_2bin",
+#            null_value=EMPTY_FLOAT,
+#            binning=(2, 0, 2*np.pi),
+#            x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha \geq \pi/4$ (rad)",
+#        )
+#        cfg.add_variable(
+#            name=f"alpha_{the_ch}",
+#            expression=f"alpha_{the_ch}",
+#            null_value=EMPTY_FLOAT,
+#            binning=(6, 0, np.pi/2),
+#            x_title=rf"$ \alpha [{title_str}] $(rad)",
+#        )
 
 def add_dilepton_features(cfg: od.Config) -> None:
     channels = cfg.channels.names()
@@ -594,7 +594,7 @@ def add_variables(cfg: od.Config) -> None:
     add_lepton_features(cfg)
     add_jet_features(cfg)
     add_highlevel_features(cfg)
-    phi_cp_variables(cfg)
+    #phi_cp_variables(cfg)
     add_weight_features(cfg)
     add_cutflow_features(cfg)
     add_dilepton_features(cfg)

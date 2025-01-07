@@ -157,7 +157,7 @@ def add_categories(config: od.Config,
                        "tau_endcap" ,
                        ],
             label=r"$\mu\tau$ no mt \n $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "mutau_control_reg_endcap_tau"}
+            aux={'control_reg': "mutau_control_reg_endcap_tau_no_mt"}
         )
         mutau_control_reg_endcap_tau_no_mt = add_category(
             config,
@@ -183,7 +183,7 @@ def add_categories(config: od.Config,
                        "tau_barrel" ,
                        ],
             label=r"$\mu\tau$ no mt \n $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "mutau_control_reg_barrel_tau"}
+            aux={'control_reg': "mutau_control_reg_barrel_tau_no_mt"}
         )
 
         mutau_control_reg_barrel_tau_no_mt = add_category(
@@ -330,7 +330,7 @@ def add_categories(config: od.Config,
                        "tau_endcap" ,
                        ],
             label=r"$e\tau$ no mt signal region\n $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "etau_control_reg_endcap_tau"}
+            aux={'control_reg': "etau_control_reg_endcap_tau_no_mt"}
         )
         etau_control_reg_endcap_tau_no_mt = add_category(
             config,
@@ -358,7 +358,7 @@ def add_categories(config: od.Config,
                         "tau_barrel" ,
                         ],
             label=r"$e\tau$ no mt signal region\n $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "etau_control_reg_barrel_tau"}
+            aux={'control_reg': "etau_control_reg_barrel_tau_no_mt"}
         )
 
         etau_control_reg_barrel_tau_no_mt = add_category(

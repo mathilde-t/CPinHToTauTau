@@ -61,7 +61,7 @@ def add_hist_hooks(config: od.Config) -> None:
         signal_categories : dict[str, dict[str, od.Category]] = defaultdict(DotDict)
         #Filling the dictionay with signal histograms
         for the_name in config.categories.names():
-            if 'signal_reg' in the_name or the_name=="mutau_no_mt":
+            if 'signal_reg' in the_name:
                 signal_categories[the_name] = config.get_category(the_name)
         
 

@@ -105,7 +105,7 @@ def jet_veto_map(
         )
 
     variable_map = {
-        "type": "jetvetomap",
+        "type": "jetvetomap_all",
         "eta": jet_eta[jet_mask],
         "phi": jet_phi[jet_mask],
     }

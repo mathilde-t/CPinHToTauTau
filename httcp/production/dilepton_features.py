@@ -46,7 +46,7 @@ def hcand_fields(
         dilep_pt = pair.pt
         hcand['pt'] = ak.where(dilep_pt > 0, dilep_pt , EMPTY_FLOAT)
         delta_r = ak.flatten(p4['lep0'].metric_table(p4['lep1']), axis=2)
-        delta_eta = ak.flatten(p4['lep0'].eta - p4['lep1'].eta , axis=2)
+        delta_eta = p4['lep0'].eta - p4['lep1'].eta
         hcand['delta_r'] = ak.where(delta_r > 0, delta_r , EMPTY_FLOAT)
         hcand['delta_eta'] = ak.where(abs(delta_eta) < 10, delta_eta , EMPTY_FLOAT)
         hcand['rel_charge'] = hcand.lep0.charge * hcand.lep1.charge

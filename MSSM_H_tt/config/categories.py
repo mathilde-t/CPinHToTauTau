@@ -48,9 +48,9 @@ def add_categories(config: od.Config,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                       ],
-            label=r"$\mu\tau$ signal region",
+            label=r"$\mu\tau$ SR",
             aux={'control_reg': "mutau_control_reg"}
         )
         
@@ -62,9 +62,9 @@ def add_categories(config: od.Config,
                        "ss_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        ],
-            label=r"$\mu\tau$ control region",
+            label=r"$\mu\tau$ CR",
         )
         mutau_signal_reg_no_mt = add_category(
             config,
@@ -73,7 +73,7 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        ],
             label=r"$\mu\tau$ no mt",
             aux={'control_reg': "mutau_control_reg_no_mt"} 
@@ -85,9 +85,9 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "ss_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        ],
-            label=r"$\mu\tau$ control region no mt",
+            label=r"$\mu\tau$ CR no mt",
         )
         mutau_signal_reg_endcap_tau = add_category(
             config,
@@ -97,10 +97,10 @@ def add_categories(config: od.Config,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$\mu\tau$ signal region\n $\eta_{\tau} > 1.2$",
+            label=r"$\mu\tau$ SR $\eta_{\tau} > 1.2$",
             aux={'control_reg': "mutau_control_reg_endcap_tau"}
         )
         mutau_control_reg_endcap_tau = add_category(
@@ -111,10 +111,10 @@ def add_categories(config: od.Config,
                        "ss_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$\mu\tau$ control region\n $\eta_{\tau} > 1.2$",
+            label=r"$\mu\tau$ CR$\eta_{\tau} > 1.2$",
         )
         
         mutau_signal_reg_barrel_tau = add_category(
@@ -125,10 +125,10 @@ def add_categories(config: od.Config,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_barrel" ,
                        ],
-            label=r"$\mu\tau$ signal region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$\mu\tau$ SR $\eta_{\tau} \leq 1.2$",
             aux={'control_reg': "mutau_control_reg_barrel_tau"}
         )
         
@@ -140,10 +140,10 @@ def add_categories(config: od.Config,
                        "ss_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_barrel" ,
                        ],
-            label=r"$\mu\tau$ control region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$\mu\tau$ CR $\eta_{\tau} \leq 1.2$",
         )
 
         mutau_signal_reg_endcap_tau_no_mt  = add_category(
@@ -153,10 +153,10 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$\mu\tau$ no mt \n $\eta_{\tau} > 1.2$",
+            label=r"$\mu\tau$ no mt  $\eta_{\tau} > 1.2$",
             aux={'control_reg': "mutau_control_reg_endcap_tau_no_mt"}
         )
         mutau_control_reg_endcap_tau_no_mt = add_category(
@@ -166,10 +166,10 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "ss_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$\mu\tau$ no mt control region\n $\eta_{\tau} > 1.2$",
+            label=r"$\mu\tau$ no mt CR $\eta_{\tau} > 1.2$",
         )
 
         mutau_signal_reg_barrel_tau_no_mt = add_category(
@@ -179,10 +179,10 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_barrel" ,
                        ],
-            label=r"$\mu\tau$ no mt \n $\eta_{\tau} \leq 1.2$",
+            label=r"$\mu\tau$ no mt  $\eta_{\tau} \leq 1.2$",
             aux={'control_reg': "mutau_control_reg_barrel_tau_no_mt"}
         )
 
@@ -193,10 +193,10 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"  ,
                        "ss_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_barrel" ,
                        ],
-            label=r"$\mu\tau$ no mt control region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$\mu\tau$ no mt CR $\eta_{\tau} \leq 1.2$",
         )
 
     elif channel=='etau':
@@ -218,9 +218,9 @@ def add_categories(config: od.Config,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        ],
-            label=r"$e\tau$ signal region",
+            label=r"$e\tau$ SR",
             aux={'control_reg': "etau_control_reg"}
         )
         etau_control_reg = add_category(
@@ -231,9 +231,9 @@ def add_categories(config: od.Config,
                        "ss_charge"   ,
                        "mt_cut"      ,
                        "deep_tau_wp" ,
-                       "b_veto"      ,
+                    #    "b_veto"      ,
                        ],
-            label=r"$e\tau$ control region",
+            label=r"$e\tau$ CR",
         )
         
         etau_signal_reg_no_mt = add_category(
@@ -243,7 +243,7 @@ def add_categories(config: od.Config,
             selection=["cat_etau"   ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        ],
             label=r"$e\tau$ no mt",
             aux={'control_reg': "etau_control_reg_no_mt"}
@@ -256,9 +256,9 @@ def add_categories(config: od.Config,
             selection=["cat_etau"    ,
                        "ss_charge"   ,
                        "deep_tau_wp" ,
-                       "b_veto"      ,
+                    #    "b_veto"      ,
                        ],
-            label=r"$e\tau$ control region no mt",
+            label=r"$e\tau$ CR no mt",
         )
         
         etau_signal_reg_endcap_tau = add_category(
@@ -269,10 +269,10 @@ def add_categories(config: od.Config,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$e\tau$ signal region\n $\eta_{\tau} > 1.2$",
+            label=r"$e\tau$ SR $\eta_{\tau} > 1.2$",
             aux={'control_reg': "etau_control_reg_endcap_tau"}
         )
         etau_control_reg_endcap_tau = add_category(
@@ -283,10 +283,10 @@ def add_categories(config: od.Config,
                        "ss_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$e\tau$ control region\n $\eta_{\tau} > 1.2$",
+            label=r"$e\tau$ CR $\eta_{\tau} > 1.2$",
         )
         
         etau_signal_reg_barrel_tau = add_category(
@@ -297,10 +297,10 @@ def add_categories(config: od.Config,
                         "os_charge"  ,
                         "mt_cut"     ,
                         "deep_tau_wp",
-                        "b_veto"     ,
+                        #"b_veto"     ,
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ signal region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$e\tau$ SR $\eta_{\tau} \leq 1.2$",
             aux={'control_reg': "etau_control_reg_barrel_tau"}
         )
         
@@ -312,10 +312,10 @@ def add_categories(config: od.Config,
                         "ss_charge"  ,
                         "mt_cut"     ,
                         "deep_tau_wp",
-                        "b_veto"     ,
+                        #"b_veto"     ,
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ control region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$e\tau$ CR $\eta_{\tau} \leq 1.2$",
         )
 
         etau_signal_reg_endcap_tau_no_mt = add_category(
@@ -325,10 +325,10 @@ def add_categories(config: od.Config,
             selection=["cat_etau"   ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$e\tau$ no mt signal region\n $\eta_{\tau} > 1.2$",
+            label=r"$e\tau$ no mt SR $\eta_{\tau} > 1.2$",
             aux={'control_reg': "etau_control_reg_endcap_tau_no_mt"}
         )
         etau_control_reg_endcap_tau_no_mt = add_category(
@@ -338,10 +338,10 @@ def add_categories(config: od.Config,
             selection=["cat_etau"   ,
                        "ss_charge"  ,
                        "deep_tau_wp",
-                       "b_veto"     ,
+                       #"b_veto"     ,
                        "tau_endcap" ,
                        ],
-            label=r"$e\tau$ no mt control region\n $\eta_{\tau} > 1.2$",
+            label=r"$e\tau$ no mt CR $\eta_{\tau} > 1.2$",
         )
 
         etau_signal_reg_barrel_tau_no_mt = add_category(
@@ -351,10 +351,10 @@ def add_categories(config: od.Config,
             selection=["cat_etau"  ,
                         "os_charge"  ,
                         "deep_tau_wp",
-                        "b_veto"     ,
+                        #"b_veto"     ,
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ no mt signal region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$e\tau$ no mt SR $\eta_{\tau} \leq 1.2$",
             aux={'control_reg': "etau_control_reg_barrel_tau_no_mt"}
         )
 
@@ -365,10 +365,10 @@ def add_categories(config: od.Config,
             selection=["cat_etau"  ,
                         "ss_charge"  ,
                         "deep_tau_wp",
-                        "b_veto"     ,
+                        #"b_veto"     ,
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ no mt control region\n $\eta_{\tau} \leq 1.2$",
+            label=r"$e\tau$ no mt CR $\eta_{\tau} \leq 1.2$",
         )
 
     

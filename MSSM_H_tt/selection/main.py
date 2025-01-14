@@ -23,14 +23,14 @@ from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import optional_column as optional
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
-from MSSM_H_tt.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
+from MSSM_H_tt.selection.physics_objects import muon_selection, electron_selection, tau_selection, gentau_selection
 from MSSM_H_tt.selection.trigger import trigger_selection
 from MSSM_H_tt.selection.lepton_pair import pair_selection
 from MSSM_H_tt.selection.match_trigobj import match_trigobj
 from MSSM_H_tt.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from MSSM_H_tt.selection.higgscand import new_higgscand, mask_nans
 
-from MSSM_H_tt.production.aux_columns import channel_id, jet_veto, add_tau_prods
+from MSSM_H_tt.production.aux_columns import channel_id
 from MSSM_H_tt.selection.jets import jet_veto_map
 
 np = maybe_import("numpy")
@@ -53,8 +53,6 @@ coffea = maybe_import("coffea")
         muon_selection,
         electron_selection,
         tau_selection,
-        jet_selection,
-        jet_veto,
         pair_selection,
         channel_id,
         extra_lepton_veto,
@@ -63,7 +61,6 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         gentau_selection,
-        add_tau_prods,
         mask_nans,
         jet_veto_map,
     },
@@ -78,8 +75,6 @@ coffea = maybe_import("coffea")
         muon_selection,
         electron_selection,
         tau_selection,
-        jet_selection,
-        jet_veto,
         pair_selection,
         channel_id,
         extra_lepton_veto,
@@ -88,7 +83,6 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         gentau_selection,
-        add_tau_prods,
         mask_nans,
         jet_veto_map,
         "category_ids",
@@ -179,9 +173,7 @@ def main(
                                  domatch=True,
                                  **kwargs)
     results += hcand_res
-    #produce is_b_vetoed columnd
-    events = self[jet_veto](events, **kwargs)
-
+    
     #produce channel id column (legacy)
     events = self[channel_id](events)
 
@@ -192,9 +184,6 @@ def main(
                                                                 veto_muon_indices)
     results += extra_lepton_veto_results
 
-    # Add tau decya products to the correspondent hcand_(channel) arrays
-    events, tau_prods_res = self[add_tau_prods](events)
-    results += tau_prods_res
     #Check arrays for np.nan values and mask them
     events, nan_mask_res = self[mask_nans](events)
     results += nan_mask_res

@@ -70,8 +70,8 @@ def muon_selection(
         "muon_pt_10"          : events.Muon.pt > 10,
         "muon_eta_2p4"        : abs(events.Muon.eta) < 2.4,
         "mediumID"            : events.Muon.mediumId == 1,
-        "muon_dxy_0p045"      : abs(events.Muon.dxy) < 0.045,
-        "muon_dz_0p2"         : abs(events.Muon.dz) < 0.2,
+        # "muon_dxy_0p045"      : abs(events.Muon.dxy) < 0.045,
+        # "muon_dz_0p2"         : abs(events.Muon.dz) < 0.2,
         "muon_iso_0p3"        : events.Muon.pfRelIso04_all < 0.3
     }
     double_veto_selections = {
@@ -173,19 +173,20 @@ def electron_selection(
     mva_noniso_wp90 = events.Electron.mvaNoIso_WP90
 
     good_selections = {
-        "electron_pt_32"          : events.Electron.pt > 32, #We are using HLT_Ele30 so this cut is needed
+        "electron_pt_33"          : events.Electron.pt > 33, #We are using HLT_Ele30 so this cut is needed
         "electron_eta_2p1"        : abs(events.Electron.eta) < 2.1,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
         "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_mva_iso_wp80"   : mva_iso_wp80 == 1,
+        "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
+        "electron_mva_iso_wp90"   : mva_iso_wp90 == 1,
     }
     single_veto_selections = {
         "electron_pt_10"          : events.Electron.pt > 10,
         "electron_eta_2p5"        : abs(events.Electron.eta) < 2.5,
-        "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
-        "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_mva_noniso_wp90": mva_noniso_wp90 == 1,
-        "electron_convVeto"       : events.Electron.convVeto == 1,
+        # "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
+        # "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
+        "electron_mva_iso_wp90"   : mva_iso_wp90 == 1,
+        # "electron_convVeto"       : events.Electron.convVeto == 1,
         #"electron_lostHits"       : events.Electron.lostHits <= 1,
         "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.3,
     }
@@ -290,8 +291,8 @@ def tau_selection(
     deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
 
     good_selections = {
-        "tau_pt_20"     : events.Tau.pt > 20,
-        "tau_eta_2p5"   : abs(events.Tau.eta) < 2.5,
+        "tau_pt_30"     : events.Tau.pt > 30,
+        "tau_eta_2p3"   : abs(events.Tau.eta) < 2.3,
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
         "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
         "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVVLoose"],

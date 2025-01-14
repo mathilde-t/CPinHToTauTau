@@ -11,7 +11,7 @@ coffea = maybe_import("coffea")
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 
 def hcand_mt(lep: ak.Array, MET: ak.Array) -> ak.Array:
-    print("producing mT...")
+    print("Producing mT...")
     delta_phi = lep.phi - MET.phi
     delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
     delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)

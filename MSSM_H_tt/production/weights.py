@@ -404,35 +404,3 @@ def tau_weight_setup(
     self.id_vs_e_corrector      = correction_set[f"{tagger_name}VSe"]
     self.id_vs_mu_corrector     = correction_set[f"{tagger_name}VSmu"]
 
-@producer(
-    uses={
-        'event', optional("TauSpinner*") 
-    },
-    produces={
-        "tauspinner_weight_up", "tauspinner_weight", "tauspinner_weight_down"
-    },
-    mc_only=True,
-)
-def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-    """
-    A simple function that sets tauspinner_weight according to the cp_hypothesis
-    
-    """
-    names = ["_up", "", "_down"]
-    for the_name in names:
-        if  "TauSpinner" in list(events.fields):
-            if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
-            elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
-            elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
-            else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner weight producer!')   
-            buf = ak.to_numpy(the_weight)
-            if any(np.isnan(buf)):
-                warn.warn("tauspinner_weight contains NaNs. Imputing them with zeros.")
-                buf[np.isnan(buf)] = 0
-                the_weight = buf
-        else:
-            print("Tauspinner column does not exist for this sample: filling weights with ones")
-            the_weight = np.ones_like(events.event, dtype=np.float32)
-        events = set_ak_column_f32(events, f"tauspinner_weight{the_name}", the_weight)
-    
-    return events

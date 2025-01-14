@@ -5,14 +5,17 @@ set_common_vars "$1"
 args=(
         --config $config
         --processes $processes
-        --version $version
         --datasets $datasets
+        --version $version
+        --categories 'etau_signal_reg,etau_signal_reg_no_mt'
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
-        --cf.MergeSelectionMasks-workflow local
-        --selector-steps 'trigger,met_filter,dilepton_veto,has_at_least_2_leptons,selected_hcand,selected_hcand_trigmatch,single_hcand,extra_lepton_veto,nans_removed,jet_veto_map'
+        --cf.MergeReducedEvents-workflow $workflow
         "${@:2}"
     )
-echo run cf.PlotCutflow "${args[@]}"
-law run cf.PlotCutflow "${args[@]}"
+echo law run cf.CreateYieldTable "${args[@]}"
+law run cf.CreateYieldTable "${args[@]}" 
+
+
+#,etau_signal_reg_endcap_tau,etau_signal_reg_barrel_tau,etau_signal_reg_endcap_tau_no_mt,etau_signal_reg_barrel_tau_no_mt'

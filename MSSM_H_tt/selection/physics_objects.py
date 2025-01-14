@@ -13,8 +13,8 @@ from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.columnar_util import optional_column as optional
 
-from httcp.util import IF_NANO_V9, IF_NANO_V11
-from httcp.util import getGenTauDecayMode
+from MSSM_H_tt.util import IF_NANO_V9, IF_NANO_V11
+from MSSM_H_tt.util import getGenTauDecayMode
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

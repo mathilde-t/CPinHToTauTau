@@ -6,7 +6,7 @@ Definition of triggers
 
 import order as od
 
-from httcp.config.trigger_util import Trigger, TriggerLeg
+from MSSM_H_tt.config.trigger_util import Trigger, TriggerLeg
     
 def add_triggers_run3_2022_postEE(config: od.Config) -> None:
     """

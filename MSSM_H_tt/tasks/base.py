@@ -9,4 +9,4 @@ from columnflow.tasks.framework.base import BaseTask
 
 class HTTCPTask(BaseTask):
 
-    task_namespace = "httcp"
+    task_namespace = "MSSM_H_tt"

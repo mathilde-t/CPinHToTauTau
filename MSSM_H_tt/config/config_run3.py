@@ -228,14 +228,14 @@ def add_run3(ana: od.Analysis,
     verify_config_processes(cfg, warn=True)
 
     #Adding the triggers 
-    from httcp.config.triggers import add_triggers_run3_2022_preEE, add_triggers_run3_2022_postEE 
+    from MSSM_H_tt.config.triggers import add_triggers_run3_2022_preEE, add_triggers_run3_2022_postEE 
     if year == 2022 and campaign.x.tag == "preEE":
         add_triggers_run3_2022_preEE(cfg)
     elif year == 2022 and campaign.x.tag == "postEE":
         add_triggers_run3_2022_postEE(cfg)
     
     
-    from httcp.config.met_filters import add_met_filters
+    from MSSM_H_tt.config.met_filters import add_met_filters
     add_met_filters(cfg)
 
     # default objects, such as calibrator, selector, producer, ml model, inference model, etc
@@ -581,7 +581,7 @@ def add_run3(ana: od.Analysis,
     # target file size after MergeReducedEvents in MB
     cfg.x.reduced_file_size = 512.0
     
-    from httcp.config.variables import keep_columns
+    from MSSM_H_tt.config.variables import keep_columns
     keep_columns(cfg)
  
     cfg.add_shift(name="nominal", id=0)
@@ -713,13 +713,13 @@ def add_run3(ana: od.Analysis,
         cfg.x.get_dataset_lfns_remote_fs =  lambda dataset_inst: "wlcg_fs_eos"
         
     # add categories using the "add_category" tool which adds auto-generated ids
-    from httcp.config.categories import add_categories
+    from MSSM_H_tt.config.categories import add_categories
     add_categories(cfg,channel=channel)
         
-    from httcp.config.variables import add_variables
+    from MSSM_H_tt.config.variables import add_variables
     add_variables(cfg)
     
-    from httcp.data_driven.hist_hooks import add_hist_hooks
+    from MSSM_H_tt.data_driven.hist_hooks import add_hist_hooks
     add_hist_hooks(cfg)
 
 

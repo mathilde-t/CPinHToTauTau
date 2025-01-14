@@ -23,15 +23,15 @@ from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import optional_column as optional
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
-from httcp.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
-from httcp.selection.trigger import trigger_selection
-from httcp.selection.lepton_pair import pair_selection
-from httcp.selection.match_trigobj import match_trigobj
-from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
-from httcp.selection.higgscand import new_higgscand, mask_nans
+from MSSM_H_tt.selection.physics_objects import jet_selection, muon_selection, electron_selection, tau_selection, gentau_selection
+from MSSM_H_tt.selection.trigger import trigger_selection
+from MSSM_H_tt.selection.lepton_pair import pair_selection
+from MSSM_H_tt.selection.match_trigobj import match_trigobj
+from MSSM_H_tt.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
+from MSSM_H_tt.selection.higgscand import new_higgscand, mask_nans
 
-from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
-from httcp.selection.jets import jet_veto_map
+from MSSM_H_tt.production.aux_columns import channel_id, jet_veto, add_tau_prods
+from MSSM_H_tt.selection.jets import jet_veto_map
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

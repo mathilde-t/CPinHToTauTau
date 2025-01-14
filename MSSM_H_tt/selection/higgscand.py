@@ -10,7 +10,7 @@ from columnflow.util import maybe_import
 from columnflow.columnar_util import set_ak_column, has_ak_column, EMPTY_FLOAT, Route, flat_np_view, optional_column as optional
 from columnflow.util import DotDict
 
-from httcp.util import hlt_path_matching, hlt_path_fired
+from MSSM_H_tt.util import hlt_path_matching, hlt_path_fired
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

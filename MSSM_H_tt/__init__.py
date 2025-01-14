@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-from httcp.columnflow_patches import patch_all
+from MSSM_H_tt.columnflow_patches import patch_all
 
 
 # apply cf patches once

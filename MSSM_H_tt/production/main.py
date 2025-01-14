@@ -14,17 +14,17 @@ from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.columnar_util import optional_column as optional
 from columnflow.production.util import attach_coffea_behavior
-#from httcp.production.PhiCPNeutralPion import PhiCPNPMethod
-from httcp.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
-from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
+#from MSSM_H_tt.production.PhiCPNeutralPion import PhiCPNPMethod
+from MSSM_H_tt.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
+from MSSM_H_tt.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
-from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight
-from httcp.production.sample_split import split_dy
-from httcp.production.generatorZ import generatorZ
-from httcp.production.dilepton_features import hcand_fields
+from MSSM_H_tt.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight
+from MSSM_H_tt.production.sample_split import split_dy
+from MSSM_H_tt.production.generatorZ import generatorZ
+from MSSM_H_tt.production.dilepton_features import hcand_fields
 
-from httcp.production.phi_cp import phi_cp
-from httcp.production.aux_columns import jet_pt_def,jets_taggable
+from MSSM_H_tt.production.phi_cp import phi_cp
+from MSSM_H_tt.production.aux_columns import jet_pt_def,jets_taggable
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

@@ -6,7 +6,7 @@ from columnflow.production import Producer, producer
 from columnflow.selection import Selector, SelectionResult, selector
 from columnflow.columnar_util import set_ak_column
 from columnflow.util import maybe_import, DotDict
-from httcp.util import get_lep_p4, find_fields_with_nan
+from MSSM_H_tt.util import get_lep_p4, find_fields_with_nan
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

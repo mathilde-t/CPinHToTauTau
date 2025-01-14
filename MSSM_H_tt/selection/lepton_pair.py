@@ -9,7 +9,7 @@ from columnflow.selection import Selector, SelectionResult, selector
 from columnflow.selection.util import create_collections_from_masks
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
-from httcp.util import get_lep_p4
+from MSSM_H_tt.util import get_lep_p4
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

@@ -8,7 +8,7 @@ from columnflow.production import Producer, producer
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.columnar_util import optional_column as optional
-from httcp.util import get_lep_p4, get_ip_p4
+from MSSM_H_tt.util import get_lep_p4, get_ip_p4
 from columnflow.production.util import attach_coffea_behavior
 
 np = maybe_import("numpy")

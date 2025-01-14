@@ -4,10 +4,10 @@ Calibration methods.
 import functools
 
 from columnflow.calibration import Calibrator, calibrator
-from httcp.calibration.jets import jec
-from httcp.calibration.met import met_phi
-from httcp.calibration.tau import tau_energy_scale
-from httcp.calibration.electron import electron_smearing_scaling
+from MSSM_H_tt.calibration.jets import jec
+from MSSM_H_tt.calibration.met import met_phi
+from MSSM_H_tt.calibration.tau import tau_energy_scale
+from MSSM_H_tt.calibration.electron import electron_smearing_scaling
 from columnflow.production.cms.seeds import deterministic_seeds
 from columnflow.util import maybe_import
 from columnflow.columnar_util import set_ak_column

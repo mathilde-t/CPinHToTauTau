@@ -82,57 +82,55 @@ def b_veto_inv(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array,
 @categorizer(uses={'event', 'hcand_*'})
 def deep_tau_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channels = self.config_inst.channels.names()
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
+    
+    deep_tau    =  self.config_inst.x.deep_tau
+    wp_idx_ejet = deep_tau.vs_e_jet_wps
+    wp_idx_mu   = deep_tau.vs_mu_wps
     
     mask = ak.zeros_like(events.event, dtype=np.bool_)
     for channel in channels:
         tau = events[f'hcand_{channel}'].lep1 
         channel_mask = ak.ones_like(events[f'hcand_{channel}'].lep1.rawIdx)
-        if channel == 'mutau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Tight"])
-        elif channel == 'etau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        elif "tautau":
+        if channel != 'tautau':
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= wp_idx_ejet[deep_tau.vs_jet[channel]])
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_e[channel]])
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
+        else:
             tau0 = events[f'hcand_{channel}'].lep0
             for the_tau in [tau, tau0]:
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["Medium"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet >= wp_idx_ejet[deep_tau.vs_jet[channel]])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_jet[channel]])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
         mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
     return events, mask
+
 
 @categorizer(uses={'event', 'hcand_*'})
 def deep_tau_inv_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channels = self.config_inst.channels.names()
-    deep_tau_vs_e_jet_wps = self.config_inst.x.deep_tau.vs_e_jet_wps
-    deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
+    
+    deep_tau    =  self.config_inst.x.deep_tau
+    wp_idx_ejet = deep_tau.vs_e_jet_wps
+    wp_idx_mu   = deep_tau.vs_mu_wps
     
     mask = ak.zeros_like(events.event, dtype=np.bool_)
     for channel in channels:
         tau = events[f'hcand_{channel}'].lep1 
         channel_mask = ak.ones_like(events[f'hcand_{channel}'].lep1.rawIdx)
-        if channel == 'mutau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["Tight"])
-        elif channel == 'etau':
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["Tight"])
-            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        elif "tautau":
+        if channel != 'tautau':
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < wp_idx_ejet[deep_tau.vs_jet[channel]])
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_e[channel]])
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
+        else:
             tau0 = events[f'hcand_{channel}'].lep0
             for the_tau in [tau, tau0]:
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
-                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        #from IPython import embed; embed()
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet < wp_idx_ejet[deep_tau.vs_jet[channel]])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_jet[channel]])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
         mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
     return events, mask
+
+
 
 @categorizer(uses={'event', 'hcand_*'})
 def tau_endcap(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:

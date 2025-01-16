@@ -78,9 +78,9 @@ def add_run3(ana: od.Analysis,
             e_smearing_corrector = "2022Re-recoE+PromptFG_SmearingJSON"
         elif tag == "preVFP"    : out_tag = "preVFP_UL"
         elif tag == "postVFP"   : out_tag = "postVFP_UL"    
-        return out_tag, e_sf_tag, e_scale_corrector, e_smearing_corrector
+        return out_tag, e_sf_tag, e_scale_corrector, e_smearing_corrector, tag
         
-    tag, e_sf_tag, e_scale_corrector, e_smearing_corrector = tag_caster(campaign)
+    tag, e_sf_tag, e_scale_corrector, e_smearing_corrector, tau_tag = tag_caster(campaign)
     
     # add processes we are interested in
     
@@ -519,23 +519,23 @@ def add_run3(ana: od.Analysis,
     )
     
     
-    corr_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "corrections/")
-    jsonpog_dir = os.path.join(os.environ.get('CF_REPO_BASE'), "modules/jsonpog-integration/POG/")
+    jsonpog_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_latest/POG/"
+    jsonpog_tau_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_tau_latest/POG/"
+    corr_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/"
 
 
     cfg.x.external_files = DotDict.wrap({
-        # lumi files
         "lumi": {
-            "golden": (f"{corr_dir}Cert_Collisions2022_355100_362760_Golden.json", "v1"),  # https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
-            "normtag": (f"{corr_dir}normtag_PHYSICS.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
+            "golden": ("https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", "v1"),
+            "normtag": ("/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_BRIL.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
 
         "pu_sf": (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
         "muon_correction" : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
-        "electron_scaling_smearing"  : f"{corr_dir}EGM/{cfg.x.year}_{tag}/electronSS.json.gz",
+        "electron_scaling_smearing"  : f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electronSS.json.gz",
         "electron_idiso"  : f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electron.json.gz",
         "electron_trigger": f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electronHlt.json.gz",
-        "tau_correction"  : f"{corr_dir}TAU/{cfg.x.year}_{tag}/tau_DeepTau2018v2p5.json.gz",
+        "tau_correction"  : f"{jsonpog_tau_dir}TAU/{cfg.x.year}_{tau_tag}/tau_DeepTau2018v2p5_{cfg.x.year}_{tau_tag}.json.gz",
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),

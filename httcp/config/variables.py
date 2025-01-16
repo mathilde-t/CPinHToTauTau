@@ -490,7 +490,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
             name=f"{ch_str}_delta_eta",
             expression=f"hcand_{ch_str}.delta_eta",
             null_value=EMPTY_FLOAT,
-            binning=(100, -5, 5),
+            binning=(50, -5, 5),
             x_title=r"$\Delta \eta(\ell,\ell)$",
         )
         cfg.add_variable(

@@ -69,12 +69,12 @@ def add_run3(ana: od.Analysis,
             e_sf_tag = "2022Re-recoE+PromptFG"
             e_scale_corrector = "2022Re-recoE+PromptFG_ScaleJSON"
             e_smearing_corrector = "2022Re-recoE+PromptFG_SmearingJSON"
-        elif tag == "preBpix"   : 
+        elif tag == "preBPix"   : 
             out_tag = "Summer23"
             e_sf_tag = "2023PromptC"
             e_scale_corrector = "2022Re-recoE+PromptFG_ScaleJSON"
             e_smearing_corrector = "2022Re-recoE+PromptFG_SmearingJSON"
-        elif tag == "postBpix"  : 
+        elif tag == "postBPix"  : 
             out_tag = "Summer23BPix"
             e_sf_tag = "2023PromptD"
             e_scale_corrector = "2022Re-recoE+PromptFG_ScaleJSON"
@@ -277,7 +277,7 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_fh",
         ]
 
-
+    
     dataset_era = {
         "Summer22": dataset_names_2022preEE,
         "Summer22EE" : dataset_names_2022postEE,
@@ -528,11 +528,11 @@ def add_run3(ana: od.Analysis,
         cfg.x.luminosity = Number(26_671.7, {
             "lumi_13p6TeV_correlated": 0.014j,
         })
-    elif year == 2023 and campaign.x.tag =="preBpix":
+    elif year == 2023 and campaign.x.tag =="preBPix":
         cfg.x.luminosity = Number(17_794, {
             "lumi_13p6TeV_correlated": 0.0j,
         })
-    elif year == 2023 and campaign.x.tag =="postBpix":
+    elif year == 2023 and campaign.x.tag =="postBPix":
         cfg.x.luminosity = Number(9_451, {
             "lumi_13p6TeV_correlated": 0.0j,
         })
@@ -603,8 +603,8 @@ def add_run3(ana: od.Analysis,
     corr_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/"
     
     golden_ls = { 
-        '2022': "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
-        '2023': "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
+        2022 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
+        2023: "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
     }    
 
     cfg.x.external_files = DotDict.wrap({

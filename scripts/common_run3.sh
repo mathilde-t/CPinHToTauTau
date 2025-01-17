@@ -105,10 +105,6 @@ case $1 in
 	variables=$variables_mutau
 	workflow='htcondor'
     ;;
-    *)
-    echo "Unknown run argument!"
-    exit
-    ;;
 ##############################
 ####### 2023preBPix ############
 ##############################
@@ -168,6 +164,9 @@ case $1 in
         workflow='htcondor'
      ;;
 
+    *)
+    echo "Unknown run argument!"
+    exit
 
 esac
 }

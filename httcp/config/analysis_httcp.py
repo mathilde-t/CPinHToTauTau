@@ -128,7 +128,7 @@ for counter, value in enumerate(channels):
         campaign_run3_2023_postBPix_nano_tau_skim_v2.copy(),
         channel=value,
         config_name=f"run3_2023_postBPix_{value}_limited",
-        config_id=18+counter,
+        config_id=24+counter,
         limit_dataset_files=1)
 for counter, value in enumerate(channels):
     add_run3(
@@ -136,6 +136,6 @@ for counter, value in enumerate(channels):
         campaign_run3_2023_postBPix_nano_tau_skim_v2.copy(),
         channel=value,
         config_name=f"run3_2023_postBPix_{value}",
-        config_id=21+counter,)
+        config_id=27+counter,)
 # -------------------------------------------------------------------------------------------------- #
 

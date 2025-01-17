@@ -20,4 +20,4 @@ args=(
         "${@:2}"
     )
 echo law run cf.PlotVariables1D "${args[@]}"
-law run cf.PlotVariables1D "${args[@]}" 
+law run cf.PlotVariables1D "${args[@]}"

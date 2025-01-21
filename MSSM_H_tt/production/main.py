@@ -20,7 +20,7 @@ from MSSM_H_tt.production.sample_split import split_dy
 from MSSM_H_tt.production.generatorZ import generatorZ
 from MSSM_H_tt.production.dilepton_features import hcand_fields
 
-from MSSM_H_tt.production.aux_columns import jet_pt_def,jets_taggable
+from MSSM_H_tt.production.aux_columns import jet_pt_def,jets_taggable,number_b_jet
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -46,6 +46,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         hcand_fields,
         category_ids,
         jet_pt_def,
+        number_b_jet,
         jets_taggable,
         "Jet.pt",
         "Jet.pt_no_jec",
@@ -81,6 +82,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     print("Producing Jet features...")
     events = set_ak_column_f32(events, "Jet.jec_no_jec_diff", (events.Jet.pt - events.Jet.pt_no_jec))
     events = set_ak_column_f32(events, "Jet.number_of_jets", ak.num(events.Jet))
+    print("Producing Number of b-jets for categorization")
+    events = self[number_b_jet](events, **kwargs)
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
@@ -104,7 +107,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[electron_weight](events,do_syst = True, **kwargs)
         print("Producing Tau weights...")
         events = self[tau_weight](events,do_syst = True, **kwargs)
-
+        
     print("Producing jet variables for plotting...") 
     n_jets, leading_jet_pt, subleading_jet_pt, delta_eta_jj, mjj = self[jet_pt_def](events, **kwargs)
     n_jets_tag = self[jets_taggable](events, **kwargs)

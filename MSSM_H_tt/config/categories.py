@@ -34,341 +34,1079 @@ def add_categories(config: od.Config,
             name="cat_mutau",
             id=2,
             selection="cat_mutau",
-            label=r"$\mu\tau$ inclusive",
+            label="$\\mu\\tau$ inclusive",
         )
+        #########################################
+        ### mu-tau channel categories 0 b jets ###
+        #########################################
+        
         #################################
-        ### mu-tau channel categories ###
+        ### SIGNAL REGION with mT cut ###
         #################################
         
-        mutau_signal_reg = add_category(
+        mutau_signal_reg_0_bjets = add_category(
             config,
-            name="mutau_signal_reg",
-            id=100 + mutau.id,
-            selection=["cat_mutau"  ,
+            name="mutau_signal_reg_0_bjets",
+            id=130 + mutau.id,
+            selection=["cat_mutau"   ,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       #"b_veto"     ,
-                      ],
-            label=r"$\mu\tau$ SR",
-            aux={'control_reg': "mutau_control_reg"}
+                       "Zero_b_jets",
+                       ],
+            label="$\\mu\\tau$ SR\n0 bjets",
+            aux={'control_reg': "mutau_control_reg_0_bjets"}
+        )
+        mutau_control_reg_0_bjets = add_category(
+            config,
+            name="mutau_control_reg_0_bjets",
+            id=131 + mutau.id,
+            selection=["cat_mutau"    ,
+                       "ss_charge"   ,
+                       "mt_cut"      ,
+                       "deep_tau_wp" ,
+                       "Zero_b_jets" ,
+                       ],
+            label="$\\mu\\tau$ CR\n0 bjets",
+        )
+        mutau_signal_reg_0_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_signal_reg_0_bjets_endcap_tau",
+            id=132 + mutau.id,
+            selection=["cat_mutau"   ,
+                       "os_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       ],
+            label = "$\\mu\\tau$ SR\n0 bjets\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_0_bjets_endcap_tau"}
+        )
+        mutau_control_reg_0_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_control_reg_0_bjets_endcap_tau",
+            id=133 + mutau.id,
+            selection=["cat_mutau"   ,
+                       "ss_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       ],
+           label = "$\\mu\\tau$ SR\n0 bjets\n$\\eta_{\\tau} > 1.2$",
         )
         
-        mutau_control_reg = add_category(
+        mutau_signal_reg_0_bjets_barrel_tau = add_category(
             config,
-            name="mutau_control_reg",
+            name="mutau_signal_reg_0_bjets_barrel_tau",
+            id=134 + mutau.id,
+            selection=["cat_mutau"    ,
+                        "os_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ SR\n0 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_0_bjets_barrel_tau"}
+        )
+        
+        mutau_control_reg_0_bjets_barrel_tau = add_category(
+            config,
+            name="mutau_control_reg_0_bjets_barrel_tau",
+            id=135 + mutau.id,
+            selection=["cat_mutau"  ,
+                        "ss_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ CR\n0 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+        
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+        
+        mutau_signal_reg_0_bjets_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_0_bjets_no_mt",
+            id=136 + mutau.id,
+            selection=["cat_mutau"   ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                      "Zero_b_jets" ,
+                       ],
+            label="$\\mu\\tau$\n0 bjets\nno $m_{T}$",
+            aux={'control_reg': "mutau_control_reg_0_bjets_no_mt"}
+        )
+        
+        mutau_control_reg_0_bjets_no_mt = add_category(
+            config,
+            name="mutau_control_reg_0_bjets_no_mt",
+            id=137 + mutau.id,
+            selection=["cat_mutau"    ,
+                       "ss_charge"   ,
+                       "deep_tau_wp" ,
+                       "Zero_b_jets" ,
+                       ],
+            label="$\\mu\\tau$ CR\n0 bjets\nno $m_{T}$",
+        )
+        mutau_signal_reg_0_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_0_bjets_endcap_tau_no_mt",
+            id=138 + mutau.id,
+            selection=["cat_mutau"   ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       ],
+            label="$\\mu\\tau$ SR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_0_bjets_endcap_tau_no_mt"}
+        )
+        mutau_control_reg_0_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="mutau_control_reg_0_bjets_endcap_tau_no_mt",
+            id=139 + mutau.id,
+            selection=["cat_mutau"   ,
+                       "ss_charge"  ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       ],
+            label="$\\mu\\tau$ CR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+        )
+        mutau_signal_reg_0_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_0_bjets_barrel_tau_no_mt",
+            id=140 + mutau.id,
+            selection=["cat_mutau"    ,
+                        "os_charge"  ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_0_bjets_barrel_tau_no_mt"}
+        )
+        
+        mutau_control_reg_0_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="mutau_control_reg_0_bjets_barrel_tau_no_mt",
+            id=141 + mutau.id,
+            selection=["cat_mutau"  ,
+                        "ss_charge"  ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+        
+        #########################################
+        ### mu-tau channel categories 1 b jets ###
+        #########################################
+
+        #################################
+        ### SIGNAL REGION with mT cut ###
+        #################################
+
+        mutau_signal_reg_1_bjets = add_category(
+            config,
+            name="mutau_signal_reg_1_bjets",
+            id=142 + mutau.id,
+            selection=["cat_mutau"   ,
+                    "os_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets",
+                    ],
+            label="$\\mu\\tau$ SR\n1 bjet",
+            aux={'control_reg': "mutau_control_reg_1_bjets"}
+        )
+
+        mutau_control_reg_1_bjets = add_category(
+            config,
+            name="mutau_control_reg_1_bjets",
+            id=143 + mutau.id,
+            selection=["cat_mutau"    ,
+                    "ss_charge"   ,
+                    "mt_cut"      ,
+                    "deep_tau_wp" ,
+                    "One_b_jets"  ,
+                    ],
+            label="$\\mu\\tau$ CR\n1 bjet",
+        )
+
+        mutau_signal_reg_1_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_signal_reg_1_bjets_endcap_tau",
+            id=144 + mutau.id,
+            selection=["cat_mutau"   ,
+                    "os_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$\\mu\\tau$ SR\n1 bjets\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_1_bjets_endcap_tau"}
+        )
+
+        mutau_control_reg_1_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_control_reg_1_bjets_endcap_tau",
+            id=145 + mutau.id,
+            selection=["cat_mutau"   ,
+                    "ss_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$\\mu\\tau$ CR\n1 bjets\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        mutau_signal_reg_1_bjets_barrel_tau = add_category(
+            config,
+            name="mutau_signal_reg_1_bjets_barrel_tau",
+            id=146 + mutau.id,
+            selection=["cat_mutau"    ,
+                        "os_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "One_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ SR\n1 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_1_bjets_barrel_tau"}
+        )
+
+        mutau_control_reg_1_bjets_barrel_tau = add_category(
+            config,
+            name="mutau_control_reg_1_bjets_barrel_tau",
+            id=147 + mutau.id,
+            selection=["cat_mutau"  ,
+                        "ss_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "One_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ CR\n1 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+
+        mutau_signal_reg_1_bjets_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_1_bjets_no_mt",
+            id=148 + mutau.id,
+            selection=["cat_mutau"   ,
+                    "os_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    ],
+            label="$\\mu\\tau$ SR\n1 bjets\nno $m_{T}$",
+            aux={'control_reg': "mutau_control_reg_1_bjets_no_mt"}
+        )
+
+        mutau_control_reg_1_bjets_no_mt = add_category(
+            config,
+            name="mutau_control_reg_1_bjets_no_mt",
+            id=149 + mutau.id,
+            selection=["cat_mutau"    ,
+                    "ss_charge"   ,
+                    "deep_tau_wp" ,
+                    "One_b_jets"  ,
+                    ],
+            label="$\\mu\\tau$ CR\n1 bjets\nno $m_{T}$",
+        )
+
+        mutau_signal_reg_1_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_1_bjets_endcap_tau_no_mt",
             id=150 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "mt_cut"     ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       ],
-            label=r"$\mu\tau$ CR",
-        )
-        mutau_signal_reg_no_mt = add_category(
-            config,
-            name="mutau_signal_reg_no_mt",
-            id=200 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "os_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       ],
-            label=r"$\mu\tau$ no mt",
-            aux={'control_reg': "mutau_control_reg_no_mt"} 
-        )
-        mutau_control_reg_no_mt = add_category(
-            config,
-            name="mutau_control_reg_no_mt",
-            id=250 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       ],
-            label=r"$\mu\tau$ CR no mt",
-        )
-        mutau_signal_reg_endcap_tau = add_category(
-            config,
-            name="mutau_signal_reg_endcap_tau",
-            id=300 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "os_charge"  ,
-                       "mt_cut"     ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$\mu\tau$ SR $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "mutau_control_reg_endcap_tau"}
-        )
-        mutau_control_reg_endcap_tau = add_category(
-            config,
-            name="mutau_control_reg_endcap_tau",
-            id=350 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "mt_cut"     ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$\mu\tau$ CR$\eta_{\tau} > 1.2$",
-        )
-        
-        mutau_signal_reg_barrel_tau = add_category(
-            config,
-            name="mutau_signal_reg_barrel_tau",
-            id=400 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "os_charge"  ,
-                       "mt_cut"     ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_barrel" ,
-                       ],
-            label=r"$\mu\tau$ SR $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "mutau_control_reg_barrel_tau"}
-        )
-        
-        mutau_control_reg_barrel_tau = add_category(
-            config,
-            name="mutau_control_reg_barrel_tau",
-            id=450 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "mt_cut"     ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_barrel" ,
-                       ],
-            label=r"$\mu\tau$ CR $\eta_{\tau} \leq 1.2$",
+            selection=["cat_mutau"   ,
+                    "os_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$\\mu\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_1_bjets_endcap_tau_no_mt"}
         )
 
-        mutau_signal_reg_endcap_tau_no_mt  = add_category(
+        mutau_control_reg_1_bjets_endcap_tau_no_mt = add_category(
             config,
-            name="mutau_signal_reg_endcap_tau_no_mt",
-            id=500 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "os_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$\mu\tau$ no mt  $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "mutau_control_reg_endcap_tau_no_mt"}
-        )
-        mutau_control_reg_endcap_tau_no_mt = add_category(
-            config,
-            name="mutau_control_reg_endcap_tau_no_mt",
-            id=550 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$\mu\tau$ no mt CR $\eta_{\tau} > 1.2$",
+            name="mutau_control_reg_1_bjets_endcap_tau_no_mt",
+            id=151 + mutau.id,
+            selection=["cat_mutau"   ,
+                    "ss_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$\\mu\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
         )
 
-        mutau_signal_reg_barrel_tau_no_mt = add_category(
+        mutau_signal_reg_1_bjets_barrel_tau_no_mt = add_category(
             config,
-            name="mutau_signal_reg_barrel_tau_no_mt",
-            id=600 + mutau.id,
-            selection=["cat_mutau"  ,
-                       "os_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_barrel" ,
-                       ],
-            label=r"$\mu\tau$ no mt  $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "mutau_control_reg_barrel_tau_no_mt"}
+            name="mutau_signal_reg_1_bjets_barrel_tau_no_mt",
+            id=152 + mutau.id,
+            selection=["cat_mutau"    ,
+                        "os_charge"  ,
+                        "deep_tau_wp",
+                        "One_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_1_bjets_barrel_tau_no_mt"}
         )
 
-        mutau_control_reg_barrel_tau_no_mt = add_category(
+        mutau_control_reg_1_bjets_barrel_tau_no_mt = add_category(
             config,
-            name="mutau_control_reg_barrel_tau_no_mt",
-            id=650 + mutau.id,
+            name="mutau_control_reg_1_bjets_barrel_tau_no_mt",
+            id=153 + mutau.id,
             selection=["cat_mutau"  ,
-                       "ss_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_barrel" ,
-                       ],
-            label=r"$\mu\tau$ no mt CR $\eta_{\tau} \leq 1.2$",
+                        "ss_charge"  ,
+                        "deep_tau_wp",
+                        "One_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$\\mu\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+            
+        #########################################
+        ### mu-tau channel categories >= 2 bjets ###
+        #########################################
+
+        #################################
+        ### SIGNAL REGION with mT cut ###
+        #################################
+
+        mutau_signal_reg_2_bjets = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets",
+            id=154 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "os_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$\\mu\\tau$ SR\n$\\\geq$ 2 bjets",
+            aux={'control_reg': "mutau_control_reg_2_bjets"}
         )
 
+        mutau_control_reg_2_bjets = add_category(
+            config,
+            name="mutau_control_reg_2_bjets",
+            id=155 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "ss_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$\\mu\\tau$ CR\n$\\\geq$ 2 bjets",
+        )
+
+        mutau_signal_reg_2_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets_endcap_tau",
+            id=156 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "os_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$\\mu\\tau$ SR\n$\\\geq$ 2 bjets\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_2_bjets_endcap_tau"}
+        )
+
+        mutau_control_reg_2_bjets_endcap_tau = add_category(
+            config,
+            name="mutau_control_reg_2_bjets_endcap_tau",
+            id=157 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "ss_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$\\mu\\tau$ CR\n$\\\geq$ 2 bjets\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        mutau_signal_reg_2_bjets_barrel_tau = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets_barrel_tau",
+            id=158 + mutau.id,
+            selection=["cat_mutau"        ,
+                        "os_charge"      ,
+                        "mt_cut"         ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$\\mu\\tau$ SR\n$\\\geq$ 2 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_2_bjets_barrel_tau"}
+        )
+
+        mutau_control_reg_2_bjets_barrel_tau = add_category(
+            config,
+            name="mutau_control_reg_2_bjets_barrel_tau",
+            id=159 + mutau.id,
+            selection=["cat_mutau"        ,
+                        "ss_charge"      ,
+                        "mt_cut"         ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$\\mu\\tau$ CR\n$\\\geq$ 2 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+
+        mutau_signal_reg_2_bjets_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets_no_mt",
+            id=160 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "os_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$\\mu\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$",
+            aux={'control_reg': "mutau_control_reg_2_bjets_no_mt"}
+        )
+
+        mutau_control_reg_2_bjets_no_mt = add_category(
+            config,
+            name="mutau_control_reg_2_bjets_no_mt",
+            id=161 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "ss_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$\\mu\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$",
+        )
+
+        mutau_signal_reg_2_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets_endcap_tau_no_mt",
+            id=162 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "os_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$\\mu\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "mutau_control_reg_2_bjets_endcap_tau_no_mt"}
+        )
+
+        mutau_control_reg_2_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="mutau_control_reg_2_bjets_endcap_tau_no_mt",
+            id=163 + mutau.id,
+            selection=["cat_mutau"        ,
+                    "ss_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$\\mu\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        mutau_signal_reg_2_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="mutau_signal_reg_2_bjets_barrel_tau_no_mt",
+            id=164 + mutau.id,
+            selection=["cat_mutau"        ,
+                        "os_charge"      ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$\\mu\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "mutau_control_reg_2_bjets_barrel_tau_no_mt"}
+        )
+
+        mutau_control_reg_2_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="mutau_control_reg_2_bjets_barrel_tau_no_mt",
+            id=165 + mutau.id,
+            selection=["cat_mutau"        ,
+                        "ss_charge"      ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$\\mu\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+    ################################
+    ### e-tau channel categories ###
+    #################################
     elif channel=='etau':
         etau = add_category(
             config,
             name="cat_etau",
             id=3,
             selection="cat_etau",
-            label=r"$e\tau$ inclusive",
+            label="$e\\tau$ inclusive",
         )
-        ################################
-        ### e-tau channel categories ###
-        ################################
-        etau_signal_reg = add_category(
+        #########################################
+        ### e-tau channel categories 0 b jets ###
+        #########################################
+        
+        #################################
+        ### SIGNAL REGION with mT cut ###
+        #################################
+        
+        etau_signal_reg_0_bjets = add_category(
             config,
-            name="etau_signal_reg",
-            id=100 + etau.id,
-            selection=["cat_etau"  ,
+            name="etau_signal_reg_0_bjets",
+            id=166 + etau.id,
+            selection=["cat_etau"   ,
                        "os_charge"  ,
                        "mt_cut"     ,
                        "deep_tau_wp",
-                       #"b_veto"     ,
+                       "Zero_b_jets",
+                       "OC_lepton_veto",
                        ],
-            label=r"$e\tau$ SR",
-            aux={'control_reg': "etau_control_reg"}
+            label="$e\\tau$ SR\n0 bjets",
+            aux={'control_reg': "etau_control_reg_0_bjets"}
         )
-        etau_control_reg = add_category(
+        etau_control_reg_0_bjets = add_category(
             config,
-            name="etau_control_reg",
-            id=150 + etau.id,
+            name="etau_control_reg_0_bjets",
+            id=167 + etau.id,
             selection=["cat_etau"    ,
                        "ss_charge"   ,
                        "mt_cut"      ,
                        "deep_tau_wp" ,
-                    #    "b_veto"      ,
+                       "Zero_b_jets" ,
                        ],
-            label=r"$e\tau$ CR",
+            label="$e\\tau$ CR\n0 bjets",
+        )
+        etau_signal_reg_0_bjets_endcap_tau = add_category(
+            config,
+            name="etau_signal_reg_0_bjets_endcap_tau",
+            id=168 + etau.id,
+            selection=["cat_etau"   ,
+                       "os_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       "OC_lepton_veto",
+                       ],
+            label = "$e\\tau$ SR\n0 bjets\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "etau_control_reg_0_bjets_endcap_tau"}
+        )
+        etau_control_reg_0_bjets_endcap_tau = add_category(
+            config,
+            name="etau_control_reg_0_bjets_endcap_tau",
+            id=169 + etau.id,
+            selection=["cat_etau"   ,
+                       "ss_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "Zero_b_jets" ,
+                       "tau_endcap" ,
+                       ],
+            label = "$e\\tau$ SR\n0 bjets\n$\\eta_{\\tau} > 1.2$",
+
         )
         
-        etau_signal_reg_no_mt = add_category(
+        etau_signal_reg_0_bjets_barrel_tau = add_category(
             config,
-            name="etau_signal_reg_no_mt",
-            id=200 + etau.id,
+            name="etau_signal_reg_0_bjets_barrel_tau",
+            id=170 + etau.id,
+            selection=["cat_etau"    ,
+                        "os_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        "OC_lepton_veto",
+                        ],
+            label="$e\\tau$ SR\n0 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_0_bjets_barrel_tau"}
+        )
+        
+        etau_control_reg_0_bjets_barrel_tau = add_category(
+            config,
+            name="etau_control_reg_0_bjets_barrel_tau",
+            id=171 + etau.id,
+            selection=["cat_etau"  ,
+                        "ss_charge"  ,
+                        "mt_cut"     ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$e\\tau$ CR\n0 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+        
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+        
+        etau_signal_reg_0_bjets_no_mt = add_category(
+            config,
+            name="etau_signal_reg_0_bjets_no_mt",
+            id=172 + etau.id,
             selection=["cat_etau"   ,
                        "os_charge"  ,
                        "deep_tau_wp",
-                       #"b_veto"     ,
+                      "Zero_b_jets" ,
+                      "OC_lepton_veto",
                        ],
-            label=r"$e\tau$ no mt",
-            aux={'control_reg': "etau_control_reg_no_mt"}
+            label="$e\\tau$\n0 bjets\nno $m_{T}$",
+            aux={'control_reg': "etau_control_reg_0_bjets_no_mt"}
         )
         
-        etau_control_reg_no_mt = add_category(
+        etau_control_reg_0_bjets_no_mt = add_category(
             config,
-            name="etau_control_reg_no_mt",
-            id=250 + etau.id,
+            name="etau_control_reg_0_bjets_no_mt",
+            id=173 + etau.id,
             selection=["cat_etau"    ,
                        "ss_charge"   ,
                        "deep_tau_wp" ,
-                    #    "b_veto"      ,
+                       "Zero_b_jets" ,
                        ],
-            label=r"$e\tau$ CR no mt",
+            label="$e\\tau$ CR\n0 bjets\nno $m_{T}$",
         )
-        
-        etau_signal_reg_endcap_tau = add_category(
+        etau_signal_reg_0_bjets_endcap_tau_no_mt = add_category(
             config,
-            name="etau_signal_reg_endcap_tau",
-            id=300 + etau.id,
+            name="etau_signal_reg_0_bjets_endcap_tau_no_mt",
+            id=174 + etau.id,
             selection=["cat_etau"   ,
                        "os_charge"  ,
-                       "mt_cut"     ,
                        "deep_tau_wp",
-                       #"b_veto"     ,
+                       "Zero_b_jets" ,
                        "tau_endcap" ,
+                       "OC_lepton_veto",
                        ],
-            label=r"$e\tau$ SR $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "etau_control_reg_endcap_tau"}
+            label="$e\\tau$ SR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "etau_control_reg_0_bjets_endcap_tau_no_mt"}
         )
-        etau_control_reg_endcap_tau = add_category(
+        etau_control_reg_0_bjets_endcap_tau_no_mt = add_category(
             config,
-            name="etau_control_reg_endcap_tau",
-            id=350 + etau.id,
+            name="etau_control_reg_0_bjets_endcap_tau_no_mt",
+            id=175 + etau.id,
             selection=["cat_etau"   ,
                        "ss_charge"  ,
-                       "mt_cut"     ,
                        "deep_tau_wp",
-                       #"b_veto"     ,
+                       "Zero_b_jets" ,
                        "tau_endcap" ,
                        ],
-            label=r"$e\tau$ CR $\eta_{\tau} > 1.2$",
+            label="$e\\tau$ CR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+        )
+        etau_signal_reg_0_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="etau_signal_reg_0_bjets_barrel_tau_no_mt",
+            id=176 + etau.id,
+            selection=["cat_etau"    ,
+                        "os_charge"  ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        "OC_lepton_veto",
+                        ],
+            label="$e\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_0_bjets_barrel_tau_no_mt"}
         )
         
-        etau_signal_reg_barrel_tau = add_category(
+        etau_control_reg_0_bjets_barrel_tau_no_mt = add_category(
             config,
-            name="etau_signal_reg_barrel_tau",
-            id=400 + etau.id,
+            name="etau_control_reg_0_bjets_barrel_tau_no_mt",
+            id=177 + etau.id,
             selection=["cat_etau"  ,
+                        "ss_charge"  ,
+                        "deep_tau_wp",
+                        "Zero_b_jets",
+                        "tau_barrel" ,
+                        ],
+            label="$e\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+        
+        #########################################
+        ### e-tau channel categories 1 b jets ###
+        #########################################
+
+        #################################
+        ### SIGNAL REGION with mT cut ###
+        #################################
+
+        etau_signal_reg_1_bjets = add_category(
+            config,
+            name="etau_signal_reg_1_bjets",
+            id=178 + etau.id,
+            selection=["cat_etau"   ,
+                    "os_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets",
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n1 bjet",
+            aux={'control_reg': "etau_control_reg_1_bjets"}
+        )
+
+        etau_control_reg_1_bjets = add_category(
+            config,
+            name="etau_control_reg_1_bjets",
+            id=179 + etau.id,
+            selection=["cat_etau"    ,
+                    "ss_charge"   ,
+                    "mt_cut"      ,
+                    "deep_tau_wp" ,
+                    "One_b_jets"  ,
+                    ],
+            label="$e\\tau$ CR\n1 bjet",
+        )
+
+        etau_signal_reg_1_bjets_endcap_tau = add_category(
+            config,
+            name="etau_signal_reg_1_bjets_endcap_tau",
+            id=180 + etau.id,
+            selection=["cat_etau"   ,
+                    "os_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n1 bjets\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "etau_control_reg_1_bjets_endcap_tau"}
+        )
+
+        etau_control_reg_1_bjets_endcap_tau = add_category(
+            config,
+            name="etau_control_reg_1_bjets_endcap_tau",
+            id=181 + etau.id,
+            selection=["cat_etau"   ,
+                    "ss_charge"  ,
+                    "mt_cut"     ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$e\\tau$ CR\n1 bjets\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        etau_signal_reg_1_bjets_barrel_tau = add_category(
+            config,
+            name="etau_signal_reg_1_bjets_barrel_tau",
+            id=182 + etau.id,
+            selection=["cat_etau"    ,
                         "os_charge"  ,
                         "mt_cut"     ,
                         "deep_tau_wp",
-                        #"b_veto"     ,
+                        "One_b_jets" ,
                         "tau_barrel" ,
+                        "OC_lepton_veto",
                         ],
-            label=r"$e\tau$ SR $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "etau_control_reg_barrel_tau"}
+            label="$e\\tau$ SR\n1 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_1_bjets_barrel_tau"}
         )
-        
-        etau_control_reg_barrel_tau = add_category(
+
+        etau_control_reg_1_bjets_barrel_tau = add_category(
             config,
-            name="etau_control_reg_barrel_tau",
-            id=450 + etau.id,
+            name="etau_control_reg_1_bjets_barrel_tau",
+            id=183 + etau.id,
             selection=["cat_etau"  ,
                         "ss_charge"  ,
                         "mt_cut"     ,
                         "deep_tau_wp",
-                        #"b_veto"     ,
+                        "One_b_jets",
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ CR $\eta_{\tau} \leq 1.2$",
+            label="$e\\tau$ CR\n1 bjets\n$\\eta_{\\tau} \\leq 1.2$",
         )
 
-        etau_signal_reg_endcap_tau_no_mt = add_category(
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+
+        etau_signal_reg_1_bjets_no_mt = add_category(
             config,
-            name="etau_signal_reg_endcap_tau_no_mt",
-            id=500 + etau.id,
+            name="etau_signal_reg_1_bjets_no_mt",
+            id=184 + etau.id,
             selection=["cat_etau"   ,
-                       "os_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$e\tau$ no mt SR $\eta_{\tau} > 1.2$",
-            aux={'control_reg': "etau_control_reg_endcap_tau_no_mt"}
-        )
-        etau_control_reg_endcap_tau_no_mt = add_category(
-            config,
-            name="etau_control_reg_endcap_tau_no_mt",
-            id=550 + etau.id,
-            selection=["cat_etau"   ,
-                       "ss_charge"  ,
-                       "deep_tau_wp",
-                       #"b_veto"     ,
-                       "tau_endcap" ,
-                       ],
-            label=r"$e\tau$ no mt CR $\eta_{\tau} > 1.2$",
+                    "os_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n1 bjets\nno $m_{T}$",
+            aux={'control_reg': "etau_control_reg_1_bjets_no_mt"}
         )
 
-        etau_signal_reg_barrel_tau_no_mt = add_category(
+        etau_control_reg_1_bjets_no_mt = add_category(
             config,
-            name="etau_signal_reg_barrel_tau_no_mt",
-            id=600 + etau.id,
-            selection=["cat_etau"  ,
+            name="etau_control_reg_1_bjets_no_mt",
+            id=185 + etau.id,
+            selection=["cat_etau"    ,
+                    "ss_charge"   ,
+                    "deep_tau_wp" ,
+                    "One_b_jets"  ,
+                    ],
+            label="$e\\tau$ CR\n1 bjets\nno $m_{T}$",
+        )
+
+        etau_signal_reg_1_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="etau_signal_reg_1_bjets_endcap_tau_no_mt",
+            id=186 + etau.id,
+            selection=["cat_etau"   ,
+                    "os_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "etau_control_reg_1_bjets_endcap_tau_no_mt"}
+        )
+
+        etau_control_reg_1_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="etau_control_reg_1_bjets_endcap_tau_no_mt",
+            id=187 + etau.id,
+            selection=["cat_etau"   ,
+                    "ss_charge"  ,
+                    "deep_tau_wp",
+                    "One_b_jets" ,
+                    "tau_endcap" ,
+                    ],
+            label="$e\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        etau_signal_reg_1_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="etau_signal_reg_1_bjets_barrel_tau_no_mt",
+            id=188 + etau.id,
+            selection=["cat_etau"    ,
                         "os_charge"  ,
                         "deep_tau_wp",
-                        #"b_veto"     ,
+                        "One_b_jets",
                         "tau_barrel" ,
+                        "OC_lepton_veto",
                         ],
-            label=r"$e\tau$ no mt SR $\eta_{\tau} \leq 1.2$",
-            aux={'control_reg': "etau_control_reg_barrel_tau_no_mt"}
+            label="$e\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_1_bjets_barrel_tau_no_mt"}
         )
 
-        etau_control_reg_barrel_tau_no_mt = add_category(
+        etau_control_reg_1_bjets_barrel_tau_no_mt = add_category(
             config,
-            name="etau_control_reg_barrel_tau_no_mt",
-            id=650 + etau.id,
+            name="etau_control_reg_1_bjets_barrel_tau_no_mt",
+            id=189 + etau.id,
             selection=["cat_etau"  ,
                         "ss_charge"  ,
                         "deep_tau_wp",
-                        #"b_veto"     ,
+                        "One_b_jets",
                         "tau_barrel" ,
                         ],
-            label=r"$e\tau$ no mt CR $\eta_{\tau} \leq 1.2$",
+            label="$e\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+            
+        #########################################
+        ### e-tau channel categories >= 2 bjets ###
+        #########################################
+
+        #################################
+        ### SIGNAL REGION with mT cut ###
+        #################################
+
+        etau_signal_reg_2_bjets = add_category(
+            config,
+            name="etau_signal_reg_2_bjets",
+            id=190 + etau.id,
+            selection=["cat_etau"        ,
+                    "os_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets",
+            aux={'control_reg': "etau_control_reg_2_bjets"}
+        )
+
+        etau_control_reg_2_bjets = add_category(
+            config,
+            name="etau_control_reg_2_bjets",
+            id=191 + etau.id,
+            selection=["cat_etau"        ,
+                    "ss_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets",
+        )
+
+        etau_signal_reg_2_bjets_endcap_tau = add_category(
+            config,
+            name="etau_signal_reg_2_bjets_endcap_tau",
+            id=192 + etau.id,
+            selection=["cat_etau"        ,
+                    "os_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets\n$\\eta_{\\tau}  > 1.2$",
+            aux={'control_reg': "etau_control_reg_2_bjets_endcap_tau"}
+        )
+
+        etau_control_reg_2_bjets_endcap_tau = add_category(
+            config,
+            name="etau_control_reg_2_bjets_endcap_tau",
+            id=193 + etau.id,
+            selection=["cat_etau"        ,
+                    "ss_charge"       ,
+                    "mt_cut"          ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets\n$\\eta_{\\tau}  > 1.2$",
+        )
+
+        etau_signal_reg_2_bjets_barrel_tau = add_category(
+            config,
+            name="etau_signal_reg_2_bjets_barrel_tau",
+            id=194 + etau.id,
+            selection=["cat_etau"        ,
+                        "os_charge"      ,
+                        "mt_cut"         ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        "OC_lepton_veto",
+                        ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_2_bjets_barrel_tau"}
+        )
+
+        etau_control_reg_2_bjets_barrel_tau = add_category(
+            config,
+            name="etau_control_reg_2_bjets_barrel_tau",
+            id=195 + etau.id,
+            selection=["cat_etau"        ,
+                        "ss_charge"      ,
+                        "mt_cut"         ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets\n$\\eta_{\\tau} \\leq 1.2$",
+        )
+
+        ####################################
+        ### SIGNAL REGION without mT cut ###
+        ####################################
+
+        etau_signal_reg_2_bjets_no_mt = add_category(
+            config,
+            name="etau_signal_reg_2_bjets_no_mt",
+            id=196 + etau.id,
+            selection=["cat_etau"        ,
+                    "os_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$",
+            aux={'control_reg': "etau_control_reg_2_bjets_no_mt"}
+        )
+
+        etau_control_reg_2_bjets_no_mt = add_category(
+            config,
+            name="etau_control_reg_2_bjets_no_mt",
+            id=197 + etau.id,
+            selection=["cat_etau"        ,
+                    "ss_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$",
+        )
+
+        etau_signal_reg_2_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="etau_signal_reg_2_bjets_endcap_tau_no_mt",
+            id=198 + etau.id,
+            selection=["cat_etau"        ,
+                    "os_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    "OC_lepton_veto",
+                    ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+            aux={'control_reg': "etau_control_reg_2_bjets_endcap_tau_no_mt"}
+        )
+
+        etau_control_reg_2_bjets_endcap_tau_no_mt = add_category(
+            config,
+            name="etau_control_reg_2_bjets_endcap_tau_no_mt",
+            id=199 + etau.id,
+            selection=["cat_etau"        ,
+                    "ss_charge"       ,
+                    "deep_tau_wp"     ,
+                    "At_least_2_b_jets",
+                    "tau_endcap"      ,
+                    ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} > 1.2$",
+        )
+
+        etau_signal_reg_2_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="etau_signal_reg_2_bjets_barrel_tau_no_mt",
+            id=200 + etau.id,
+            selection=["cat_etau"        ,
+                        "os_charge"      ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        "OC_lepton_veto",
+                        ],
+            label="$e\\tau$ SR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            aux={'control_reg': "etau_control_reg_2_bjets_barrel_tau_no_mt"}
+        )
+
+        etau_control_reg_2_bjets_barrel_tau_no_mt = add_category(
+            config,
+            name="etau_control_reg_2_bjets_barrel_tau_no_mt",
+            id=201 + etau.id,
+            selection=["cat_etau"        ,
+                        "ss_charge"      ,
+                        "deep_tau_wp"    ,
+                        "At_least_2_b_jets",
+                        "tau_barrel"     ,
+                        ],
+            label="$e\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
         )
 
     
@@ -378,7 +1116,7 @@ def add_categories(config: od.Config,
             name="cat_tautau",
             id=4,
             selection="cat_tautau",
-            label=r"$\tau\tau$ inclusive",
+            label="$\tau\tau$ inclusive",
         )
 
     else:

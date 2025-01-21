@@ -69,14 +69,24 @@ def mt_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.
             mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt <= 50), axis=1),False)
     return events, mask
 
-@categorizer(uses={"is_b_vetoed"})
-def b_veto(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = ~events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
+@categorizer(uses={"N_b_jets"})
+def Zero_b_jets(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = events.N_b_jets == 0 
     return events, mask
 
-@categorizer(uses={"is_b_vetoed"})
-def b_veto_inv(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = events.is_b_vetoed #If event has b-veto is_b_vetoed mask is set to True, so to reject the event we need to inverse the mask
+@categorizer(uses={"N_b_jets"})
+def One_b_jets(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = events.N_b_jets == 1 
+    return events, mask
+
+@categorizer(uses={"N_b_jets"})
+def At_least_2_b_jets(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = events.N_b_jets >= 2 
+    return events, mask
+
+@categorizer(uses={"OC_lepton_veto"})
+def OC_lepton_veto(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = events.OC_lepton_veto
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})

@@ -23,11 +23,10 @@ from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import optional_column as optional
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 
-from MSSM_H_tt.selection.physics_objects import muon_selection, electron_selection, tau_selection, gentau_selection
+from MSSM_H_tt.selection.physics_objects import muon_selection, electron_selection, tau_selection
 from MSSM_H_tt.selection.trigger import trigger_selection
 from MSSM_H_tt.selection.lepton_pair import pair_selection
-from MSSM_H_tt.selection.match_trigobj import match_trigobj
-from MSSM_H_tt.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
+from MSSM_H_tt.selection.lepton_veto import single_lepton_veto, second_lepton_veto, OC_lepton_veto
 from MSSM_H_tt.selection.higgscand import new_higgscand, mask_nans
 
 from MSSM_H_tt.production.aux_columns import channel_id
@@ -55,12 +54,11 @@ coffea = maybe_import("coffea")
         tau_selection,
         pair_selection,
         channel_id,
-        extra_lepton_veto,
-        double_lepton_veto,
-        match_trigobj,
+        single_lepton_veto,
+        second_lepton_veto,
+        OC_lepton_veto,
         increment_stats,
         new_higgscand,
-        gentau_selection,
         mask_nans,
         jet_veto_map,
     },
@@ -77,15 +75,15 @@ coffea = maybe_import("coffea")
         tau_selection,
         pair_selection,
         channel_id,
-        extra_lepton_veto,
-        double_lepton_veto,
-        match_trigobj,
+        single_lepton_veto,
+        second_lepton_veto,
+        OC_lepton_veto,
         increment_stats,
         new_higgscand,
-        gentau_selection,
         mask_nans,
         jet_veto_map,
         "category_ids",
+        "OC_lepton_veto",
     },
     exposed=True,
 )
@@ -117,13 +115,13 @@ def main(
 
     # muon selection
     # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]
-    events, muon_results, good_muon_indices, veto_muon_indices, dlveto_muon_indices = self[muon_selection](events,
+    events, muon_results, good_muon_indices, single_veto_muon_indices, OC_veto_muon_indices = self[muon_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
     
     # electron selection
     # e.g. ele_idx: [ [], [0,1], [], [], [1,2] ]
-    events, ele_results, good_ele_indices, veto_ele_indices, dlveto_ele_indices = self[electron_selection](events,
+    events, ele_results, good_electron_indices, single_veto_electron_indices, OC_veto_electron_indices = self[electron_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
 
@@ -133,19 +131,13 @@ def main(
                                                     call_force=True,
                                                     **kwargs)
     
-    # double lepton veto
-    events, double_lepton_veto_results = self[double_lepton_veto](events,
-                                                                  dlveto_ele_indices,
-                                                                  dlveto_muon_indices)
-    results += double_lepton_veto_results
-
     mutau_indices_pair = self[pair_selection](events,
                                               'mutau',
                                               good_muon_indices,
                                               good_tau_indices)
     etau_indices_pair = self[pair_selection](events,
                                              'etau',
-                                             good_ele_indices,
+                                             good_electron_indices,
                                              good_tau_indices)
     
     tautau_indices_pair = self[pair_selection](events,
@@ -177,13 +169,24 @@ def main(
     #produce channel id column (legacy)
     events = self[channel_id](events)
 
-    # extra lepton veto
+    # Single lepton veto
     # it is only applied on the events with one higgs candidate only
-    events, extra_lepton_veto_results = self[extra_lepton_veto](events,
-                                                                veto_ele_indices,
-                                                                veto_muon_indices)
-    results += extra_lepton_veto_results
-
+    
+    events, single_lepton_veto_results = self[single_lepton_veto](events,single_veto_electron_indices, single_veto_muon_indices)
+    results += single_lepton_veto_results
+    
+    # # Additional lepton veto
+    events, second_lepton_veto_results = self[second_lepton_veto](events,
+                                                                  single_veto_electron_indices,
+                                                                  single_veto_muon_indices)
+    results += second_lepton_veto_results
+    
+    # Opposite Charge (OC) lepton pair veto
+    events, OC_lepton_veto_results = self[OC_lepton_veto](events,
+                                                          OC_veto_electron_indices,
+                                                          OC_veto_muon_indices)
+    # results += OC_lepton_veto_results
+    
     #Check arrays for np.nan values and mask them
     events, nan_mask_res = self[mask_nans](events)
     results += nan_mask_res

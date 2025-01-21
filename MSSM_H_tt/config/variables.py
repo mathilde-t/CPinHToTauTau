@@ -90,7 +90,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "pdgId", "tauIdx"
             ]
         } | {
-		"hcand_*","tau_decay_prods*"
+		"hcand_*","tau_decay_prods*", "OC_lepton_veto"
 	} | {"is_b_vetoed","channel_id"} | {ColumnCollection.ALL_FROM_SELECTOR},
         "cf.MergeSelectionMasks": {
             "normalization_weight", 
@@ -553,7 +553,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_pt",
                 expression=f"hcand_{ch_str}.{lep}.pt",
                 null_value=EMPTY_FLOAT,
-                binning=(30, 20, 80.),
+                binning=(50, 0, 100.),
                 unit="GeV",
                 x_title= rf"{lep_str} $p_{{T}}$",
             )
@@ -561,7 +561,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_eta",
                 expression=f"hcand_{ch_str}.{lep}.eta",
                 null_value=EMPTY_FLOAT,
-                binning=(32, -3.2, 3.2),
+                binning=(30, -2.3, 2.3),
                 x_title=rf"{lep_str} $\eta$",
             )
             cfg.add_variable(
@@ -645,7 +645,7 @@ def add_variables(cfg: od.Config) -> None:
     add_lepton_features(cfg)
     add_jet_features(cfg)
     add_highlevel_features(cfg)
-    phi_cp_variables(cfg)
+    #phi_cp_variables(cfg)
     add_weight_features(cfg)
     add_cutflow_features(cfg)
     add_dilepton_features(cfg)

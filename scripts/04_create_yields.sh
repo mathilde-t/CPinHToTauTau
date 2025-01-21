@@ -7,7 +7,7 @@ args=(
         --processes $processes
         --datasets $datasets
         --version $version
-        --categories 'etau_signal_reg,etau_signal_reg_no_mt'
+        --categories 'etau_signal_reg_0_bjets'
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow

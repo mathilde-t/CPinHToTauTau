@@ -2,12 +2,14 @@
 
 set_common_vars() {
 
-version="desy_dev"
+version="dev"
+#version="desy_dev"
     
 categories_mutau="mutau_signal_reg,mutau_signal_reg_no_mt,mutau_signal_reg_endcap_tau,mutau_signal_reg_barrel_tau,mutau_signal_reg_endcap_tau_no_mt,mutau_signal_reg_barrel_tau_no_mt" 
 variables_mutau='mutau_lep0_pt,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep1_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
 
 categories_etau="etau_signal_reg,etau_signal_reg_no_mt,etau_signal_reg_endcap_tau,etau_signal_reg_barrel_tau,etau_signal_reg_endcap_tau_no_mt,etau_signal_reg_barrel_tau_no_mt" 
+#"etau_signal_reg_0_bjets,etau_signal_reg_0_bjets_endcap_tau,etau_signal_reg_0_bjets_barrel_tau,etau_signal_reg_0_bjets_no_mt,etau_signal_reg_0_bjets_endcap_tau_no_mt,etau_signal_reg_0_bjets_barrel_tau_no_mt,etau_signal_reg_1_bjets,etau_signal_reg_1_bjets_endcap_tau,etau_signal_reg_1_bjets_barrel_tau,etau_signal_reg_1_bjets_no_mt,etau_signal_reg_1_bjets_endcap_tau_no_mt,etau_signal_reg_1_bjets_barrel_tau_no_mt,etau_signal_reg_2_bjets,etau_signal_reg_2_bjets_endcap_tau,etau_signal_reg_2_bjets_barrel_tau,etau_signal_reg_2_bjets_no_mt,etau_signal_reg_2_bjets_endcap_tau_no_mt,etau_signal_reg_2_bjets_barrel_tau_no_mt"
 variables_etau='mjj,N_jets_pT_30_eta_4_7_Tight,N_jets_pT_20_eta_2_5_Tight,Leading_jet_pt,Subleading_jet_pt,delta_eta_jj,jet_1_pt,etau_lep0_pt,etau_lep0_eta,etau_lep0_phi,etau_lep0_ip_sig,etau_lep1_pt,etau_lep1_eta,etau_lep1_phi,etau_lep1_mass,etau_lep1_decayModePNet,etau_lep1_decayMode,etau_mt,etau_mvis,etau_delta_r,etau_pt,puppi_met_pt,puppi_met_phi'
 
 data_e_2022preEE='data_e_C,data_e_D,'
@@ -39,9 +41,9 @@ case $1 in
     "run3_2022preEE_mutau_lim")
         config="run3_2022_preEE_mutau_limited"	
         datasets='dy_lep_madgraph'
-        processes='dy_z2mumu,dy_z2ee,dy_lep'
-	categories=$categories_mutau
-	variables=$variables_mutau
+        processes='dy_z2mumu,dy_z2ee,dy_z2tautau'
+	    categories=$categories_mutau
+	    variables=$variables_mutau
         workflow='local'
     ;;
     "run3_2022preEE_etau")
@@ -64,8 +66,8 @@ case $1 in
         bkg_ttbar=$bkg_ttbar_2022preEE
         datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	categories=$categories_mutau
-	variables=$variables_mutau
+	    categories=$categories_mutau
+	    variables=$variables_mutau
         workflow='htcondor'
      ;;
 ###############################
@@ -75,16 +77,16 @@ case $1 in
         config="run3_2022_postEE_etau_limited"	
         datasets='data_e_E,dy_lep_madgraph' 
         processes='data,dy_z2tautau,dy_z2mumu,dy_z2ee' 
-	categories=$categories_etau
-	variables=$variables_etau
+	    categories=$categories_etau
+	    variables=$variables_etau
         workflow='local'
     ;;
     "run3_2022postEE_mutau_lim")
         config="run3_2022_postEE_mutau_limited"	
         datasets='dy_lep_madgraph' 
         processes='dy_z2mumu,dy_z2ee,dy_lep' 
-	categories=$categories_mutau
-	variables=$variables_mutau
+	    categories=$categories_mutau
+	    variables=$variables_mutau
         workflow='local'
     ;;
     "run3_2022postEE_etau")
@@ -105,11 +107,11 @@ case $1 in
         bkg_ewk=$bkg_ewk_2022postEE
         bkg_top=$bkg_top_2022postEE
         bkg_ttbar=$bkg_ttbar_2022postEE
-	datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
+	    datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	categories=$categories_mutau
-	variables=$variables_mutau
-	workflow='htcondor'
+	    categories=$categories_mutau
+	    variables=$variables_mutau
+	    workflow='htcondor'
     ;;
     *)
     echo "Unknown run argument!"

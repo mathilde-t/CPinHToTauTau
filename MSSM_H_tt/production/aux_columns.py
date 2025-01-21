@@ -47,53 +47,6 @@ def channel_id(
 
 @producer(
     uses={ f"Jet.{var}" for var in 
-        [
-            "pt", "eta", "phi", "mass",
-            "jetId", "btagDeepFlavB"
-        ]} | {"hcand_*"},
-    produces={"is_b_vetoed"},
-    exposed=False,
-)
-def jet_veto(
-        self: Producer,
-        events: ak.Array,
-        **kwargs
-) -> ak.Array:
-    """
-    This function that produces 'is_b_vetoed' column to be used in categorisation
-    """
-    year = self.config_inst.x.year
-    btag_wp = self.config_inst.x.btag_working_points[year].deepjet.medium
-    # nominal jet selection
-    jet_pt_sorted_idx = ak.argsort(events.Jet.pt, axis=1, ascending=False)
-    sorted_jets = events.Jet[jet_pt_sorted_idx]
-    jet_selections = {
-        "jet_pt_20"               : sorted_jets.pt > 20.0,
-        "jet_eta_2.5"             : abs(sorted_jets.eta) < 2.5,
-        "jet_id"                  : sorted_jets.jetId & 0b10 == 0b10, 
-        "btag_wp_medium"          : sorted_jets.btagDeepFlavB >= btag_wp
-    }
-    jet_obj_mask = ak.ones_like(jet_pt_sorted_idx, dtype=np.bool_)
-    for the_sel in jet_selections.values():
-        jet_obj_mask = jet_obj_mask & the_sel
-    event_mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for the_ch in self.config_inst.channels.names(): 
-        hcand = events[f'hcand_{the_ch}']
-        for lep_str in [field for field in hcand.fields if 'lep' in field]:
-            lep = ak.firsts(hcand[lep_str])
-            seed_idx = ak.fill_none(lep.jetIdx, -1) 
-            jet_obj_mask = jet_obj_mask & (jet_pt_sorted_idx != seed_idx)
-            presel_jet = ak.drop_none(ak.mask(sorted_jets, jet_obj_mask))
-            jet_tau_pairs = ak.cartesian([presel_jet,lep], axis=1)
-            jet_br, lep_br = ak.unzip(jet_tau_pairs)
-            delta_r = jet_br.delta_r(lep_br)
-            event_mask = event_mask | ak.any(delta_r < 0.4, axis=1)  #make joint mask for first and second tau.
-    events = set_ak_column(events, "is_b_vetoed", event_mask)
-    return events
-
-
-@producer(
-    uses={ f"Jet.{var}" for var in 
         [ "pt", "eta", "phi", "mass",
           "jetId", "btagDeepFlavB"
         ]} | {"hcand_*"},
@@ -265,3 +218,52 @@ def jets_taggable(
     n_jets_taggable = ak.where(n_jets_mask_tag, n_jets_vs_lep0_tag, 0)
 
     return n_jets_taggable
+@producer(
+    uses={ f"Jet.{var}" for var in 
+        [
+            "pt", "eta", "phi", "mass",
+            "jetId", "btagDeepFlavB"
+        ]} | {"hcand_*"},
+    produces={"N_b_jets"},
+    exposed=False,
+)
+def number_b_jet(
+        self: Producer,
+        events: ak.Array,
+        **kwargs
+) -> ak.Array:
+    """
+    This function that produces 'N_b_jets' column to be used in categorisation
+    """
+    year = self.config_inst.x.year
+    btag_wp = self.config_inst.x.btag_working_points[year].deepjet.medium
+    # nominal jet selection
+    jet_pt_sorted_idx = ak.argsort(events.Jet.pt, axis=1, ascending=False)
+    sorted_jets = events.Jet[jet_pt_sorted_idx]
+    jet_selections = {
+        "jet_pt_20"               : sorted_jets.pt > 20.0,
+        "jet_eta_2.5"             : abs(sorted_jets.eta) < 2.5,
+        "jet_id"                  : sorted_jets.jetId & 0b10 == 0b10, 
+        "btag_wp_medium"          : sorted_jets.btagDeepFlavB >= btag_wp
+    }
+    jet_obj_mask = ak.ones_like(jet_pt_sorted_idx, dtype=np.bool_)
+    for the_sel in jet_selections.values():
+        jet_obj_mask = jet_obj_mask & the_sel
+    #event_mask = ak.zeros_like(events.event, dtype=np.bool_)
+    for the_ch in self.config_inst.channels.names(): 
+        hcand = events[f'hcand_{the_ch}']
+        for lep_str in [field for field in hcand.fields if 'lep' in field]:
+            lep = ak.firsts(hcand[lep_str])
+            seed_idx = ak.fill_none(lep.jetIdx, -1) 
+            jet_obj_mask = jet_obj_mask & (jet_pt_sorted_idx != seed_idx)
+            presel_jet = ak.drop_none(ak.mask(sorted_jets, jet_obj_mask))
+            jet_tau_pairs = ak.cartesian([presel_jet,lep], axis=1)
+            jet_br, lep_br = ak.unzip(jet_tau_pairs)
+            delta_phi = jet_br.phi - lep_br.phi
+            delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
+            delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)
+            delta_eta = jet_br.eta - lep_br.eta
+            delta_r = np.sqrt(delta_phi**2 + delta_eta**2)
+            event_mask = ak.sum(delta_r > 0.5,axis=1)
+    events = set_ak_column(events, "N_b_jets", event_mask)
+    return events

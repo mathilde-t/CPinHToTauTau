@@ -137,11 +137,8 @@ def add_DM_categories(config: od.Config) -> None:
 @call_once_on_config()
 def add_etau_mutau_categories(config: od.Config) -> None:
     categories = {
-        "channel": [config.get_category("etau"), config.get_category("mutau")],
-        "abcd"   : [config.get_category("lepA"),  config.get_category("lepB"),
-                    config.get_category("lepA0"), config.get_category("lepB0"),
-                    config.get_category("lepA1"), config.get_category("lepB1"),
-                    config.get_category("lepC"),  config.get_category("lepD")],
+        "channel": [config.get_category("mutau")],  #config.get_category("etau"), 
+        "abcd"   : [config.get_category("lepD")],   #config.get_category("lepA"),  config.get_category("lepB"),config.get_category("lepA0"), config.get_category("lepB0"),config.get_category("lepA1"), config.get_category("lepB1"),config.get_category("lepC"),  
         "cp"     : [config.get_category("pi_2"),
                     config.get_category("rho_2"),
                     config.get_category("a1dm2_2"),
@@ -269,8 +266,8 @@ def add_categories(config: od.Config) -> None:
     add_DM_categories(config)
 
     add_etau_mutau_categories(config)
-    #add_tautau_real_categories(config)
-    add_tautau_phiCP_categories(config)
+    #add_tautau_real_categories(config) #here2# either or
+    #add_tautau_phiCP_categories(config) #here2# either or
     ###add_test_categories(config)
     
     #all_cats = [cat.name for cat, _, _ in config.walk_categories()]

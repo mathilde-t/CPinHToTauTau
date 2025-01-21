@@ -70,6 +70,7 @@ logger = law.logger.get_logger(__name__)
         reArrangeGenDecayProducts,
         ProduceGenPhiCP, #ProduceGenCosPsi, 
         ProduceDetPhiCP, #ProduceDetCosPsi,
+        #here1# "PV.npvs","Pileup.nTrueInt","Pileup.nPU",
     },
     produces={
         # new columns
@@ -81,6 +82,7 @@ logger = law.logger.get_logger(__name__)
         "dphi_met_h1", "dphi_met_h2",
         "met_var_qcd_h1", "met_var_qcd_h2",
         "hT",
+        #here1# npvs, pu_nTrue_Int, nPU,
     },
 )
 def hcand_features(
@@ -115,6 +117,12 @@ def hcand_features(
     events = set_ak_column_f32(events, "met_var_qcd_h2", met_var_qcd_h2)
     
     events = set_ak_column_i32(events, "n_jet", ak.num(events.Jet.pt, axis=1))
+
+    # PU variables npvs, pu_nTrue_Int, nPU #here1#
+
+    #here1# events = set_ak_column_f32(events, "npvs", PV.npvs)
+    #here1# events = set_ak_column_f32(events, "pu_nTrue_Int", Pileup.nTrueInt)
+    #here1# events = set_ak_column_f32(events, "nPU", Pileup.nPU)
 
 
     events, P4_dict     = self[reArrangeDecayProducts](events)
@@ -216,6 +224,11 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         # TODO : pileup weight is constrained to max value 10
         # TODO : check columnflow production/pileup
         events = self[pu_weight](events, **kwargs)
+        # remove high pu weights
+        puwt = ak.where(events.pu_weight > 300.0, 1.0, events.pu_weight)
+        events = ak.without_field(events, "pu_weight")
+        events = set_ak_column_f32(events, "pu_weight", puwt)
+
         if self.has_dep(pdf_weights):
             events = self[pdf_weights](events, **kwargs)
         # ----------- Muon weights ----------- #

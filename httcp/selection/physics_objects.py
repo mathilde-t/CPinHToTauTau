@@ -76,7 +76,7 @@ def muon_selection(
         "muon_dz_0p2"         : abs(muons.dz) < 0.2,
         "muon_iso_0p15"       : muons.pfRelIso04_all < 0.15,
         "muon_ipsig_safe"     : muons.IPsig > ipsig_dummy,
-        "muon_ipsig_1p5"      : np.abs(muons.IPsig) > 1.5,
+        "muon_ipsig_1p5"      : np.abs(muons.IPsig) > 1.25,
     }
     single_veto_selections = {
         "muon_pt_10"          : muons.pt > 10,
@@ -387,8 +387,8 @@ def tau_selection(
         #                       | (taus.decayMode == 10)
         #                       | (taus.decayMode == 11)),
         "tau_DecayMode"     : (
-            (  (taus.decayMode ==  0)
-               | (((taus.decayMode ==  1)
+            (  (taus.decayMode ==  0) #here3 & (np.abs(taus.IPsig) > 1.25) # ipsig > 1.25 only for pion, the value found by Imperial C by their optimation
+                 | (((taus.decayMode ==  1)
                    | (taus.decayMode ==  2)
                    | (taus.decayMode == 10)
                    | (taus.decayMode == 11))

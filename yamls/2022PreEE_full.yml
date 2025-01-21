@@ -5,15 +5,14 @@ era     : 2022
 postfix : PreEE
 wrapper : true
 limited : false
-workers : 8
-tasks_per_job  : 2
+workers : 7
+tasks_per_job  : 3
 
 args:
   config    : run3_2022_preEE_nano_cp_tau_v14
   workflow  : htcondor
   branch    : -1
-  # version   : dummy
-  version : Run3_skim2024_2022PreEE_v2
+  version   : Run3puNmcvertices_full #Run3_2022PreEE_full_9jan_kine #PhiCPtt+mt_12jan25 #Run3_2022PreEE_full_9jan_preipsigcut #Run3_2022PreEE_full_8jan_prepucut #dummy
 
   datasets  :
     ## == data ==
@@ -21,26 +20,26 @@ args:
     - data_tau_D
     - data_mu_C
     - data_mu_D
-    # - data_single_mu_C
-    # - data_e_C
-    # - data_e_D
+    #- data_single_mu_C
+    - data_e_C
+    - data_e_D
     ## == wj ==
     #- wj_incl_amcatnlo
     #- wj_0j_amcatnlo
     #- wj_1j_amcatnlo
     #- wj_2j_amcatnlo
     - wj_incl_madgraph
-    - wj_1j_madgraph
-    - wj_2j_madgraph
-    - wj_3j_madgraph
-    - wj_4j_madgraph    
+    #- wj_1j_madgraph
+    #- wj_2j_madgraph
+    #- wj_3j_madgraph
+    #- wj_4j_madgraph    
     ## == dy ==
     - dy_lep_m10to50_madgraph
     - dy_lep_m50_madgraph
-    - dy_lep_m50_1j_madgraph
-    - dy_lep_m50_2j_madgraph
-    - dy_lep_m50_3j_madgraph
-    - dy_lep_m50_4j_madgraph    
+    #- dy_lep_m50_1j_madgraph
+    #- dy_lep_m50_2j_madgraph
+    #- dy_lep_m50_3j_madgraph
+    #- dy_lep_m50_4j_madgraph    
     #- dy_lep_m10to50_amcatnlo
     #- dy_lep_m50_amcatnlo
     #- dy_lep_m50_0j_amcatnlo
@@ -57,16 +56,16 @@ args:
     #- dy_lep_m50_1j_pt600toInf_amcatnlo
     #- dy_lep_m50_2j_pt600toInf_amcatnlo
     ## == tt ==
-    - tt_dl
-    - tt_sl
-    - tt_fh
+    - tt_dl # di-lepton tt -> bbWW -> ll
+    - tt_sl # semi-leptonic
+    - tt_fh # hadronic
     ## == st ==
-    - st_tchannel_t
     - st_tchannel_tbar
     - st_tw_t_sl
+    - st_tchannel_t
     - st_tw_t_dl
     - st_tw_t_fh
-    - st_tw_tb_sl
+    - st_tw_tb_sl #tb = tbar
     - st_tw_tb_dl
     - st_tw_tb_fh
     - st_schannel_t
@@ -84,9 +83,10 @@ args:
     - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
-    #- zh_tautau_uncorrelatedDecay_Filtered
-    #- wph_tautau_uncorrelatedDecay_Filtered
-    #- wmh_tautau_uncorrelatedDecay_Filtered
+    - zh_tautau_uncorrelatedDecay_Filtered
+    - wph_tautau_uncorrelatedDecay_Filtered
+    - wmh_tautau_uncorrelatedDecay_Filtered
+    #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
 
   processes :
     - data
@@ -98,19 +98,30 @@ args:
     #- dy_m50toinf_jet
     - dy
     - tt
-    ##- st_tchannel
-    ##- st_twchannel
     - st
+    #- st_tchannel  #either st ot one of these two channels !
+    #- st_twchannel
     - vv
     - vvv
     - h_ggf_htt
-    #- zh_htt
-    #- wh_htt
+    - zh_htt
+    - wh_htt
 
   categories:
-    - etau__*
-    - mutau__*
-    - tautau__real_1__had*
+    #- etau__*
+    #- mutau__*
+    - mutau__lepD
+    - mutau__lepD__a1dm10_2
+    - mutau__lepD__a1dm2_2
+    - mutau__lepD__a1dm11_2
+    - mutau__lepD__pi_2
+    - mutau__lepD__rho_2
+    #- tautau__hadD__pi_a1dm10
+    #- tautau__hadD__pi_rho
+    #- tautau__hadD__pi_pi
+    #- tautau__hadD__pi_a1dm2
+    #- tautau__hadD__pi_a1dm11
+    #- tautau__real_1__had*
     
 
   variables:
@@ -135,83 +146,92 @@ args:
     #- tau_2_phi
     #- tau_2_IPsig
     ## -- hcand -- #
-    - hcand_1_pt
-    - hcand_1_pt_binvar
-    - hcand_1_eta
-    - hcand_1_phi
+    #- hcand_1_pt
+    ##- hcand_1_pt_binvar
+    #- hcand_1_eta
+    #- hcand_1_phi
     #- hcand_1_IPx
     #- hcand_1_IPy
     #- hcand_1_IPz
-    - hcand_1_IPsig
-    - hcand_1_decayMode
-    - hcand_2_pt
-    - hcand_2_pt_binvar
-    - hcand_2_eta
-    - hcand_2_phi
+    #- hcand_1_IPsig
+    #- hcand_1_decayMode
+    #- hcand_2_pt
+    ###- hcand_2_pt_binvar
+    #- hcand_2_eta
+    #- hcand_2_phi
     #- hcand_2_IPx
     #- hcand_2_IPy
     #- hcand_2_IPz
-    - hcand_2_IPsig
-    - hcand_2_decayMode
-    - hcand_dr
-    - hcand_invm
-    - dphi_met_h1
-    - dphi_met_h2
-    - met_var_qcd_h1
-    - met_var_qcd_h2
+    #- hcand_2_IPsig
+    #- hcand_2_decayMode
+    #- hcand_dr
+    #- hcand_invm
+    #- dphi_met_h1
+    #- dphi_met_h2
+    #- met_var_qcd_h1
+    #- met_var_qcd_h2
     ## -- jet -- #
-    - n_jet
-    - jet_1_pt
-    - jet_1_eta
-    - jet_1_phi
-    - jet_2_pt
-    - jet_2_eta
-    - jet_2_phi
-    - hT
+    #- n_jet
+    #- jet_1_pt
+    #- jet_1_eta
+    #- jet_1_phi
+    #- jet_2_pt
+    #- jet_2_eta
+    #- jet_2_phi
+    #- hT
+    #- pu_weight # only with MC                     #all weights only with MC
+    - npvs
+    #- pu_nTrue_Int # only with MC
+    #- nPU # only with MC
     ## -- met -- #
-    - puppi_met_pt
-    - puppi_met_phi
+    #- puppi_met_pt
+    #- puppi_met_phi
     ## -- angular variables -- #
     #- Alpha
-    #- PhiCP_IPIP
-    #- PhiCP_IPIP_alpha_lt_piby4
-    #- PhiCP_IPIP_alpha_gt_piby4
-    #- PhiCP_DPDP
-    #- PhiCP_PVPV
-    #- PhiCP_IPPV
-    #- PhiCP_IPDP
-    #- PhiCP_IPDP_alpha_lt_piby4
-    #- PhiCP_IPDP_alpha_gt_piby4
+    #- PhiCP_IPIP # only with signal data
+    ##- PhiCP_IPIP_alpha_lt_piby4
+    ##- PhiCP_IPIP_alpha_gt_piby4
+    ##- PhiCP_DPDP # only with signal data
+    ##- PhiCP_PVPV # only with signal data
+    #- PhiCP_IPPV # only with signal data
+    #- PhiCP_IPDP # only with signal data
+    ##- PhiCP_IPDP_alpha_lt_piby4
+    ##- PhiCP_IPDP_alpha_gt_piby4
+    #- PhiCPGen_IPIP   
+    ##- PhiCPGen_DPDP
+    ##- PhiCPGen_PVPV
+    #- PhiCPGen_IPDP       
+    #- PhiCPGen_IPPV
     ## -- Y vs. pT -- ##
-    - dphi_met_h1-hcand_1_pt
-    - met_var_qcd_h1-hcand_1_pt
-    - hcand_dr-hcand_1_pt
-    - hcand_2_pt-hcand_1_pt
-    - n_jet-hcand_1_pt
-    - hT-hcand_1_pt
-    - hcand_invm-hcand_1_pt
-    - jet_1_pt-hcand_1_pt
-    - jet_2_pt-hcand_1_pt
+    #- dphi_met_h1-hcand_1_pt
+    #- met_var_qcd_h1-hcand_1_pt
+    #- hcand_dr-hcand_1_pt
+    #- hcand_2_pt-hcand_1_pt
+    #- n_jet-hcand_1_pt
+    #- hT-hcand_1_pt
+    #- hcand_invm-hcand_1_pt
+    #- jet_1_pt-hcand_1_pt
+    #- jet_2_pt-hcand_1_pt
     ## -- Y vs metvarqcd -- ##
-    - hcand_dr-met_var_qcd_h1
-    - hcand_1_pt-met_var_qcd_h1
-    - hcand_2_pt-met_var_qcd_h1
-    - n_jet-met_var_qcd_h1
-    - hT-met_var_qcd_h1
-    - hcand_invm-met_var_qcd_h1
-    - dphi_met_h1-met_var_qcd_h1
-    - jet_1_pt-met_var_qcd_h1
-    - jet_2_pt-met_var_qcd_h1
+    #- hcand_dr-met_var_qcd_h1
+    #- hcand_1_pt-met_var_qcd_h1
+    #- hcand_2_pt-met_var_qcd_h1
+    #- n_jet-met_var_qcd_h1
+    #- hT-met_var_qcd_h1
+    #- hcand_invm-met_var_qcd_h1
+    #- dphi_met_h1-met_var_qcd_h1
+    #- jet_1_pt-met_var_qcd_h1
+    #- jet_2_pt-met_var_qcd_h1
     ## -- Y vs DR -- ##
-    - met_var_qcd_h1-hcand_dr
-    - hcand_1_pt-hcand_dr
-    - hcand_2_pt-hcand_dr
-    - n_jet-hcand_dr
-    - hT-met_hcand_dr
-    - hcand_invm-hcand_dr
-    - dphi_met_h1-hcand_dr
-    - jet_1_pt-hcand_dr
-    - jet_2_pt-hcand_dr
+    #- met_var_qcd_h1-hcand_dr
+    #- hcand_1_pt-hcand_dr
+    #- hcand_2_pt-hcand_dr
+    #- n_jet-hcand_dr
+    #- hT-met_hcand_dr
+    #- hcand_invm-hcand_dr
+    #- dphi_met_h1-hcand_dr
+    #- jet_1_pt-hcand_dr
+    #- jet_2_pt-hcand_dr
 
   shifts:
     #- minbias_xs
@@ -227,7 +247,5 @@ args:
     
 
   extras:
-    - process-settings "h_ggf_htt,unstack,300"
-    #- cf.CreateHistograms-workflow htcondor  #naf
-    #- cf.CreateHistograms-max-runtime 2  #naf
-    
+    - process-settings "h_ggf_htt,unstack,300:zh_htt,unstack,300:wh_htt,unstack,300"
+    #- variable-settings "pu_weight,overflow"

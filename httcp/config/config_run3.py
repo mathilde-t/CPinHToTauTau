@@ -32,7 +32,7 @@ logger = law.logger.get_logger(__name__)
 ak = maybe_import("awkward")
 
 #thisdir = os.path.dirname(os.path.abspath(__file__))
-thisdir = "/afs/cern.ch/work/g/gsaha/public/IPHC/Work/ColumnFlowAnalyses/CPinHToTauTau/httcp/config"
+thisdir = "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/httcp/config"
 #print(f"thisdir: {thisdir}")
 corrdir = os.path.join(os.path.dirname(thisdir), "data")
 #print(f"corrdir: {corrdir}")
@@ -374,7 +374,7 @@ def add_config (ana: od.Analysis,
     }
     """
     # w+jets [NLO]
-    cfg.x.allow_w_stitching = True
+    cfg.x.allow_w_stitching = False
     cfg.x.w_stitching = {
         "wj": {
             "inclusive_dataset": cfg.datasets.n.wj_incl_madgraph,
@@ -533,7 +533,7 @@ def add_config (ana: od.Analysis,
         "electron_xtrig_sf" : (f"{json_mirror}/POG/EGM/{year}_Summer{year2}{year_postfix}/CrossEleTauHlt.json",        "v1"), # Ele xTrig SF
         "tau_sf"            : (f"{json_mirror}/POG/TAU/{year}_{postfix}/tau_DeepTau2018v2p5_{year}_{postfix}.json.gz", "v1"), # TEC and ID SF
         # https://gitlab.cern.ch/cclubbtautau/AnalysisCore/-/blob/main/data/TriggerScaleFactors/2022preEE/ditaujet_jetleg_SFs_preEE.json?ref_type=heads
-        "ditau_jet_trig_sf" : (f"{json_mirror}/POG/TAU/{year}_{postfix}/ditaujet_jetleg_SFs_preEE.json",               "v1"),
+        #"ditau_jet_trig_sf" : (f"{json_mirror}/POG/TAU/{year}_{postfix}/ditaujet_jetleg_SFs_preEE.json",               "v1"),
         "jet_veto_map"      : (f"{json_mirror}/POG/JME/{year}_Summer{year2}{year_postfix}/jetvetomaps.json.gz",        "v1"), # JetVeto
         "zpt_rewt_sf"       : (f"{external_path}/Zpt/myZptCorrections.json.gz",                                        "v1"), # Zpt Rewt
         "tautau_ff"         : (f"{external_path}/Zpt/myZptCorrections.json.gz",                                        "v1"), # DUMMY !!!
@@ -1088,7 +1088,7 @@ def add_config (ana: od.Analysis,
             "TauProd.*",
             # general event info
             "run", "luminosityBlock", "event", "LHEPdfWeight",
-            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP",
+            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP", #here1#
             "trigger_ids",
             "single_triggered", "cross_triggered",
             "single_e_triggered", "cross_e_triggered",
@@ -1289,7 +1289,7 @@ def add_config (ana: od.Analysis,
 
 
     cfg.x.extra_tags = DotDict.wrap({
-        "genmatch"       : False,
+        "genmatch"       : True, #here2#
     })
 
 
@@ -1297,5 +1297,5 @@ def add_config (ana: od.Analysis,
     cfg.x.channel_specific_info = DotDict.wrap({
         "etau"   : False,
         "mutau"  : False,
-        "tautau" : True,
+        "tautau" : False,
     })

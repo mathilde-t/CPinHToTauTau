@@ -8,27 +8,31 @@ limited : true
 workers : 3
 
 args:
-  config    : run3_2022_preEE_nano_cp_tau_v12_limited
+  config    : run3_2022_preEE_nano_cp_tau_v14_limited
   workflow  : local
   branch    : -1
-  version   : dummy 
+  version   : dummy #Run3puNmcvertices #PhiCPtt+mt_12jan25 #PrePuwAndIpsigCut_13jan_preEE #here2# #here1#12jan25_preEE_test_PU_vars #dummy 
 
   datasets  :
-    #- data_e_C
-    #- data_mu_C
+    - data_e_C
+    - data_mu_C
     - data_tau_C
     - dy_lep_m50_madgraph
     - wj_incl_madgraph
     - tt_sl
     - tt_fh
     #- h_ggf_tautau_prod_cp_even_sm
+    - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
+    - h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
+    - h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+    #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
 
   processes :
     - data
     - dy_m50toinf
     - w_lnu
     - tt
-    #- h_ggf_tautau
+    - h_ggf_htt
 
   categories:
     #- etau
@@ -40,7 +44,7 @@ args:
     #- etau__lepB1
     #- etau__lepC
     #- etau__lepD
-    #- mutau
+    #- mutau*
     #- mutau_lepA
     #- mutau__lepB
     #- mutau__lepA0
@@ -48,14 +52,20 @@ args:
     #- mutau__lepA1
     #- mutau__lepB1
     #- mutau__lepC
-    #- mutau__lepD
-    - tautau*
+    - mutau__lepD
+    - mutau__lepD__a1dm10_2
+    #- mutau__lepD__a1dm2_2
+    #- mutau__lepD__a1dm11_2
+    #- mutau__lepD__pi_2
+    #- mutau__lepD__rho_2
+    #- tautau*
     #- tautau__hadA
     #- tautau__hadB
     #- tautau__hadA0
     #- tautau__hadB0
     #- tautau__hadC
-    #- tautau__hadD
+    #- tautau__real_1__hadD
+    #- tautau__hadD* #here2#
     #- tautau__hadC0
     #- tautau__hadD0
 
@@ -69,13 +79,16 @@ args:
     #- tau_1_pt
     #- tau_1_eta
     #- tau_1_phi
+    #- hcand_1_decayMode
     #- tau_2_pt
     #- tau_2_eta
     #- tau_2_phi
-    - hcand_1_pt
+    #- hcand_1_pt
     #- hcand_1_eta
     #- hcand_2_pt
     #- hcand_2_eta
+    #- hcand_2_phi
+    #- hcand_2_decayMode
     #- hcand_dr
     #- hcand_invm
     #- puppi_met_pt
@@ -83,8 +96,14 @@ args:
     #- PhiCP_IPIP
     #- PhiCP_DPDP
     #- PhiCP_IPDP
+    #- PhiCPGen_IPIP   
+    #- PhiCPGen_DPDP
+    #- PhiCPGen_IPDP       
     #- pu_weight
     #- pu_weight_log
+    - npvs
+    #- pu_nTrue_Int
+    #- nPU
     #- muon_id_weight
     #- muon_id_weight_log
     #- muon_iso_weight
@@ -103,4 +122,4 @@ args:
     #- tau_trigger_log
 
   #extras:
-  #  - process-settings "h_ggf_tautau,unstack,10000"
+    - process-settings "h_ggf_tautau,unstack,10"

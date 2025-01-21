@@ -38,6 +38,7 @@ def add_run3(ana: od.Analysis,
 
     # gather campaign data
     cfg.x.year = campaign.x.year
+    cfg.x.tag = campaign.x.tag
     year = cfg.x.year
 
     # validations
@@ -570,7 +571,6 @@ def add_run3(ana: od.Analysis,
                            'Medium' : 3,
                            'Tight'  : 4}
         })
-
     cfg.x.btag_working_points = DotDict.wrap(
         {
             2016 : {
@@ -586,12 +586,39 @@ def add_run3(ana: od.Analysis,
                 },
             },
             2022 : {
-                "deepjet" : { #https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22/
-                    "loose": 0.0583,
-                    "medium": 0.3086,
-                    "tight": 0.7183,
-                }
+                "preEE":{
+                    "deepjet" : { #https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22/
+                        "loose": 0.0583,
+                        "medium": 0.3086,
+                        "tight": 0.7183,
+                    },
+                },
+                "postEE":{
+                    "deepjet" : { #https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22/
+                        "loose": 0.0614,
+                        "medium": 0.3196,
+                        "tight": 0.73,
+                    },
+                },
+            },
+            2023 : {
+                "preBPix":{
+                    "deepjet" : { #https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22/
+                        "loose": 0.0479,
+                        "medium": 0.2431,
+                        "tight": 0.6553,
+                    },
+                },
+                "postBPix":{
+                    "deepjet" : { #https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22/
+                        "loose": 0.048,
+                        "medium": 0.2435,
+                        "tight": 0.6563,
+                    },
+                },
+
             }
+
                     
                 
         },
@@ -604,7 +631,7 @@ def add_run3(ana: od.Analysis,
     
     golden_ls = { 
         2022 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
-        2023: "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
+        2023 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
     }    
 
     cfg.x.external_files = DotDict.wrap({

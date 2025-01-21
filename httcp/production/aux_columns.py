@@ -67,7 +67,9 @@ def jet_veto(
     This function that produces 'is_b_vetoed' column to be used in categorisation
     """
     year = self.config_inst.x.year
-    btag_wp = self.config_inst.x.btag_working_points[year].deepjet.medium
+    tag = self.config_inst.x.tag
+    btag_wp = self.config_inst.x.btag_working_points[year][tag].deepjet.medium
+    
     # nominal jet selection
     jet_pt_sorted_idx = ak.argsort(events.Jet.pt, axis=1, ascending=False)
     sorted_jets = events.Jet[jet_pt_sorted_idx]

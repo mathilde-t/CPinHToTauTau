@@ -7,16 +7,15 @@ args=(
         --processes $processes
         --datasets $datasets
         --version $version
-        --categories $categories
+        --categories 'etau_signal_reg_0_bjets'
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
         --cf.MergeReducedEvents-workflow $workflow
-        --variables $variables
-        --file-types pdf,png
-	--hist-hooks qcd_hook
-        --general-settings "cms-label=pw"
         "${@:2}"
     )
-echo law run cf.PlotVariables1D "${args[@]}"
-law run cf.PlotVariables1D "${args[@]}"
+echo law run cf.CreateYieldTable "${args[@]}"
+law run cf.CreateYieldTable "${args[@]}" 
+
+
+#,etau_signal_reg_endcap_tau,etau_signal_reg_barrel_tau,etau_signal_reg_endcap_tau_no_mt,etau_signal_reg_barrel_tau_no_mt'

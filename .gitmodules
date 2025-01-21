@@ -4,3 +4,6 @@
 [submodule "modules/cmsdb"]
 	path = modules/cmsdb
 	url = https://github.com/IPHCTau/cmsdb.git
+[submodule "modules/ClassicsSVfit"]
+	path = modules/ClassicsSVfit
+	url = git@github.com:mathilde-t/ClassicSVfit.git

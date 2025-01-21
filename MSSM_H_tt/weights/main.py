@@ -44,13 +44,10 @@ def main_init(self: WeightProducer) -> None:
         "muon_weight_nom",
         "tau_weight_nom",
         "electron_weight_nom",
-        "tauspinner_weight",
         "zpt_weight"
     }
     self.uses |= self.weight_columns
     
     # declare shifts that the produced event weight depends on
-    shift_sources = {
-       "ts",
-    }
+    shift_sources = {}
     self.shifts |= set(get_shifts_from_sources(self.config_inst, *shift_sources))

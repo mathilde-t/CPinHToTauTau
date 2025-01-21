@@ -13,8 +13,8 @@ from columnflow.util import maybe_import, DotDict
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.columnar_util import optional_column as optional
 
-from httcp.util import IF_NANO_V9, IF_NANO_V11
-from httcp.util import getGenTauDecayMode
+from MSSM_H_tt.util import IF_NANO_V9, IF_NANO_V11
+from MSSM_H_tt.util import getGenTauDecayMode
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -30,7 +30,7 @@ ak = maybe_import("awkward")
     uses={
         # Muon nano columns
         f"Muon.{var}" for var in [
-            "pt", "eta", "phi", "dxy", "dz", "mediumId", 
+            "pt", "eta", "phi", "dxy", "dz", "mediumId", "looseId", 
             "pfRelIso04_all", "isGlobal", "isPFcand", "pdgId",'sip3d',
             #"isTracker",
         ]
@@ -70,28 +70,23 @@ def muon_selection(
         "muon_pt_10"          : events.Muon.pt > 10,
         "muon_eta_2p4"        : abs(events.Muon.eta) < 2.4,
         "mediumID"            : events.Muon.mediumId == 1,
-        "muon_dxy_0p045"      : abs(events.Muon.dxy) < 0.045,
-        "muon_dz_0p2"         : abs(events.Muon.dz) < 0.2,
         "muon_iso_0p3"        : events.Muon.pfRelIso04_all < 0.3
     }
-    double_veto_selections = {
+    OC_veto_selections = {
         "muon_pt_15"          : events.Muon.pt > 15,
         "muon_eta_2p4"        : abs(events.Muon.eta) < 2.4,
-        "muon_isGlobal"       : events.Muon.isGlobal == True,
-        "muon_isPF"           : events.Muon.isPFcand == True,
-        #"muon_isTracker"      : events.Muon.isTracker ==True,
         "muon_dxy_0p045"      : abs(events.Muon.dxy) < 0.045,
         "muon_dz_0p2"         : abs(events.Muon.dz) < 0.2,
+        "looseID"             : events.Muon.looseId == 1,
         "muon_iso_0p3"        : events.Muon.pfRelIso04_all < 0.3
     }
 
     # pt sorted indices for converting masks to indices
-    sorted_indices = ak.argsort(events.Muon.pt, axis=-1, ascending=False)
-
-    muon_mask      = ak.local_index(events.Muon.pt) >= 0    
-    good_muon_mask = muon_mask
+    sorted_indices = ak.argsort(events.Muon.pt, axis=-1, ascending=False)    
+    muon_mask  = ak.local_index(events.Muon.pt) >= 0
+    good_muon_mask        = muon_mask
     single_veto_muon_mask = muon_mask
-    double_veto_muon_mask = muon_mask
+    OC_veto_muon_mask = muon_mask
     selection_steps = {}
 
     selection_steps = {"Starts with": good_muon_mask}
@@ -101,32 +96,30 @@ def muon_selection(
 
     for cut in single_veto_selections.keys():
         single_veto_muon_mask = single_veto_muon_mask & ak.fill_none(single_veto_selections[cut], False)
-    #single_veto_muon_mask = single_veto_muon_mask & ~good_muon_mask
-
-    for cut in double_veto_selections.keys():
-        double_veto_muon_mask = double_veto_muon_mask & ak.fill_none(double_veto_selections[cut], False)
-    #double_veto_muon_mask = double_veto_muon_mask & ~good_muon_mask
-
+    
+    for cut in OC_veto_selections.keys():
+        OC_veto_muon_mask = OC_veto_muon_mask & ak.fill_none(OC_veto_selections[cut], False)
+        
     # convert to sorted indices
     good_muon_indices = sorted_indices[good_muon_mask[sorted_indices]]
     good_muon_indices = ak.values_astype(good_muon_indices, np.int32)
 
-    veto_muon_indices = sorted_indices[single_veto_muon_mask[sorted_indices]]
-    veto_muon_indices = ak.values_astype(veto_muon_indices, np.int32)
-
-    double_veto_muon_indices = sorted_indices[double_veto_muon_mask[sorted_indices]]
-    double_veto_muon_indices = ak.values_astype(double_veto_muon_indices, np.int32)
+    single_veto_muon_indices = sorted_indices[single_veto_muon_mask[sorted_indices]]
+    single_veto_muon_indices = ak.values_astype(single_veto_muon_indices, np.int32)
+    
+    OC_veto_muon_indices = sorted_indices[OC_veto_muon_mask[sorted_indices]]
+    OC_veto_muon_indices = ak.values_astype(OC_veto_muon_indices, np.int32)
 
     return events, SelectionResult(
         objects={
             "Muon": {
                 "Muon": good_muon_indices,
-                "VetoMuon": veto_muon_indices,
-                "DoubleVetoMuon": double_veto_muon_indices,
+                "SingleVetoMuon": single_veto_muon_indices,
+                "OCVetoMuon": OC_veto_muon_indices,
             },
         },
         aux=selection_steps,
-    ), good_muon_indices, veto_muon_indices, double_veto_muon_indices
+    ), good_muon_indices, single_veto_muon_indices, OC_veto_muon_indices
 
 
 # ------------------------------------------------------------------------------------------------------- #
@@ -173,24 +166,20 @@ def electron_selection(
     mva_noniso_wp90 = events.Electron.mvaNoIso_WP90
 
     good_selections = {
-        "electron_pt_32"          : events.Electron.pt > 32, #We are using HLT_Ele30 so this cut is needed
+        "electron_pt_33"          : events.Electron.pt > 33, #We are using HLT_Ele30 so this cut is needed
         "electron_eta_2p1"        : abs(events.Electron.eta) < 2.1,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
         "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_mva_iso_wp80"   : mva_iso_wp80 == 1,
-        "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.3,
+        "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
+        "electron_mva_iso_wp90"   : mva_iso_wp90 == 1,
     }
     single_veto_selections = {
         "electron_pt_10"          : events.Electron.pt > 10,
         "electron_eta_2p5"        : abs(events.Electron.eta) < 2.5,
-        "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
-        "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_mva_noniso_wp90": mva_noniso_wp90 == 1,
-        "electron_convVeto"       : events.Electron.convVeto == 1,
-        #"electron_lostHits"       : events.Electron.lostHits <= 1,
+        "electron_mva_iso_wp90"   : mva_iso_wp90 == 1,
         "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.3,
     }
-    double_veto_selections = {
+    OC_veto_selections = {
         "electron_pt_15"          : events.Electron.pt > 15,
         "electron_eta_2p5"        : abs(events.Electron.eta) < 2.5,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
@@ -204,7 +193,7 @@ def electron_selection(
     electron_mask  = ak.local_index(events.Electron.pt) >= 0
     good_electron_mask        = electron_mask
     single_veto_electron_mask = electron_mask
-    double_veto_electron_mask = electron_mask
+    OC_veto_electron_mask = electron_mask
     selection_steps = {}
 
     selection_steps = {"Starts with": good_electron_mask}
@@ -214,33 +203,31 @@ def electron_selection(
 
     for cut in single_veto_selections.keys():
         single_veto_electron_mask = single_veto_electron_mask & ak.fill_none(single_veto_selections[cut], False)
-    #single_veto_electron_mask = single_veto_electron_mask & ~good_electron_mask
-
-    for cut in double_veto_selections.keys():
-        double_veto_electron_mask = double_veto_electron_mask & ak.fill_none(double_veto_selections[cut], False)
-    #double_veto_electron_mask = double_veto_electron_mask & ~good_electron_mask
-
+    
+    for cut in OC_veto_selections.keys():
+        OC_veto_electron_mask = OC_veto_electron_mask & ak.fill_none(OC_veto_selections[cut], False)
+        
     # convert to sorted indices
     good_electron_indices = sorted_indices[good_electron_mask[sorted_indices]]
     good_electron_indices = ak.values_astype(good_electron_indices, np.int32)
 
-    veto_electron_indices = sorted_indices[single_veto_electron_mask[sorted_indices]]
-    veto_electron_indices = ak.values_astype(veto_electron_indices, np.int32)
-
-    double_veto_electron_indices = sorted_indices[double_veto_electron_mask[sorted_indices]]
-    double_veto_electron_indices = ak.values_astype(double_veto_electron_indices, np.int32)
+    single_veto_electron_indices = sorted_indices[single_veto_electron_mask[sorted_indices]]
+    single_veto_electron_indices = ak.values_astype(single_veto_electron_indices, np.int32)
+    
+    OC_veto_electron_indices = sorted_indices[OC_veto_electron_mask[sorted_indices]]
+    OC_veto_electron_indices = ak.values_astype(OC_veto_electron_indices, np.int32)
 
 
     return events, SelectionResult(
         objects={
             "Electron": {
                 "Electron": good_electron_indices,
-                "VetoElectron": veto_electron_indices,
-                "DoubleVetoElectron": double_veto_electron_indices,
+                "SingleVetoElectron": single_veto_electron_indices,
+                "OCVetoElectron": OC_veto_electron_indices,
             },
         },
         aux=selection_steps,
-    ), good_electron_indices, veto_electron_indices, double_veto_electron_indices
+    ), good_electron_indices, single_veto_electron_indices, OC_veto_electron_indices
 
 
 
@@ -291,8 +278,8 @@ def tau_selection(
     deep_tau_vs_mu_wps = self.config_inst.x.deep_tau.vs_mu_wps
 
     good_selections = {
-        "tau_pt_20"     : events.Tau.pt > 20,
-        "tau_eta_2p5"   : abs(events.Tau.eta) < 2.5,
+        "tau_pt_30"     : events.Tau.pt > 30,
+        "tau_eta_2p3"   : abs(events.Tau.eta) < 2.3,
         "tau_dz_0p2"    : abs(events.Tau.dz) < 0.2,
         "DeepTauVSjet"  : events.Tau.idDeepTau2018v2p5VSjet >= deep_tau_vs_e_jet_wps["VVVLoose"], 
         "DeepTauVSe"    : events.Tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVVLoose"],

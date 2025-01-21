@@ -49,7 +49,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         get_mc_weight,
         hcand_fields,
         tauspinner_weight,
-        phi_cp,
+        #phi_cp,
         category_ids,
         jet_pt_def,
         jets_taggable,
@@ -69,7 +69,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         zpt_weight,
         hcand_fields,
         tauspinner_weight,
-        phi_cp,
+        #phi_cp,
         category_ids,
         "Jet.jec_no_jec_diff",
         "Jet.number_of_jets",
@@ -114,15 +114,15 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-    print("Producing phi_cp...") 
+    #print("Producing phi_cp...") 
     # TEMPORARY FIX. CHANGE AFTERWARDS
     channel = self.config_inst.channels.names()
     if len(channel) > 1:
         ch_str = ' '.join([str(ch) for ch in channel])
         raise ValueError(f"attempt to process more than one channel: {ch_str}")
     else: channel = channel[0]
-    if channel=='mutau':
-        events = self[phi_cp](events, **kwargs) 
+    # if channel=='mutau':
+    #     events = self[phi_cp](events, **kwargs) 
     print("Producing jet variables for plotting...") 
     
     n_jets, leading_jet_pt, subleading_jet_pt, delta_eta_jj, mjj = self[jet_pt_def](events, **kwargs)

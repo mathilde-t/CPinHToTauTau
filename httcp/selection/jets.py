@@ -127,20 +127,6 @@ def jet_veto_map(
     return events, results
 
 
-@jet_veto_map.init
-def jet_veto_map_init(self: Selector, **kwargs) -> None:
-    if getattr(self, "config_inst", None) is None:
-        return
-
-    if (
-        self.config_inst.campaign.x.year == 2023 and
-        self.config_inst.campaign.x.postfix.lower() == "bpix"
-    ):
-        # in postBPix, we need to run the veto map with type=jetvetomap_bpix and subtract this from
-        # the result of the nominal jet veto map
-        raise NotImplementedError("Jet Veto Map for 2023 postBPix not implemented yet")
-
-
 @jet_veto_map.requires
 def jet_veto_map_requires(self: Selector, reqs: dict) -> None:
     if "external_files" in reqs:

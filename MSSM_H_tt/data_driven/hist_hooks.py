@@ -96,7 +96,7 @@ def add_hist_hooks(config: od.Config) -> None:
             cat_idx = find_by_id(qcd_hist, the_category.id)
             qcd_hist.view().value[cat_idx, ...] = qcd_values
             qcd_hist.view().variance[cat_idx, ...] = qcd_variances
-        #from IPython import embed; embed()            
+          
         # for group_name in complete_groups:
         
         #     group = qcd_groups[group_name]

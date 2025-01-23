@@ -83,7 +83,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "decayMode", "rawIdx", "ip_sig", "IPx", "IPy","IPz"
             ]
         } | {
-            "GenTau.*", "GenTauProd.*", "nJet",
+            "GenTau.*", "GenTauProd.*", "nJet", "N_b_jets"
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
@@ -277,7 +277,13 @@ def add_jet_features(cfg: od.Config) -> None:
         discrete_x=True,
         x_title="N_jets_pT_20_eta_2_5_Tight",
     )
-    
+    cfg.add_variable(
+        name="N_b_jets",
+        expression="N_b_jets",
+        binning=(11, -0.5, 10.5),
+        discrete_x=True,
+        x_title="N_b_jets",
+    )
     cfg.add_variable(
         name="Leading_jet_pt",
         expression="Jet.leading_jet_pt",
@@ -290,14 +296,14 @@ def add_jet_features(cfg: od.Config) -> None:
         expression="Jet.subleading_jet_pt",
         binning=(25, 30.0, 280.0),
         unit="GeV",
-        x_title=r"$Subleading jet p_{T}$",
+        x_title=r"Subleading jet $p_{T}$",
     )
     cfg.add_variable(
         name="delta_eta_jj",
         expression="Jet.delta_eta_jj",
         null_value=EMPTY_FLOAT,
         binning=(20,-6,6),
-        x_title=r"$\Delta\eta_{jj}",
+        x_title="$\\Delta \\eta_{jj}$",
     ) 
     cfg.add_variable(
         name="mjj",

@@ -568,10 +568,59 @@ def add_categories(config: od.Config,
             selection="cat_etau",
             label="$e\\tau$ inclusive",
         )
+        #######################################################
+        ### e-tau channel categories NO b jets requirements ###
+        #######################################################
+        etau_signal_reg_no_mT = add_category(
+            config,
+            name="etau_signal_reg_no_mT",
+            id=206 + etau.id,
+            selection=["cat_etau"   ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                       "OC_lepton_veto",
+                       ],
+            label="$e\\tau$ SR\nno $m_{T}$ cut",
+            aux={'control_reg': "etau_control_reg_no_mT"}
+        )
+        etau_control_reg_no_mT = add_category(
+            config,
+            name="etau_control_reg_no_mT",
+            id=207 + etau.id,
+            selection=["cat_etau"    ,
+                       "ss_charge"   ,
+                       "deep_tau_wp" ,
+                       ],
+            label="$e\\tau$ CR\nno $m_{T}$ cut",
+        )
+        
+        etau_signal_reg = add_category(
+            config,
+            name="etau_signal_reg",
+            id=208 + etau.id,
+            selection=["cat_etau"   ,
+                       "os_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "OC_lepton_veto",
+                       ],
+            label="$e\\tau$ SR\n",
+            aux={'control_reg': "etau_control_reg"}
+        )
+        etau_control_reg = add_category(
+            config,
+            name="etau_control_reg",
+            id=209 + etau.id,
+            selection=["cat_etau"    ,
+                       "ss_charge"   ,
+                       "mt_cut"      ,
+                       "deep_tau_wp" ,
+                       ],
+            label="$e\\tau$ CR\n",
+        )
         #########################################
         ### e-tau channel categories 0 b jets ###
         #########################################
-        
         #################################
         ### SIGNAL REGION with mT cut ###
         #################################
@@ -728,7 +777,7 @@ def add_categories(config: od.Config,
                         "tau_barrel" ,
                         "OC_lepton_veto",
                         ],
-            label="$e\\tau$ SR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            label="$e\\tau$ SR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
             aux={'control_reg': "etau_control_reg_0_bjets_barrel_tau_no_mt"}
         )
         
@@ -742,7 +791,7 @@ def add_categories(config: od.Config,
                         "Zero_b_jets",
                         "tau_barrel" ,
                         ],
-            label="$e\\tau$ CR\n1 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
+            label="$e\\tau$ CR\n0 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
         )
         
         #########################################
@@ -1108,7 +1157,55 @@ def add_categories(config: od.Config,
                         ],
             label="$e\\tau$ CR\n$\\geq$ 2 bjets\nno $m_{T}$\n$\\eta_{\\tau} \\leq 1.2$",
         )
-
+        
+        ##### Categories to plot Jet Variables with mT cut###
+        etau_signal_reg_b_jets = add_category(
+            config,
+            name="etau_signal_reg_b_jets",
+            id=202 + etau.id,
+            selection=["cat_etau"   ,
+                       "os_charge"  ,
+                       "mt_cut"     ,
+                       "deep_tau_wp",
+                       "OC_lepton_veto",
+                       ],
+            label="$e\\tau$\nbjets plots",
+            aux={'control_reg': "etau_control_reg_b_jets"}
+        )
+        etau_control_reg_b_jets = add_category(
+            config,
+            name="etau_control_reg_b_jets",
+            id=203 + etau.id,
+            selection=["cat_etau"    ,
+                       "ss_charge"   ,
+                       "mt_cut"      ,
+                       "deep_tau_wp" ,
+                       ],
+            label="$e\\tau$ CR\nbjets",
+        )
+        ##### Categories to plot Jet Variables without mT cut###
+        etau_signal_reg_b_jets_no_mT = add_category(
+            config,
+            name="etau_signal_reg_b_jets_no_mT",
+            id=204 + etau.id,
+            selection=["cat_etau"   ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                       "OC_lepton_veto",
+                       ],
+            label="$e\\tau$\nbjets plots\nno $m_{T}$",
+            aux={'control_reg': "etau_control_reg_b_jets_no_mT"}
+        )
+        etau_control_reg_b_jets_no_mT = add_category(
+            config,
+            name="etau_control_reg_b_jets_no_mT",
+            id=205 + etau.id,
+            selection=["cat_etau"    ,
+                       "ss_charge"   ,
+                       "deep_tau_wp" ,
+                       ],
+            label="$e\\tau$ CR\nbjets\nno $m_{T}$",
+        )
     
     elif channel=='tautau':
         tautau = add_category(

@@ -45,8 +45,8 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         get_mc_weight,
         hcand_fields,
         category_ids,
-        jet_pt_def,
         number_b_jet,
+        jet_pt_def,
         jets_taggable,
         "Jet.pt",
         "Jet.pt_no_jec",
@@ -64,15 +64,11 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         zpt_weight,
         hcand_fields,
         category_ids,
+        number_b_jet,
+        jet_pt_def,
+        jets_taggable,
         "Jet.jec_no_jec_diff",
-        "Jet.number_of_jets",
-        "Jet.n_jets",
-        "Jet.leading_jet_pt",
-        "Jet.subleading_jet_pt",
-        "Jet.delta_eta_jj",
-        "Jet.mjj",
-        "Jet.n_jets_tag",
-        
+        "Jet.number_of_jets",        
     },
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
@@ -109,14 +105,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         
     print("Producing jet variables for plotting...") 
-    n_jets, leading_jet_pt, subleading_jet_pt, delta_eta_jj, mjj = self[jet_pt_def](events, **kwargs)
-    n_jets_tag = self[jets_taggable](events, **kwargs)
-    
-    events = set_ak_column_f32(events, "Jet.n_jets",            n_jets           )
-    events = set_ak_column_f32(events, "Jet.leading_jet_pt",    leading_jet_pt   )
-    events = set_ak_column_f32(events, "Jet.subleading_jet_pt", subleading_jet_pt)
-    events = set_ak_column_f32(events, "Jet.delta_eta_jj",      delta_eta_jj     )
-    events = set_ak_column_f32(events, "Jet.mjj",               mjj              )
-    events = set_ak_column_f32(events, "Jet.n_jets_tag",        n_jets_tag       )
+    events = self[jet_pt_def](events, **kwargs)
+    events = self[jets_taggable](events, **kwargs)    
     
     return events

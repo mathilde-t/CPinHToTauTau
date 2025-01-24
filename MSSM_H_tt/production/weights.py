@@ -200,7 +200,7 @@ def electron_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) 
                 electron = hcand[lep]
                 # Create sf array template to make copies and dict for finnal results of all systematics
                 pt =  flat_np_view(electron.pt,axis=1) #take the first particle from the hcand pair
-                eta =  flat_np_view(abs(electron.eta),axis=1)
+                eta =  flat_np_view(electron.eta,axis=1)
                 pt_20_mask = flat_np_view(electron.pt < 20)
                 pt_20_75_mask =flat_np_view( (electron.pt >= 20) & (electron.pt < 75))
                 pt_75_mask = flat_np_view(electron.pt >= 75)

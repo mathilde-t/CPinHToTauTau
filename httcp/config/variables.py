@@ -37,9 +37,7 @@ def keep_columns(cfg: od.Config) -> None:
                 "pt", "eta", "phi", "mass", "jetId", 
                 "btagDeepFlavB", "hadronFlavour", 
                 "pt_no_jec", "phi_no_jec","eta_no_jec", 
-                "mass_no_jec", "jec_no_jec_diff","number_of_jets",
-                "n_jets", "leading_jet_pt","subleading_jet_pt",
-                "delta_eta_jj","mjj","n_jets_tag",
+                "mass_no_jec", "jec_no_jec_diff",
             ] 
         } | {
             f"Tau.{var}" for var in [
@@ -84,6 +82,8 @@ def keep_columns(cfg: od.Config) -> None:
             ]
         } | {
             "GenTau.*", "GenTauProd.*", "nJet",
+            "n_jets", "leading_jet_pt","subleading_jet_pt",
+            "delta_eta_jj","mjj","n_jets_tag",
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
@@ -209,13 +209,6 @@ def add_jet_features(cfg: od.Config) -> None:
         unit="GeV",
         x_title=r"$p_{T} of all jets$",
     )
-    cfg.add_variable(
-        name="Number_of_Jets",
-        expression="Jet.number_of_jets",
-        binning=(11, -0.5, 10.5),
-        x_title=r"Number of Jets",
-        discrete_x=True,
-    )
     for i in range(2):
         cfg.add_variable(
             name=f"jet_{i+1}_pt",
@@ -264,7 +257,7 @@ def add_jet_features(cfg: od.Config) -> None:
         
     cfg.add_variable(
         name="N_jets_pT_30_eta_4_7_Tight",
-        expression="Jet.n_jets",
+        expression="n_jets",
         binning=(11, -0.5, 10.5),
         discrete_x=True,
         x_title="N_jets_pT_30_eta_4_7_Tight",
@@ -272,7 +265,7 @@ def add_jet_features(cfg: od.Config) -> None:
     
     cfg.add_variable(
         name="N_jets_pT_20_eta_2_5_Tight",
-        expression="Jet.n_jets_tag",
+        expression="n_jets_tag",
         binning=(11, -0.5, 10.5),
         discrete_x=True,
         x_title="N_jets_pT_20_eta_2_5_Tight",
@@ -280,28 +273,28 @@ def add_jet_features(cfg: od.Config) -> None:
     
     cfg.add_variable(
         name="Leading_jet_pt",
-        expression="Jet.leading_jet_pt",
+        expression="leading_jet_pt",
         binning=(30, 30.0, 330.0),
         unit="GeV",
         x_title=r"$Leading jet p_{T}$",
     )        
     cfg.add_variable(
         name="Subleading_jet_pt",
-        expression="Jet.subleading_jet_pt",
+        expression="subleading_jet_pt",
         binning=(25, 30.0, 280.0),
         unit="GeV",
         x_title=r"$Subleading jet p_{T}$",
     )
     cfg.add_variable(
         name="delta_eta_jj",
-        expression="Jet.delta_eta_jj",
+        expression="delta_eta_jj",
         null_value=EMPTY_FLOAT,
         binning=(20,-6,6),
         x_title=r"$\Delta\eta_{jj}",
     ) 
     cfg.add_variable(
         name="mjj",
-        expression="Jet.mjj",
+        expression="mjj",
         binning=(40, 10.0, 410.0),
         unit="GeV",
         x_title=r"$m_{jj}$",

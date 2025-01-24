@@ -24,7 +24,6 @@ def add_categories(config: od.Config,
         selection="cat_incl",
         label="inclusive",
     )
-     
     ##############################################
     ### Main categories for the three channels ###
     ##############################################
@@ -53,7 +52,7 @@ def add_categories(config: od.Config,
             label=r"$\mu\tau$ signal region",
             aux={'control_reg': "mutau_control_reg"}
         )
-        
+
         mutau_control_reg = add_category(
             config,
             name="mutau_control_reg",
@@ -197,6 +196,53 @@ def add_categories(config: od.Config,
                        "tau_barrel" ,
                        ],
             label=r"$\mu\tau$ no mt control region\n $\eta_{\tau} \leq 1.2$",
+        )
+
+        mutau_signal_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="mutau_signal_reg_no_mt_bveto_wp_mtt",
+            id=700 + mutau.id,
+            selection=["cat_mutau"  ,
+                       "os_charge"  ,
+                       "deep_tau_wp_mtt",
+                      ],
+            label=r"$\mu\tau$ signal region no mt, mtt wp, no b veto",
+            aux={'control_reg': "mutau_contol_reg_no_mt_bveto_wp_mtt"}
+        )
+
+        mutau_contol_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="mutau_contol_reg_no_mt_bveto_wp_mtt",
+            id=750 + mutau.id,
+            selection=["cat_mutau"  ,
+                       "ss_charge"  ,
+                       "deep_tau_wp_mtt",
+                      ],
+            label=r"$\mu\tau$ control region no mt, mtt wp, no b veto",
+        )
+
+
+        mutau_signal_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="mutau_signal_reg_no_mt_bveto",
+            id=800 + mutau.id,
+            selection=["cat_mutau"  ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                      ],
+            label=r"$\mu\tau$ signal region no mt, no b veto",
+            aux={'control_reg': "mutau_contol_reg_no_mt_bveto"}
+        )
+
+        mutau_contol_reg_no_mt_bveto = add_category(
+            config,
+            name="mutau_contol_reg_no_mt_bveto",
+            id=850 + mutau.id,
+            selection=["cat_mutau"  ,
+                       "ss_charge"  ,
+                       "deep_tau_wp",
+                      ],
+            label=r"$\mu\tau$ control region no mt, no b veto",
         )
 
     elif channel=='etau':
@@ -369,6 +415,54 @@ def add_categories(config: od.Config,
                         "tau_barrel" ,
                         ],
             label=r"$e\tau$ no mt control region\n $\eta_{\tau} \leq 1.2$",
+        )
+
+
+        etau_signal_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="etau_signal_reg_no_mt_bveto_wp_mtt",
+            id=700 + etau.id,
+            selection=["cat_etau"  ,
+                       "os_charge"  ,
+                       "deep_tau_wp_mtt",
+                      ],
+            label=r"$e\tau$ signal region no mt, mtt wp, no b veto",
+            aux={'control_reg': "etau_contol_reg_no_mt_bveto_wp_mtt"}
+        )
+
+        etau_contol_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="etau_contol_reg_no_mt_bveto_wp_mtt",
+            id=750 + etau.id,
+            selection=["cat_etau"  ,
+                       "ss_charge"  ,
+                       "deep_tau_wp_mtt",
+                      ],
+            label=r"$e\tau$ control region no mt, mtt wp, no b veto",
+        )
+
+
+        etau_signal_reg_no_mt_bveto_wp_mtt = add_category(
+            config,
+            name="etau_signal_reg_no_mt_bveto",
+            id=800 + etau.id,
+            selection=["cat_etau"  ,
+                       "os_charge"  ,
+                       "deep_tau_wp",
+                      ],
+            label=r"$e\tau$ signal region no mt, no b veto",
+            aux={'control_reg': "etau_contol_reg_no_mt_bveto"}
+        )
+
+        etau_contol_reg_no_mt_bveto = add_category(
+            config,
+            name="etau_contol_reg_no_mt_bveto",
+            id=850 + etau.id,
+            selection=["cat_etau"  ,
+                       "ss_charge"  ,
+                       "deep_tau_wp",
+                      ],
+            label=r"$e\tau$ control region no mt, no b veto",
         )
 
     

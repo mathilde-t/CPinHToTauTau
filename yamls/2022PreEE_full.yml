@@ -12,30 +12,30 @@ args:
   config    : run3_2022_preEE_nano_cp_tau_v14
   workflow  : htcondor
   branch    : -1
-  version   : Run3puNmcvertices_full #Run3_2022PreEE_full_9jan_kine #PhiCPtt+mt_12jan25 #Run3_2022PreEE_full_9jan_preipsigcut #Run3_2022PreEE_full_8jan_prepucut #dummy
+  version   : PhiCPtt+mt_12jan25 #Run3_2022PreEE_full_9jan_kine #Run3puNmcvertices_full #Run3_2022PreEE_full_9jan_preipsigcut #Run3_2022PreEE_full_8jan_prepucut #dummy
 
   datasets  :
     ## == data ==
-    - data_tau_C
-    - data_tau_D
-    - data_mu_C
-    - data_mu_D
+    #- data_tau_C
+    #- data_tau_D
+    #- data_mu_C
+    #- data_mu_D
     #- data_single_mu_C
-    - data_e_C
-    - data_e_D
+    #- data_e_C
+    #- data_e_D
     ## == wj ==
     #- wj_incl_amcatnlo
     #- wj_0j_amcatnlo
     #- wj_1j_amcatnlo
     #- wj_2j_amcatnlo
-    - wj_incl_madgraph
+    #- wj_incl_madgraph
     #- wj_1j_madgraph
     #- wj_2j_madgraph
     #- wj_3j_madgraph
     #- wj_4j_madgraph    
     ## == dy ==
-    - dy_lep_m10to50_madgraph
-    - dy_lep_m50_madgraph
+    #- dy_lep_m10to50_madgraph
+    #- dy_lep_m50_madgraph
     #- dy_lep_m50_1j_madgraph
     #- dy_lep_m50_2j_madgraph
     #- dy_lep_m50_3j_madgraph
@@ -56,66 +56,66 @@ args:
     #- dy_lep_m50_1j_pt600toInf_amcatnlo
     #- dy_lep_m50_2j_pt600toInf_amcatnlo
     ## == tt ==
-    - tt_dl # di-lepton tt -> bbWW -> ll
-    - tt_sl # semi-leptonic
-    - tt_fh # hadronic
+    #- tt_dl # di-lepton tt -> bbWW -> ll
+    #- tt_sl # semi-leptonic
+    #- tt_fh # hadronic
     ## == st ==
-    - st_tchannel_tbar
-    - st_tw_t_sl
-    - st_tchannel_t
-    - st_tw_t_dl
-    - st_tw_t_fh
-    - st_tw_tb_sl #tb = tbar
-    - st_tw_tb_dl
-    - st_tw_tb_fh
-    - st_schannel_t
-    - st_schannel_tbar
+    #- st_tchannel_tbar
+    #- st_tw_t_sl
+    #- st_tchannel_t
+    #- st_tw_t_dl
+    #- st_tw_t_fh
+    #- st_tw_tb_sl #tb = tbar
+    #- st_tw_tb_dl
+    #- st_tw_tb_fh
+    #- st_schannel_t
+    #- st_schannel_tbar
     ## == vv ==
-    - ww
-    - wz
-    - zz
+    #- ww
+    #- wz
+    #- zz
     ## == vvv ==
-    - www
-    - wwz
-    - wzz
-    - zzz
+    #- www
+    #- wwz
+    #- wzz
+    #- zzz
     ## == signal ==
     - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
-    - zh_tautau_uncorrelatedDecay_Filtered
-    - wph_tautau_uncorrelatedDecay_Filtered
-    - wmh_tautau_uncorrelatedDecay_Filtered
+    #- zh_tautau_uncorrelatedDecay_Filtered
+    #- wph_tautau_uncorrelatedDecay_Filtered
+    #- wmh_tautau_uncorrelatedDecay_Filtered
     #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
 
   processes :
-    - data
+    #- data
     #- w
-    - w_lnu
+    #- w_lnu
     #- dy_m10to50
     #- dy_m50toinf_lep
     #- dy_m50toinf_tau
     #- dy_m50toinf_jet
-    - dy
-    - tt
-    - st
+    #- dy
+    #- tt
+    #- st
     #- st_tchannel  #either st ot one of these two channels !
     #- st_twchannel
-    - vv
-    - vvv
+    #- vv
+    #- vvv
     - h_ggf_htt
-    - zh_htt
-    - wh_htt
+    #- zh_htt
+    #- wh_htt
 
   categories:
     #- etau__*
     #- mutau__*
     - mutau__lepD
     - mutau__lepD__a1dm10_2
-    - mutau__lepD__a1dm2_2
-    - mutau__lepD__a1dm11_2
-    - mutau__lepD__pi_2
-    - mutau__lepD__rho_2
+    #- mutau__lepD__a1dm2_2
+    #- mutau__lepD__a1dm11_2
+    #- mutau__lepD__pi_2
+    #- mutau__lepD__rho_2
     #- tautau__hadD__pi_a1dm10
     #- tautau__hadD__pi_rho
     #- tautau__hadD__pi_pi
@@ -180,7 +180,7 @@ args:
     #- jet_2_phi
     #- hT
     #- pu_weight # only with MC                     #all weights only with MC
-    - npvs
+    #- npvs
     #- pu_nTrue_Int # only with MC
     #- nPU # only with MC
     ## -- met -- #
@@ -188,13 +188,13 @@ args:
     #- puppi_met_phi
     ## -- angular variables -- #
     #- Alpha
-    #- PhiCP_IPIP # only with signal data
+    - PhiCP_IPIP # only with signal data
     ##- PhiCP_IPIP_alpha_lt_piby4
     ##- PhiCP_IPIP_alpha_gt_piby4
-    ##- PhiCP_DPDP # only with signal data
-    ##- PhiCP_PVPV # only with signal data
-    #- PhiCP_IPPV # only with signal data
-    #- PhiCP_IPDP # only with signal data
+    - PhiCP_DPDP # only with signal data
+    - PhiCP_PVPV # only with signal data
+    - PhiCP_IPPV # only with signal data
+    - PhiCP_IPDP # only with signal data
     ##- PhiCP_IPDP_alpha_lt_piby4
     ##- PhiCP_IPDP_alpha_gt_piby4
     #- PhiCPGen_IPIP   

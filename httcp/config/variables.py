@@ -270,6 +270,21 @@ def add_cutflow_features(cfg: od.Config) -> None:
         x_title=r"Jet 1 $p_{T}$",
     )
 
+    cfg.add_variable(
+        name="cf_npvs",
+        expression="cutflow.n_pvs",
+        binning=(100, 0, 100),
+        unit="GeV",
+        x_title="npvs",
+    )
+
+    cfg.add_variable(
+        name="cf_njet",
+        expression="cutflow.n_jet",
+        binning=(17, -0.5, 16.5),
+        x_title="Jet Multipicity",
+    )
+
 
 def add_hcand_features(cfg: od.Config) -> None:
     """

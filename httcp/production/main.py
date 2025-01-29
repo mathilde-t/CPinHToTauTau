@@ -136,6 +136,35 @@ def hcand_features(
             #events = self[ProduceGenCosPsi](events, P4_gen_dict)
     return events
 
+@producer(
+    uses={
+        # nano columns
+        "Jet.pt", "Jet.eta", "Jet.phi", "Electron.pt", "PV.npvs"
+    },
+    produces={
+        # new columns
+        "cutflow.n_jet",
+        #"cutflow.jet1_pt",
+        "cutflow.n_pvs"
+    },
+)
+def cutflow_features(
+    self: Producer,
+    events: ak.Array,
+    #object_masks: dict[str, dict[str, ak.Array]],
+    **kwargs,
+) -> ak.Array:
+    # columns required for cutflow plots
+
+    # apply per-object selections
+
+    # add feature columns
+    events = set_ak_column_i32(events, "cutflow.n_jet", ak.num(events.Jet, axis=1))
+    #events = set_ak_column_f32(events, "cutflow.jet1_pt", Route("pt[:,0]").apply(selected_jet, EMPTY_FLOAT))
+    events = set_ak_column_f32(events, "cutflow.n_pvs", events.PV.npvs)
+    
+
+    return events
 
 @producer(
     uses={
@@ -163,8 +192,8 @@ def hcand_features(
         IF_DATASET_IS_DY(zpt_reweight),
         hcand_features,
         hcand_mass,
-        category_ids,
-        build_abcd_masks,
+        #category_ids,
+        #build_abcd_masks,
         #ff_weight,
     },
     produces={
@@ -193,8 +222,8 @@ def hcand_features(
         hcand_mass,
         "channel_id",
         "trigger_ids",
-        category_ids,
-        build_abcd_masks,
+        #category_ids,
+        #build_abcd_masks,
         #ff_weight,
     },
     #exposed = true or false
@@ -206,8 +235,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     events = self[attach_coffea_behavior](events, **kwargs)
     # deterministic seeds
     ##events = self[deterministic_seeds](events, **kwargs)
-    events = self[build_abcd_masks](events, **kwargs)
-    events, category_ids_debug_dict = self[category_ids](events, **kwargs)
+    #events = self[build_abcd_masks](events, **kwargs)
+    #events, category_ids_debug_dict = self[category_ids](events, **kwargs) #calls the cat ids in production
 
     #events = self[ff_weight](events, **kwargs)
     if self.dataset_inst.is_mc:

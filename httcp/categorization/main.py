@@ -37,7 +37,7 @@ def cat_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array,
     ch = self.config_inst.get_channel("tautau")
     return events, events["channel_id"] == ch.id
 
-
+"""
 # ---------------------------------------------------------- #
 #                          For nJets                         #
 # ---------------------------------------------------------- #
@@ -390,3 +390,4 @@ def cat_tautau_1j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Arr
 @categorizer(uses={"channel_id", "has_2jet"})
 def cat_tautau_2j(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     return events, (events.channel_id == 4) & events.has_2jet
+"""

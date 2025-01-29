@@ -20,6 +20,7 @@ logger = law.logger.get_logger(__name__)
 # other combinatorics will be produced in createHistograms task,  #
 # if mentioned                                                    #
 # ############################################################### #
+"""
 def name_fn(root_categories):
     catlist = [cat.name for cat in root_categories.values() if cat]
     catname = "__".join(cat.name for cat in root_categories.values() if cat)
@@ -31,17 +32,15 @@ def kwargs_fn(root_categories):
         "label": ",".join([c.label for c in root_categories.values()]),
         "tags": set.union(*[cat.tags for cat in root_categories.values() if cat]),
     }
-
+"""
 @call_once_on_config()
 def add_common_categories(config: od.Config) -> None:
-    """
     add_category(config,
                  name="incl",
-                 id=9000000,
+                 id=90000000,
                  selection="cat_incl",
                  label=r"$Inclusive$",
                  tags={"incl"})
-    """
     add_category(config,
                  name="etau",
                  id=10000000,
@@ -60,7 +59,7 @@ def add_common_categories(config: od.Config) -> None:
                  selection="cat_tautau",
                  label=r"$\tau_{h} \tau_{h}$",
                  tags={"tautau"})
-
+"""
 @call_once_on_config()
 def add_RealOrFake_categories(config: od.Config) -> None:
     add_category(config, name="real_1", id=1000000, selection="cat_real_1", label=r"$t_1$", tags={"tau1isRealMC"})
@@ -223,29 +222,29 @@ def add_tautau_phiCP_categories(config: od.Config) -> None:
 # ################### #
 # test categorization #
 # ################### #
-"""
-@call_once_on_config()
-def add_test_categories(config: od.config) -> None:
-    categories = {
-        "channel": [config.get_category("tautau")],
-        "TorF"   : [config.get_category("real_1")],
-        "abcd"   : [
-            config.get_category("hadA"),   config.get_category("hadB"),
-            config.get_category("hadA0"),  config.get_category("hadB0"),
-            config.get_category("hadC0"),  config.get_category("hadD0"),
-            config.get_category("hadC"),   config.get_category("hadD"),
-        ],
-        "IP"     : [config.get_category("ipsig_0to1_1"), config.get_category("ipsig_1toany_1")],
-        "cp"     : [config.get_category("pi_rho_1")],
-    }
 
-    logger.info("test_categories")
-    n = create_category_combinations(config,
-                                     categories,
-                                     name_fn=name_fn,
-                                     kwargs_fn=kwargs_fn,
-                                     skip_existing=True)
-    logger.info(f"{n} categories have been created")
+#@call_once_on_config()
+#def add_test_categories(config: od.config) -> None:
+#    categories = {
+#        "channel": [config.get_category("tautau")],
+#        "TorF"   : [config.get_category("real_1")],
+#        "abcd"   : [
+#            config.get_category("hadA"),   config.get_category("hadB"),
+#            config.get_category("hadA0"),  config.get_category("hadB0"),
+#            config.get_category("hadC0"),  config.get_category("hadD0"),
+#            config.get_category("hadC"),   config.get_category("hadD"),
+#        ],
+#        "IP"     : [config.get_category("ipsig_0to1_1"), config.get_category("ipsig_1toany_1")],
+#        "cp"     : [config.get_category("pi_rho_1")],
+#    }#
+#
+#    logger.info("test_categories")
+#    n = create_category_combinations(config,
+#                                     categories,
+#                                     name_fn=name_fn,
+#                                     kwargs_fn=kwargs_fn,
+#                                     skip_existing=True)
+#    logger.info(f"{n} categories have been created")
 """
     
 # ################### #
@@ -259,22 +258,22 @@ def add_categories(config: od.Config) -> None:
     """
     add_common_categories(config)
     
-    add_njet_categories(config)
-    add_RealOrFake_categories(config)
+    #add_njet_categories(config)
+    #add_RealOrFake_categories(config)
     
-    add_ABCD_categories(config)
-    add_DM_categories(config)
+    #add_ABCD_categories(config)
+    #add_DM_categories(config)
 
-    add_etau_mutau_categories(config)
-    #add_tautau_real_categories(config) #here2# either or
-    #add_tautau_phiCP_categories(config) #here2# either or
+    #add_etau_mutau_categories(config)
+    ##add_tautau_real_categories(config) #here2# either or
+    ##add_tautau_phiCP_categories(config) #here2# either or
     ###add_test_categories(config)
     
-    #all_cats = [cat.name for cat, _, _ in config.walk_categories()]
-    #print(f"List of all cateogries in config: \n{all_cats}")
+    ##all_cats = [cat.name for cat, _, _ in config.walk_categories()]
+    ##print(f"List of all cateogries in config: \n{all_cats}")
     """
     add_category(config, name="test0", id=9997, selection="cat_tautau_0j", label=r"test0", tags={"test0"})
     add_category(config, name="test1", id=9998, selection="cat_tautau_1j", label=r"test1", tags={"test1"})
     add_category(config, name="test2", id=9999, selection="cat_tautau_2j", label=r"test2", tags={"test2"})
     """
-    #add_category(config, name="tautau_test11", id=9999, selection="cat_tautau_test11", label=r"test1", tags={"test1"})
+    ##add_category(config, name="tautau_test11", id=9999, selection="cat_tautau_test11", label=r"test1", tags={"test1"})

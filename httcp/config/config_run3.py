@@ -67,7 +67,7 @@ def add_config (ana: od.Analysis,
                          name  = config_name,
                          id    = config_id)
 
-    
+
     # --------------------------------------------------------------------------------------------- #
     # add processes we are interested in
     # --------------------------------------------------------------------------------------------- #
@@ -1066,8 +1066,8 @@ def add_config (ana: od.Analysis,
         "etau"  : {},
         "mutau" : {},
         "tautau" : {
-            "id"  : [cfg.get_category("tautau").id, cfg.get_category("real_1").id, cfg.get_category("hadC").id],  # category_id for AR C 
-            "id0" : [cfg.get_category("tautau").id, cfg.get_category("real_1").id, cfg.get_category("hadC0").id], # category_id for AR C0
+            "id"  : [cfg.get_category("tautau").id],#, cfg.get_category("real_1").id, cfg.get_category("hadC").id],  # category_id for AR C 
+            #"id0" : [cfg.get_category("tautau").id, cfg.get_category("real_1").id, cfg.get_category("hadC0").id], # category_id for AR C0
         },
     })
     
@@ -1289,7 +1289,7 @@ def add_config (ana: od.Analysis,
 
 
     cfg.x.extra_tags = DotDict.wrap({
-        "genmatch"       : True, #here2#
+        "genmatch"       : False, #here2 24 jan#
     })
 
 

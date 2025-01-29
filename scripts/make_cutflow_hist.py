@@ -109,7 +109,7 @@ def get_hist_values(pickle_file):
 
 #path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12/data_mu_g/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/condor_production/cutflow_hist__event.pickle"
 
-path22 = "/afs/cern.ch/work/g/gsaha/public/IPHC/Work/ColumnFlowAnalyses/CPinHToTauTau/data/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_nano_cp_tau_v12_limited/dy_lep_m50/nominal/calib__main/sel__main__steps_trigger_met_filter_b_veto_has_2_or_more_leps_with_at_least_1_tau_dilepton_veto_has_at_least_1_pair_before_trigobj_matching_has_at_least_1_pair_after_trigobj_matching_extra_lepton_veto_One_higgs_cand_per_event_has_proper_tau_decay_products/v1/cutflow_hist__event.pickle"
+path22 = "/eos/user/m/mwitt/CPinHToTauTauOutput/cf_store/analysis_httcp/cf.CreateCutflowHistograms/run3_2022_preEE_nano_cp_tau_v14/h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay/nominal/calib__main/sel__main__steps_json_met_filter_trigger_dilepton_veto_has_at_least_1_pair_extra_lepton_veto_One_higgs_cand_per_event_has_proper_tau_decay_products_jet_veto_map/Run3_2022PreEE_limited_9jan_kine_v7/cutflow_hist__cf_npvs.pickle"
 
 #path18 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run2_UL2018_nano_tau_v10_limited/data_ul2018_a_single_mu/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_mutau_os_mutau_dr_0p5_mutau_mt_50_single_pair/dev1/cutflow_hist__event.pickle"
 #path22 = "/afs/cern.ch/user/s/stzakhar/work/higgs_cp/data/cf_store/analysis_higgs_cp/cf.CreateCutflowHistograms/run3_2022_postEE_nano_tau_v12_limited/data_mu_f/nominal/calib__example/sel__default__steps_trigger_muon_pt_26_muon_eta_2p4_mediumID_muon_dxy_0p045_muon_dz_0p2_muon_iso_0p15_DeepTauVSjet_DeepTauVSe_DeepTauVSmu_tau_eta_2p3_tau_dz_0p2_tau_pt_20_single_pair_extra_lep_veto_dilep_veto/multi_pair/cutflow_hist__event.pickle"
@@ -118,6 +118,6 @@ cuts, values22 = get_hist_values(path22)
 
 create_cutflow_histogram(cuts, 
                          data={"2022_preEE": values22},
-                         save_path="cutflow_histogram_l.pdf",
+                         save_path="cutflow_histogram_npvs.pdf",
                          log=False,
                          rel=False)

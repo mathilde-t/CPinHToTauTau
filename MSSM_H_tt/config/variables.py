@@ -82,7 +82,8 @@ def keep_columns(cfg: od.Config) -> None:
             ]
         } | {
             "GenTau.*", "GenTauProd.*", "nJet", "N_b_jets", "n_jets", 
-            "leading_jet_pt","subleading_jet_pt", "delta_eta_jj","mjj","n_jets_tag"
+            "leading_jet_pt","subleading_jet_pt", "delta_eta_jj","mjj","n_jets_tag",
+            "all_triggers_id",
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
@@ -281,7 +282,7 @@ def add_jet_features(cfg: od.Config) -> None:
         expression="leading_jet_pt",
         binning=(30, 30.0, 330.0),
         unit="GeV",
-        x_title=r"$Leading jet p_{T}$",
+        x_title=r"Leading jet $p_{T}$",
     )        
     cfg.add_variable(
         name="Subleading_jet_pt",
@@ -502,12 +503,14 @@ def phi_cp_variables(cfg: od.Config) -> None:
 def add_dilepton_features(cfg: od.Config) -> None:
     channels = cfg.channels.names()
     ch_objects = DotDict.wrap({
-        'etau'   : {'lep0' : 'Electron',
-                    'lep1' : 'Tau'},
-        'mutau'  : {'lep0' : 'Muon',
-                    'lep1' : 'Tau'},
-        'tautau' : {'lep0' : 'Tau',
-                    'lep1' : 'Tau'},
+        'etau'  : {'lep0':'Electron',
+                   'lep1':'Tau'    },
+        'mutau' : {'lep0':'Muon'    ,
+                   'lep1':'Tau'    },
+        'emu'   : {'lep0':'Electron',
+                   'lep1':'Muon'   },
+        'tautau': {'lep0':'Tau'     ,
+                   'lep1':'Tau'    },
     })
     bin_split_factor = 4 #Used to define histograms for kinematic variables with finer binning
     for ch_str in channels:

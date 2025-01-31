@@ -34,7 +34,7 @@ def add_categories(config: od.Config,
             name="cat_mutau",
             id=2,
             selection="cat_mutau",
-            label="$\\mu\\tau$ inclusive",
+            label="$\\mu\\tau$ incl",
         )
         #########################################
         ### mu-tau channel categories 0 b jets ###
@@ -566,7 +566,7 @@ def add_categories(config: od.Config,
             name="cat_etau",
             id=3,
             selection="cat_etau",
-            label="$e\\tau$ inclusive",
+            label="$e\\tau$ incl",
         )
         #######################################################
         ### e-tau channel categories NO b jets requirements ###
@@ -580,7 +580,7 @@ def add_categories(config: od.Config,
                        "deep_tau_wp",
                        "OC_lepton_veto",
                        ],
-            label="$e\\tau$ SR\nno $m_{T}$ cut",
+            label="$e\\tau$ SR\nno $m_{T}$",
             aux={'control_reg': "etau_control_reg_no_mT"}
         )
         etau_control_reg_no_mT = add_category(
@@ -591,7 +591,7 @@ def add_categories(config: od.Config,
                        "ss_charge"   ,
                        "deep_tau_wp" ,
                        ],
-            label="$e\\tau$ CR\nno $m_{T}$ cut",
+            label="$e\\tau$ CR\nno $m_{T}$",
         )
         
         etau_signal_reg = add_category(
@@ -1169,7 +1169,7 @@ def add_categories(config: od.Config,
                        "deep_tau_wp",
                        "OC_lepton_veto",
                        ],
-            label="$e\\tau$\nbjets plots",
+            label="$e\\tau$\nbjets incl",
             aux={'control_reg': "etau_control_reg_b_jets"}
         )
         etau_control_reg_b_jets = add_category(
@@ -1193,7 +1193,7 @@ def add_categories(config: od.Config,
                        "deep_tau_wp",
                        "OC_lepton_veto",
                        ],
-            label="$e\\tau$\nbjets plots\nno $m_{T}$",
+            label="$e\\tau$\nbjets incl\nno $m_{T}$",
             aux={'control_reg': "etau_control_reg_b_jets_no_mT"}
         )
         etau_control_reg_b_jets_no_mT = add_category(
@@ -1206,14 +1206,47 @@ def add_categories(config: od.Config,
                        ],
             label="$e\\tau$ CR\nbjets\nno $m_{T}$",
         )
+    ################################
+    ### e-mu channel categories ###
+    #################################
+    elif channel=='emu':
+        emu = add_category(
+            config,
+            name="cat_emu",
+            id=4,
+            selection="cat_emu",
+            label="$e\\mu$ incl",
+        )
+        #######################################################
+        ### e-tau channel categories NO b jets requirements ###
+        #######################################################
+        emu_signal_reg = add_category(
+            config,
+            name="emu_signal_reg",
+            id=207 + emu.id,
+            selection=["cat_emu"  ,
+                       "os_charge",
+                       ],
+            label="$e\\mu$ SR\n",
+            aux={'control_reg': "emu_control_reg"}
+        )
+        emu_control_reg = add_category(
+            config,
+            name="emu_control_reg",
+            id=208 + emu.id,
+            selection=["cat_emu"  ,
+                       "ss_charge",
+                       ],
+            label="$e\\mu$ CR\n",
+        )
     
     elif channel=='tautau':
         tautau = add_category(
             config,
             name="cat_tautau",
-            id=4,
+            id=5,
             selection="cat_tautau",
-            label="$\tau\tau$ inclusive",
+            label="$\tau\tau$ incl",
         )
 
     else:

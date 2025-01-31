@@ -57,8 +57,7 @@ def main(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
     #events = self[met_phi](events, **kwargs)
     #events = self[jer](events, **kwargs)
     #events = self[jets](events, **kwargs)
-    
-    if self.dataset_inst.is_mc: 
+    if self.dataset_inst.is_mc & (self.config_inst.channels.names()[0]!= 'emu'): 
     #Apply tau energy scale correction
         print("Performing tau energy scale correction...")
         

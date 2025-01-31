@@ -99,7 +99,7 @@ def zpt_weight_setup(
 
 @producer(
     uses={
-        'hcand_*', 'event'
+        'hcand_*', 'event', 'all_triggers_id',
     },
     produces={
          f"muon_weight_{shift}"
@@ -122,6 +122,7 @@ def muon_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) -> a
                 muon = hcand[lep]
                 # Create sf array template to make copies and dict for finnal results of all systematics
                 pt =  flat_np_view(muon.pt,axis=1) #take the first particle from the hcand pair
+                pt = ak.where(events.all_triggers_id == 132, pt, 30)
                 eta =  flat_np_view(abs(muon.eta),axis=1)
                 #Prepare a tuple with the inputs of the correction evaluator
                 mu_sf_args = lambda syst : (eta,pt,syst)
@@ -132,11 +133,12 @@ def muon_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) -> a
                         flat_sf = flat_sf * the_sf.evaluate(*mu_sf_args(the_shift))
                     shaped_sf = ak.unflatten(flat_sf, ak.num(muon.pt, axis=1))
                     sf_values[the_shift] = sf_values[the_shift] * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)
-
+                    sf_values[the_shift] =  ak.where(events.all_triggers_id == 132, sf_values[the_shift],1)
+    
     rename_systs = {"nominal" : "nom",
                     "systup"  : "up",
                     "systdown": "down"
-    }
+    }             
     for the_shift in shifts: events = set_ak_column_f32(events, f"muon_weight_{rename_systs[the_shift]}", sf_values[the_shift])
     return events
 
@@ -200,19 +202,29 @@ def electron_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) 
                 electron = hcand[lep]
                 # Create sf array template to make copies and dict for finnal results of all systematics
                 pt =  flat_np_view(electron.pt,axis=1) #take the first particle from the hcand pair
+                pt = ak.where(events.all_triggers_id == 111, pt, 30)
                 eta =  flat_np_view(electron.eta,axis=1)
+                phi =  flat_np_view(electron.phi,axis=1)
                 pt_20_mask = flat_np_view(electron.pt < 20)
                 pt_20_75_mask =flat_np_view( (electron.pt >= 20) & (electron.pt < 75))
                 pt_75_mask = flat_np_view(electron.pt >= 75)
-                #Prepare a tuple with the inputs of the correction evaluator
-                ele_sf_args_idiso       = lambda syst : (year_id,syst,wp_id,eta,pt)
-                ele_sf_args_trigger     = lambda syst : (year_trigger,syst,wp_trigger,eta,pt)
                 pt_20    = flat_np_view(ak.where(pt_20_mask,pt,19))
                 pt_20_75 = flat_np_view(ak.where(pt_20_75_mask,pt,21))
                 pt_75    = flat_np_view(ak.where(pt_75_mask, pt, 76))
-                ele_sf_args_RecoBelow20 = lambda syst : (year_id,syst,wp_id_RecoBelow20,eta,pt_20)
-                ele_sf_args_Reco20to75  = lambda syst : (year_id,syst,wp_id_Reco20to75,eta,pt_20_75)
-                ele_sf_args_RecoAbove75 = lambda syst : (year_id,syst,wp_id_RecoAbove75,eta,pt_75)             
+                #Prepare a tuple with the inputs of the correction evaluator
+                if '2023' in year_id :
+                    ele_sf_args_idiso = lambda syst : (year_id,syst,wp_id,eta,pt,phi)
+                    ele_sf_args_RecoBelow20 = lambda syst : (year_id,syst,wp_id_RecoBelow20,eta,pt_20,phi)
+                    ele_sf_args_Reco20to75  = lambda syst : (year_id,syst,wp_id_Reco20to75,eta,pt_20_75,phi)
+                    ele_sf_args_RecoAbove75 = lambda syst : (year_id,syst,wp_id_RecoAbove75,eta,pt_75,phi)   
+                else :
+                    ele_sf_args_idiso = lambda syst : (year_id,syst,wp_id,eta,pt)
+                    ele_sf_args_RecoBelow20 = lambda syst : (year_id,syst,wp_id_RecoBelow20,eta,pt_20)
+                    ele_sf_args_Reco20to75  = lambda syst : (year_id,syst,wp_id_Reco20to75,eta,pt_20_75)
+                    ele_sf_args_RecoAbove75 = lambda syst : (year_id,syst,wp_id_RecoAbove75,eta,pt_75)
+                
+                ele_sf_args_trigger = lambda syst : (year_trigger,syst,wp_trigger,eta,pt)
+                
                 #Loop over the shifts and calculate for each shift electron scale factor
 
                 for the_shift in shifts:
@@ -227,6 +239,7 @@ def electron_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) 
                     flat_sf = ak.where(pt_75_mask,flat_sf*RecoAbove75_sf,flat_sf)
                     shaped_sf = ak.unflatten(flat_sf, ak.num(electron.pt, axis=1))
                     sf_values[the_shift] = sf_values[the_shift] * ak.fill_none(ak.firsts(shaped_sf,axis=1), 1.)
+                    sf_values[the_shift] =  ak.where(events.all_triggers_id == 111, sf_values[the_shift],1)
 
     rename_systs = {"sf" : "nom",
                     "sfup"  : "up",

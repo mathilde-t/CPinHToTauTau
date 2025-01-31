@@ -19,7 +19,7 @@ def cat_incl(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, a
     # fully inclusive selection
     return events, ak.ones_like(events.event) == 1
 
-#Three general categories: etau, mutau and tautau
+#Four general categories: etau, mutau, emu and tautau
 @categorizer(uses={'hcand_etau.*'})
 def cat_etau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     mask = ak.num(events.hcand_etau.lep0.pt > 0, axis =1) > 0
@@ -29,6 +29,11 @@ def cat_etau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, a
 def cat_mutau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     mask = ak.num(events.hcand_mutau.lep0.pt > 0, axis =1) > 0
     return events, mask
+
+@categorizer(uses={'hcand_emu.*'})
+def cat_emu(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = ak.num(events.hcand_emu.lep0.pt > 0, axis =1) > 0
+    return events, mask 
 
 @categorizer(uses={'hcand_tautau.*'})
 def cat_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:

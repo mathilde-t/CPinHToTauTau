@@ -345,7 +345,54 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
             trigger_ID["triggerID_e"]    = triggerID_e
             trigger_ID["triggerID_etau"] = triggerID_etau
 
-        if is_cross_tau & ('mutau' in pair_objects.keys()) :
+        if (is_single_el or is_cross_el) & ('emu' in pair_objects.keys()) :
+            electrons =  pair_objects.emu.lep0
+            muons     =  pair_objects.emu.lep1
+
+            if is_single_el:
+                assert trigger.n_legs == len(leg_masks) == 1
+                assert abs(trigger.legs[0].pdg_id) == 11
+                
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (electrons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(electrons.eta) <= trigger.legs[0].min_eta)
+                
+                # electrons to match with the trigger
+                electrons = electrons[pt_mask0 & eta_mask0]           
+
+                dr_matching_e = trigger_object_matching(electrons, events.TrigObj[leg_masks[0]])
+                single_e_matches_leg0 =  dr_matching_e
+                single_e_matches_leg0 = ak.any(ak.flatten(single_e_matches_leg0, axis=-1), axis=1)
+                single_electron_triggered = ak.where(trigger_fired & is_single_el, True, single_electron_triggered)
+                hlt_path_fired_e[trigger.hlt_field] = ak.where(single_e_matches_leg0, trigger.id, -1)
+
+            elif is_single_mu:
+                assert trigger.n_legs == len(leg_masks) == 1
+                assert abs(trigger.legs[0].pdg_id) == 13
+                
+                dr_matching = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
+                # pt requirement on the offline object before the trigger matching (leg 0)
+                pt_mask0 = (muons.pt >= trigger.legs[0].min_pt)
+                # eta requirement on the offline object before the trigger matching (leg 0)
+                eta_mask0 = (abs(muons.eta) <= trigger.legs[0].min_eta)
+                # muons to match with the trigger
+                muons = muons[pt_mask0 & eta_mask0]
+                
+                # Delta R matching
+                dr_matching = trigger_object_matching(muons, events.TrigObj[leg_masks[0]])
+                single_mu_matches_leg0 = dr_matching
+                single_mu_matches_leg0 = ak.any(ak.flatten(single_mu_matches_leg0, axis=-1), axis=1)
+                single_muon_triggered = ak.where(trigger_fired & is_single_mu, True, single_muon_triggered)
+                hlt_path_fired_mu[trigger.hlt_field] = ak.where(single_mu_matches_leg0, trigger.id, -1)
+            
+            triggerID_e  = hlt_path_fired(events, hlt_path_fired_e)
+            triggerID_mu = hlt_path_fired(events, hlt_path_fired_mu)
+            matched_masks['emu'] = ((triggerID_e > 0) | (triggerID_mu > 0))
+            trigger_ID["triggerID_e"]  = triggerID_e
+            trigger_ID["triggerID_mu"] = triggerID_mu
+            
+        if is_cross_tau & ('tautau' in pair_objects.keys()) :
             assert trigger.n_legs == len(leg_masks) == 2
             assert abs(trigger.legs[0].pdg_id) == 15
             assert abs(trigger.legs[1].pdg_id) == 15

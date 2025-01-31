@@ -86,6 +86,12 @@ def pair_selection(
                         'lep1.rawDeepTau2018v2p5VSjet'  : 'ascending',
                         'lep1.pt'                       : 'descending'}
         pair_cuts = {"dr_0p5"        : lep0_p4.delta_r(lep1_p4) > 0.5}
+    if channel =='emu': 
+        vars4sorting = {'lep0.pfRelIso03_all'           : 'ascending', 
+                        'lep0.pt'                       : 'descending',
+                        'lep1.pfRelIso04_all'           : 'ascending',
+                        'lep1.pt'                       : 'descending'}
+        pair_cuts = {"dr_0p5"        : lep0_p4.delta_r(lep1_p4) > 0.3}
     if channel =='tautau': 
         vars4sorting = {'lep0.rawDeepTau2018v2p5VSjet'  : 'ascending', 
                         'lep1.rawDeepTau2018v2p5VSjet'  : 'ascending',

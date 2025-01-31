@@ -115,13 +115,13 @@ def main(
 
     # muon selection
     # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]
-    events, muon_results, good_muon_indices, single_veto_muon_indices, OC_veto_muon_indices = self[muon_selection](events,
+    events, muon_results, good_muon_indices, mu_emu_indices, single_veto_muon_indices, second_mu_veto_emu_indices, OC_veto_muon_indices = self[muon_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
     
     # electron selection
     # e.g. ele_idx: [ [], [0,1], [], [], [1,2] ]
-    events, ele_results, good_electron_indices, single_veto_electron_indices, OC_veto_electron_indices = self[electron_selection](events,
+    events, ele_results, good_electron_indices, ele_emu_indices, single_veto_electron_indices, second_ele_veto_emu_indices, OC_veto_electron_indices = self[electron_selection](events,
                                                                                                            call_force=True,
                                                                                                            **kwargs)
 
@@ -139,6 +139,10 @@ def main(
                                              'etau',
                                              good_electron_indices,
                                              good_tau_indices)
+    emu_indices_pair = self[pair_selection](events,
+                                             'emu',
+                                             ele_emu_indices,
+                                             mu_emu_indices)
     
     tautau_indices_pair = self[pair_selection](events,
                                               'tautau',
@@ -146,9 +150,10 @@ def main(
                                               good_tau_indices)
     
     pair_idxs = DotDict.wrap({
-        'etau' : etau_indices_pair,
+        'etau'  : etau_indices_pair,
         'mutau' : mutau_indices_pair,
-        'tautau' : tautau_indices_pair
+        'emu'   : emu_indices_pair,
+        'tautau': tautau_indices_pair
     })
     
     raw_dilepton_mask = ak.ones_like(events.event, dtype=np.bool_)
@@ -171,21 +176,26 @@ def main(
 
     # Single lepton veto
     # it is only applied on the events with one higgs candidate only
-    
-    events, single_lepton_veto_results = self[single_lepton_veto](events,single_veto_electron_indices, single_veto_muon_indices)
-    results += single_lepton_veto_results
-    
-    # # Additional lepton veto
-    events, second_lepton_veto_results = self[second_lepton_veto](events,
+    events, single_lepton_veto_results = self[single_lepton_veto](events,
                                                                   single_veto_electron_indices,
                                                                   single_veto_muon_indices)
+    results += single_lepton_veto_results
+
+    # # Additional lepton veto
+    if self.config_inst.channels.names()[0] == 'emu':
+        events, second_lepton_veto_results = self[second_lepton_veto](events,
+                                                                      second_ele_veto_emu_indices,
+                                                                      second_mu_veto_emu_indices)
+    else:
+        events, second_lepton_veto_results = self[second_lepton_veto](events,
+                                                                      single_veto_electron_indices,
+                                                                      single_veto_muon_indices)
     results += second_lepton_veto_results
-    
+
     # Opposite Charge (OC) lepton pair veto
     events, OC_lepton_veto_results = self[OC_lepton_veto](events,
-                                                          OC_veto_electron_indices,
-                                                          OC_veto_muon_indices)
-    # results += OC_lepton_veto_results
+                                                        OC_veto_electron_indices,
+                                                        OC_veto_muon_indices)
     
     #Check arrays for np.nan values and mask them
     events, nan_mask_res = self[mask_nans](events)

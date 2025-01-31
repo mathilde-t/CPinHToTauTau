@@ -93,6 +93,7 @@ def add_run3(ana: od.Analysis,
         "data_mu",
         "data_tau",
         "data_e",
+        "data_egamma",
         "data_singlemu",
         #Drell-Yan
         "dy_lep",
@@ -140,6 +141,8 @@ def add_run3(ana: od.Analysis,
         #data
         "data_e_C",
         "data_e_D",
+        "data_egamma_C",
+        "data_egamma_D",
         "data_singlemu_C",
         "data_mu_C",
         "data_mu_D",
@@ -178,6 +181,9 @@ def add_run3(ana: od.Analysis,
         "data_e_E",
         "data_e_F",
         "data_e_G",
+        "data_egamma_E",
+        "data_egamma_F",
+        "data_egamma_G",
         "data_mu_E",
         "data_mu_F",
         "data_mu_G",
@@ -216,6 +222,8 @@ def add_run3(ana: od.Analysis,
         #data
         "data_e_Cv123",
         "data_e_Cv4",
+        "data_egamma_Cv123",
+        "data_egamma_Cv4",
         "data_mu_Cv123",
         "data_mu_Cv4",
         #Drell-Yan
@@ -249,6 +257,7 @@ def add_run3(ana: od.Analysis,
     dataset_names_2023postBPix = [
         #data
         "data_e_D",
+        "data_egamma_D",
         "data_mu_D",
         #Drell-Yan
         "dy_lep_madgraph",
@@ -771,21 +780,21 @@ def add_run3(ana: od.Analysis,
     }
     # channels
     # processing only one channel at once, electron calibration is channel dependent!
-    channel_id = {'etau': 1,
-                  'mutau': 2,
+    channel_id = {'etau'  : 1,
+                  'mutau' : 2,
+                  'emu'   : 3,
                   'tautau': 4}
     cfg.add_channel(name=channel,   id=channel_id[channel])
-    #cfg.add_channel(name="mutau",  id=2)
-    #cfg.add_channel(name="emu"  ,  id=3)
-    #cfg.add_channel(name="tautau", id=4)
     
     cfg.x.ch_objects = DotDict.wrap({
         'etau'   : {'lep0' : 'Electron',
-                    'lep1' : 'Tau'},
+                    'lep1' : 'Tau'    },
         'mutau'  : {'lep0' : 'Muon',
-                    'lep1' : 'Tau'},
+                    'lep1' : 'Tau'    },
+        'emu'    : {'lep0' : 'Electron',
+                    'lep1' : 'Muon'   },
         'tautau' : {'lep0' : 'Tau',
-                    'lep1' : 'Tau'},
+                    'lep1' : 'Tau'    },
     })
     
     if cfg.campaign.x("custom").get("creator") == "desy":  

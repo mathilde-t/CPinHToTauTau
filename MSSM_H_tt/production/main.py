@@ -83,15 +83,15 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
-    if self.dataset_inst.is_mc:
-        events = self[get_mc_weight](events, **kwargs)
-        print("Producing Normalization weights...")
-        events = self[normalization_weights](events, **kwargs)
+    if (self.dataset_inst.is_mc & (self.config_inst.channels.names()[0] != 'emu')):
         processes = self.dataset_inst.processes.names()
         if ak.any(['dy' in proc for proc in processes]):
             print("Splitting Drell-Yan dataset...")
             events = self[split_dy](events,**kwargs)
-
+    if self.dataset_inst.is_mc:
+        events = self[get_mc_weight](events, **kwargs)
+        print("Producing Normalization weights...")
+        events = self[normalization_weights](events, **kwargs)
         events = self[generatorZ](events, **kwargs)
         print("Z pt reweighting...")
         events = self[zpt_weight](events,**kwargs)

@@ -51,11 +51,11 @@ def channel_id(
           "jetId", "btagDeepFlavB"
         ]} | {"hcand_*"},
     produces={
-        "Jet.n_jets",
-        "Jet.leading_jet_pt",
-        "Jet.subleading_jet_pt",
-        "Jet.delta_eta_jj",
-        "Jet.mjj",
+        "n_jets",
+        "leading_jet_pt",
+        "subleading_jet_pt",
+        "delta_eta_jj",
+        "mjj",
         },
     exposed=False,
 )
@@ -142,23 +142,25 @@ def jet_pt_def(
     delta_phi_to_plot          = delta_phi_0_1[(delta_phi_0_1 != 2*10**1) & (subleading_jet_phi != 10**1)]
     
 
-    n_jets_vs_lep0 = ak.sum(jet_vs_lep0_pt>0,axis=1)
-    n_jets_vs_lep1 = ak.sum(jet_vs_lep1_pt>0,axis=1)
+    n_jets_vs_lep0 = ak.sum(jet_vs_lep0_pt>30,axis=1)
+    n_jets_vs_lep1 = ak.sum(jet_vs_lep1_pt>30,axis=1)
     n_jets_mask = (n_jets_vs_lep0 == n_jets_vs_lep1)
     n_jets = ak.where(n_jets_mask, n_jets_vs_lep0,0)
     
-    ls_product = leading_jet_pt*subleading_jet_pt
+    
+    ls_product_mask = ((leading_jet_pt > 0) & (subleading_jet_pt > 0))
+    ls_product = ak.where(ls_product_mask, leading_jet_pt*subleading_jet_pt, 0)
     
     delta_eta = ak.where(n_jets>=2 , delta_eta_0_1, -100)
     delta_phi =  ak.where(n_jets>=2, delta_phi    , -999)
-    mjj_mask = (n_jets>=2) & (delta_phi != -999) & (delta_eta != -100)
-
+    mjj_mask = ((n_jets>=2) & (delta_phi != -999) & (delta_eta != -100) & (ls_product > 0))
+    
     mjj = ak.where(mjj_mask,np.sqrt(2*ls_product*(np.cosh(delta_eta) - np.cos(delta_phi))),-999) 
-    events = set_ak_column(events, "Jet.n_jets",            n_jets           )
-    events = set_ak_column(events, "Jet.leading_jet_pt",    leading_jet_pt   )
-    events = set_ak_column(events, "Jet.subleading_jet_pt", subleading_jet_pt)
-    events = set_ak_column(events, "Jet.delta_eta_jj",      delta_eta     )
-    events = set_ak_column(events, "Jet.mjj",               mjj              )
+    events = set_ak_column(events, "n_jets",            n_jets           )
+    events = set_ak_column(events, "leading_jet_pt",    leading_jet_pt   )
+    events = set_ak_column(events, "subleading_jet_pt", subleading_jet_pt)
+    events = set_ak_column(events, "delta_eta_jj",      delta_eta     )
+    events = set_ak_column(events, "mjj",               mjj              )
     return events
 
 @producer(
@@ -166,7 +168,7 @@ def jet_pt_def(
         [ "pt", "eta", "phi", "mass",
           "jetId", "btagDeepFlavB"
         ]} | {"hcand_*"},
-    produces={"Jet.n_jets_tag"},
+    produces={"n_jets_tag"},
     exposed=False,
 )
 def jets_taggable(
@@ -188,7 +190,7 @@ def jets_taggable(
     jet_obj_mask = ak.ones_like(jet_pt_sorted_idx, dtype=np.bool_)
     for the_sel in jet_selections.values():
         jet_obj_mask = jet_obj_mask & the_sel
-        
+    
     for the_ch in self.config_inst.channels.names(): 
         hcand = events[f'hcand_{the_ch}']
         
@@ -199,18 +201,17 @@ def jets_taggable(
             presel_jet = ak.drop_none(ak.mask(sorted_jets, jet_obj_mask_seed_idx))
             jet_tau_pairs = ak.cartesian([presel_jet,lep], axis=1)
             jet_br, lep_br = ak.unzip(jet_tau_pairs)     
-            delta_phi = jet_br.phi - lep_br.phi
+            delta_phi = (jet_br.phi - lep_br.phi)
             delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
             delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)
-            delta_eta = jet_br.eta - lep_br.eta
+            delta_eta = (jet_br.eta - lep_br.eta)
             delta_r = np.sqrt(delta_phi**2 + delta_eta**2)
             jet_br_to_plot = jet_br[delta_r > 0.4]
             if lep_str == 'lep0':
                 jet_vs_lep0 = jet_br[delta_r > 0.4]
             elif lep_str == 'lep1':
                 jet_vs_lep1 = jet_br[delta_r > 0.4]
-                
-                
+                    
     lep0_max_obj       = ak.max(ak.num(jet_vs_lep0.pt))         
     lep1_max_obj       = ak.max(ak.num(jet_vs_lep1.pt))
     max_len            = ak.max([lep0_max_obj,lep1_max_obj])
@@ -224,7 +225,7 @@ def jets_taggable(
     n_jets_vs_lep1_tag = ak.sum(jet_vs_lep1_pt_tag >20,axis=1)
     n_jets_mask_tag    = (n_jets_vs_lep0_tag == n_jets_vs_lep1_tag)
     n_jets_taggable = ak.where(n_jets_mask_tag, n_jets_vs_lep0_tag, 0)
-    events = set_ak_column(events, "Jet.n_jets_tag", n_jets_taggable)
+    events = set_ak_column(events, "n_jets_tag", n_jets_taggable)
     return events
 
 @producer(
@@ -291,9 +292,10 @@ def number_b_jet(
     jet_vs_lep1_pt     = ak.pad_none(jet_vs_lep1.pt, max_len)
     jet_vs_lep1_pt_tag = ak.fill_none(jet_vs_lep1_pt, -999)
     
-    n_jets_vs_lep0_tag = ak.sum(jet_vs_lep0_pt_tag >20,axis=1)
-    n_jets_vs_lep1_tag = ak.sum(jet_vs_lep1_pt_tag >20,axis=1)
+    n_jets_vs_lep0_tag = ak.sum((jet_vs_lep0_pt_tag > 20),axis=1)
+    n_jets_vs_lep1_tag = ak.sum((jet_vs_lep1_pt_tag > 20),axis=1)
     n_jets_mask_tag    = (n_jets_vs_lep0_tag == n_jets_vs_lep1_tag)
     n_jets_taggable = ak.where(n_jets_mask_tag, n_jets_vs_lep0_tag, 0)
+   
     events = set_ak_column(events, "N_b_jets", n_jets_taggable)
     return events

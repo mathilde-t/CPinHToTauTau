@@ -67,8 +67,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         number_b_jet,
         jet_pt_def,
         jets_taggable,
-        "Jet.jec_no_jec_diff",
-        "Jet.number_of_jets",        
+        "Jet.jec_no_jec_diff",       
     },
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
@@ -77,7 +76,9 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     events = self[attach_coffea_behavior](events, **kwargs)
     print("Producing Jet features...")
     events = set_ak_column_f32(events, "Jet.jec_no_jec_diff", (events.Jet.pt - events.Jet.pt_no_jec))
-    events = set_ak_column_f32(events, "Jet.number_of_jets", ak.num(events.Jet))
+    print("Producing jet variables for plotting...") 
+    events = self[jet_pt_def](events, **kwargs)
+    events = self[jets_taggable](events, **kwargs)   
     print("Producing Number of b-jets for categorization")
     events = self[number_b_jet](events, **kwargs)
     print("Producing Hcand features...")
@@ -102,10 +103,5 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         print("Producing Electron weights...")
         events = self[electron_weight](events,do_syst = True, **kwargs)
         print("Producing Tau weights...")
-        events = self[tau_weight](events,do_syst = True, **kwargs)
-        
-    print("Producing jet variables for plotting...") 
-    events = self[jet_pt_def](events, **kwargs)
-    events = self[jets_taggable](events, **kwargs)    
-    
+        events = self[tau_weight](events,do_syst = True, **kwargs)    
     return events

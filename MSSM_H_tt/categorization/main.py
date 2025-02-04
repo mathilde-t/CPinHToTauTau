@@ -145,7 +145,6 @@ def deep_tau_inv_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.A
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet < deep_tau_vs_e_jet_wps["Medium"]) #This cut is reversed
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= deep_tau_vs_e_jet_wps["VVLoose"])
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= deep_tau_vs_mu_wps["VLoose"])
-        #from IPython import embed; embed()
         mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
     return events, mask
 

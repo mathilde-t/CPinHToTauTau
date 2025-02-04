@@ -290,7 +290,6 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
         if (is_single_el or is_cross_el) & ('etau' in pair_objects.keys()) :
             electrons =  pair_objects.etau.lep0
             taus =  pair_objects.etau.lep1
-
             if is_single_el:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 11
@@ -345,10 +344,9 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
             trigger_ID["triggerID_e"]    = triggerID_e
             trigger_ID["triggerID_etau"] = triggerID_etau
 
-        if (is_single_el or is_cross_el) & ('emu' in pair_objects.keys()) :
+        if (is_single_el or is_single_mu) & ('emu' in pair_objects.keys()) :
             electrons =  pair_objects.emu.lep0
             muons     =  pair_objects.emu.lep1
-
             if is_single_el:
                 assert trigger.n_legs == len(leg_masks) == 1
                 assert abs(trigger.legs[0].pdg_id) == 11
@@ -427,11 +425,11 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
         triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
         matched_masks['tautau'] = (triggerID_tau > 0)
         trigger_ID["triggerID_tau"]    = triggerID_tau
-        
-        for column_name, array in trigger_ID.items():
-            events = set_ak_column(events, column_name, array)
-        matched_trigger_array = hlt_path_fired(events, trigger_ID)
-        events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
+
+    for column_name, array in trigger_ID.items():
+        events = set_ak_column(events, column_name, array)
+    matched_trigger_array = hlt_path_fired(events, trigger_ID)
+    events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
     return events, matched_masks
 
 

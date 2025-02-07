@@ -1279,7 +1279,7 @@ def add_config (ana: od.Analysis,
             "tau"                     : False,
         },
         "selection": {
-            "main"                    : False,
+            "main"                    : True,
             "trigobject_matching"     : False,
             "extra_lep_veto"          : False,
             "dilep_veto"              : False,

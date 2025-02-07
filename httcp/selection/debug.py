@@ -89,11 +89,11 @@ def get_object_eff(results, tag, dataset_name, key : Optional[str]=None):
     logger.info(f"object level : \n{table}")
     logger.info(f"event level  : \n{evt_table}")
     # save the table as a .txt file
-    save_efficiency_table(table, dataset_name, title=f"Object-Level Efficiency: {tag}")
-    save_efficiency_table(evt_table, dataset_name, title=f"Event-Level Efficiency: {tag}")
+    save_efficiency_table(table, dataset_name, title=f"Object-Level Efficiency: {tag} {key}")
+    save_efficiency_table(evt_table, dataset_name, title=f"Event-Level Efficiency: {tag} {key}")
     # plot the table as stair plot
-    plot_eff(rows, ["Selection", f"n_{tag}", "Abs Eff"], dataset_name, title=f"Object-Level Efficiency: {tag}")
-    plot_eff(rows_evt_level, ["Selection", f"n_{tag}", "Abs Eff"], dataset_name, title=f"Event-Level Efficiency: {tag}")
+    plot_eff(rows, ["Selection", f"n_{tag}", "Abs Eff"], dataset_name, title=f"Object-Level Efficiency: {tag} {key}")
+    plot_eff(rows_evt_level, ["Selection", f"n_{tag}", "Abs Eff"], dataset_name, title=f"Event-Level Efficiency: {tag} {key}")
 
     
 

@@ -631,10 +631,10 @@ def add_config (ana: od.Analysis,
     # register shifts
     # --------------------------------------------------------------------------------------------- #
 
-    cfg.add_shift(name="nominal", id=0)
+    cfg.add_shift(name="nominal", id=0)#here1, label="CP maximal mixing") #CAVE : I changed the nominal shift to match mm hypothesis
 
 
-    # --- >>> PU weight <<< --- #
+    # --- >>> PU weight <<< --- d#
     cfg.add_shift(name="minbias_xs_up", id=7, type="shape")
     cfg.add_shift(name="minbias_xs_down", id=8, type="shape")
     add_shift_aliases(
@@ -790,8 +790,8 @@ def add_config (ana: od.Analysis,
     )
 
     # --- >>> tau spinner weight <<< --- #
-    cfg.add_shift(name="tauspinner_up",   id=150, type="shape")
-    cfg.add_shift(name="tauspinner_down", id=151, type="shape")
+    cfg.add_shift(name="tauspinner_up",   id=150, type="shape")#here1, label="CP even")
+    cfg.add_shift(name="tauspinner_down", id=151, type="shape")#here1, label="CP odd")
     add_shift_aliases(
         cfg,
         "tauspinner",

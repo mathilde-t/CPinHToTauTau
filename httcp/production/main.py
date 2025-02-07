@@ -207,7 +207,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     # deterministic seeds
     ##events = self[deterministic_seeds](events, **kwargs)
     events = self[build_abcd_masks](events, **kwargs)
-    events, category_ids_debug_dict = self[category_ids](events, **kwargs)
+    #events, category_ids_debug_dict = self[category_ids](events, **kwargs)
+    events = self[category_ids](events, **kwargs)
 
     #events = self[ff_weight](events, **kwargs)
     if self.dataset_inst.is_mc:

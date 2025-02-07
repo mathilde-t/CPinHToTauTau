@@ -387,14 +387,14 @@ def tau_selection(
         #                       | (taus.decayMode == 10)
         #                       | (taus.decayMode == 11)),
         "tau_DecayMode"     : (
-            (  (taus.decayMode ==  0) #here3 & (np.abs(taus.IPsig) > 1.25) # ipsig > 1.25 only for pion, the value found by Imperial C by their optimation
+            (  (taus.decayMode ==  0) & (np.abs(taus.IPsig) > 1.25) # ipsig > 1.25 only for pion, the value found by Imperial C by their optimation
                  | (((taus.decayMode ==  1)
                    | (taus.decayMode ==  2)
                    | (taus.decayMode == 10)
                    | (taus.decayMode == 11))
                   & (taus.decayModeHPS != 0)))), # decayMode is now decayModePNet
         "tau_ipsig_safe"    : taus.IPsig > ipsig_dummy,
-        #"tau_ipsig_1p5"     : (taus.decayModePNet ==  0) & (np.abs(taus.IPsig) > 1.5), # ipsig > 1.5 only for pion
+        #"tau_ipsig_1p25"     : (taus.decayMode ==  0) & (np.abs(taus.IPsig) > 1.25), # ipsig > 1.25 only for pion, the value found by Imperial C by their optimation
     }
     
     tau_mask = ak.local_index(taus) >= 0

@@ -82,8 +82,8 @@ def keep_columns(cfg: od.Config) -> None:
             ]
         } | {
             "GenTau.*", "GenTauProd.*", "nJet", "N_b_jets", "n_jets", 
-            "leading_jet_pt","subleading_jet_pt", "delta_eta_jj","mjj","n_jets_tag",
-            "all_triggers_id",
+            "leading_jet_pt","subleading_jet_pt","leading_jet_eta","subleading_jet_eta","leading_jet_phi","subleading_jet_phi","delta_eta_jj","mjj","n_jets_tag",
+            "all_triggers_id", "triggerID_e", "triggerID_mu", "triggerID_tau",
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
@@ -278,19 +278,43 @@ def add_jet_features(cfg: od.Config) -> None:
         x_title="N_b_jets",
     )
     cfg.add_variable(
-        name="Leading_jet_pt",
+        name="leading_jet_pt",
         expression="leading_jet_pt",
         binning=(30, 30.0, 330.0),
         unit="GeV",
         x_title=r"Leading jet $p_{T}$",
     )        
     cfg.add_variable(
-        name="Subleading_jet_pt",
+        name="subleading_jet_pt",
         expression="subleading_jet_pt",
         binning=(25, 30.0, 280.0),
         unit="GeV",
         x_title=r"Subleading jet $p_{T}$",
     )
+    cfg.add_variable(
+        name="leading_jet_eta",
+        expression="leading_jet_eta",
+        binning=(47, -4.7, 4.7),
+        x_title="Leading Jet $\\eta$",
+    ) 
+    cfg.add_variable(
+        name="subleading_jet_eta",
+        expression="subleading_jet_eta",
+        binning=(47, -4.7, 4.7),
+        x_title="Subleading Jet $\\eta$",
+    ) 
+    cfg.add_variable(
+        name="leading_jet_phi",
+        expression="leading_jet_phi",
+        binning=(32, -3.2, 3.2),
+        x_title="Leading Jet $\\phi$",
+    )  
+    cfg.add_variable(
+        name="subleading_jet_phi",
+        expression="subleading_jet_phi",
+        binning=(32, -3.2, 3.2),
+        x_title="Subleading Jet $\\phi$",
+    ) 
     cfg.add_variable(
         name="delta_eta_jj",
         expression="delta_eta_jj",

@@ -202,7 +202,7 @@ def electron_selection(
         "electron_eta_2p1"        : abs(events.Electron.eta) < 2.1,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
         "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
+        #"electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
         "electron_mva_iso_wp90"   : mva_iso_wp90 == 1,
     }
     ele_emu_selections = {
@@ -210,8 +210,8 @@ def electron_selection(
         "electron_eta_2p5"        : abs(events.Electron.eta) < 2.5,
         "electron_dxy_0p045"      : abs(events.Electron.dxy) < 0.045,
         "electron_dz_0p2"         : abs(events.Electron.dz) < 0.2,
-        "electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
-        "electron_mva_noniso_wp90": mva_noniso_wp90 == 1,
+        #"electron_pfRelIso03_all" : events.Electron.pfRelIso03_all < 0.15,
+        "electron_mva_iso_wp90": mva_iso_wp90 == 1,
         "electron_missing_hits"   : number_of_missing_hits < 2,
         "electron_pass_conVeto"   : events.Electron.convVeto == 1,
     }

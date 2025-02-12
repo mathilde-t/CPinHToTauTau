@@ -103,5 +103,5 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         print("Producing Electron weights...")
         events = self[electron_weight](events,do_syst = True, **kwargs)
         print("Producing Tau weights...")
-        events = self[tau_weight](events,do_syst = True, **kwargs)    
+        events = self[tau_weight](events,do_syst = True, **kwargs)   
     return events

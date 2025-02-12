@@ -179,8 +179,8 @@ case $1 in
     ;;
     "run3_2023preBPix_emu_lim")
         config="run3_2023_preBPix_emu_limited"
-        datasets='dy_lep_madgraph,data_egamma_Cv123'
-        processes='dy_lep,data'
+        datasets='data_egamma_Cv123' #dy_lep_madgraph
+        processes='data' #dy_lep
         categories='emu_signal_reg'
         variables='N_b_jets'
         workflow='local'

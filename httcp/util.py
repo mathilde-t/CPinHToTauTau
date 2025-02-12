@@ -381,10 +381,10 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
         matched_masks['tautau'] = (triggerID_tau > 0)
         trigger_ID["triggerID_tau"]    = triggerID_tau
         
-        for column_name, array in trigger_ID.items():
-            events = set_ak_column(events, column_name, array)
-        matched_trigger_array = hlt_path_fired(events, trigger_ID)
-        events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
+    for column_name, array in trigger_ID.items():
+        events = set_ak_column(events, column_name, array)
+    matched_trigger_array = hlt_path_fired(events, trigger_ID)
+    events = set_ak_column(events, "all_triggers_id", matched_trigger_array)
     return events, matched_masks
 
 

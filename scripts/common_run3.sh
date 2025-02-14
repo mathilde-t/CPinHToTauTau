@@ -2,9 +2,10 @@
 
 set_common_vars() {
 
-version="dev"
+version="dev" 
     
-categories_mutau="mutau_signal_reg,mutau_signal_reg_no_mt,mutau_signal_reg_endcap_tau,mutau_signal_reg_barrel_tau,mutau_signal_reg_endcap_tau_no_mt,mutau_signal_reg_barrel_tau_no_mt" 
+categories_mutau='cat_mutau_sr,cat_mutau_ar_wj,cat_mutau_ar_qcd,cat_mutau_ar_yields' #cat_mutau_sr #,cat_mutau_no_mt,cat_mutau_ar_wj,cat_mutau_ar_qcd,cat_mutau_ar_wj__tau_h,cat_mutau_ar_wj__tau_not_h
+#categories_mutau="mutau_signal_reg,mutau_signal_reg_no_mt,mutau_signal_reg_endcap_tau,mutau_signal_reg_barrel_tau,mutau_signal_reg_endcap_tau_no_mt,mutau_signal_reg_barrel_tau_no_mt" 
 variables_mutau='mutau_lep0_pt,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep1_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_eta,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
 
 categories_etau="etau_signal_reg,etau_signal_reg_no_mt" 

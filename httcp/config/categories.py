@@ -81,7 +81,7 @@ def add_categories(config: od.Config,
         )
     
     #Define initial category map with selections and call the function
-    
+    #Don't change this part: it is important for fake factor method    
     base_selection = [f'cat_{channel}', 'os_charge']
     
     category_map  = DotDict.wrap({

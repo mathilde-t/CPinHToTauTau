@@ -410,3 +410,63 @@ def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             the_weight = np.ones_like(events.event, dtype=np.float32)
         events = set_ak_column_f32(events, f"tauspinner_weight{the_name}", the_weight)
     return events
+
+
+
+
+
+
+@producer(
+    uses={
+        'event','hcand_*',
+    },
+    produces={
+        'ff_weight*'
+    },
+)
+def fake_factors(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
+    """
+    A simple function that sets tauspinner_weight according to the cp_hypothesis
+    
+    """
+    channel = self.config_inst.channels.names()[0]
+    tau = events[f'hcand_{channel}'].lep1 # fake factor method works for nutau/etau channel
+    pt = flat_np_view(tau.pt, axis=1)
+    dm = flat_np_view(tau.decayModePNet, axis=1)
+    mask = (pt > 20) & (dm >= 0)
+    fake_factors = {}
+    for the_name in self.config_inst.x.fake_factor_method.columns:
+        for the_shift in self.config_inst.x.fake_factor_method.shifts:
+            ff_evaluator = self.fake_factor_qcd if 'qcd' in the_name else self.fake_factor_wjets
+            args = lambda mask, shift : (pt[mask],
+                                         dm[mask],
+                                         #shift, comment this out for a time
+            )
+            ff_vals = np.zeros_like(pt, dtype=np.float32)
+            ff_vals[mask] = ff_evaluator(*args(mask, the_shift))
+            events = set_ak_column_f32(events,'_'.join((the_name,the_shift)), ff_vals)
+    return events
+
+@fake_factors.requires
+def fake_factors_requires(self: Producer, reqs: dict) -> None:
+    if "external_files" in reqs:
+        return
+    
+    from columnflow.tasks.external import BundleExternalFiles
+    reqs["external_files"] = BundleExternalFiles.req(self.task)
+    
+@fake_factors.setup
+def fake_factors_setup(
+    self: Producer,
+    reqs: dict,
+    inputs: dict,
+    reader_targets: InsertableDict,
+) -> None:
+    bundle = reqs["external_files"]
+    import correctionlib
+    correctionlib.highlevel.Correction.__call__ = correctionlib.highlevel.Correction.evaluate
+    fake_factors = correctionlib.CorrectionSet.from_string(
+        bundle.files.fake_factors.load(formatter='json'))
+    self.fake_factor_qcd = fake_factors["ff_qcd"]
+    self.fake_factor_wjets = fake_factors["ff_wjets"]
+  

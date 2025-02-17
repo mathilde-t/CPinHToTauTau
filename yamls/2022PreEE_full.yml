@@ -12,7 +12,7 @@ args:
   config    : run3_2022_preEE_nano_cp_tau_v14
   workflow  : htcondor
   branch    : -1
-  version   : Run3puNmcvertices_full #Run3_2022PreEE_full_9jan_kine #PhiCPtt+mt_12jan25 #Run3_2022PreEE_full_9jan_preipsigcut #Run3_2022PreEE_full_8jan_prepucut #dummy
+  version   : dummy #YieldTables_Run3_preEE_4_fev_20h37 #Run3puNmcvertices_full_4feb #Run3_2022PreEE_full_9jan_kine #PhiCPtt+mt_12jan25 #Run3_2022PreEE_full_9jan_preipsigcut #Run3_2022PreEE_full_8jan_prepucut #dummy
 
   datasets  :
     ## == data ==
@@ -20,7 +20,7 @@ args:
     - data_tau_D
     - data_mu_C
     - data_mu_D
-    #- data_single_mu_C
+    - data_single_mu_C
     - data_e_C
     - data_e_D
     ## == wj ==

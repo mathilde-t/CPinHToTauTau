@@ -48,9 +48,12 @@ from httcp.production.columnvalid import make_column_valid
 
 from httcp.util import IF_DATASET_HAS_LHE_WEIGHTS, IF_DATASET_IS_DY, IF_DATASET_IS_W, IF_DATASET_IS_SIGNAL
 from httcp.util import IF_RUN2, IF_RUN3, IF_ALLOW_STITCHING
+    
+from httcp.production.apply_FastMTT_Wiktor import apply_fastMTT_Wiktor
+#from httcp.production.apply_FastMTT_IC import apply_fastMTT_IC
 
 np = maybe_import("numpy")
-ak = maybe_import("awkward")
+ak = maybe_import("awkward")        
 coffea = maybe_import("coffea")
 maybe_import("coffea.nanoevents.methods.nanoaod")
 
@@ -71,6 +74,8 @@ logger = law.logger.get_logger(__name__)
         ProduceGenPhiCP, #ProduceGenCosPsi, 
         ProduceDetPhiCP, #ProduceDetCosPsi,
         #here1# "PV.npvs","Pileup.nTrueInt","Pileup.nPU",
+        apply_fastMTT_Wiktor,
+        #apply_fastMTT_IC,
     },
     produces={
         # new columns
@@ -83,6 +88,8 @@ logger = law.logger.get_logger(__name__)
         "met_var_qcd_h1", "met_var_qcd_h2",
         "hT",
         #here1# npvs, pu_nTrue_Int, nPU,
+        apply_fastMTT_Wiktor,
+        #apply_fastMTT_IC,
     },
 )
 def hcand_features(
@@ -118,22 +125,38 @@ def hcand_features(
     
     events = set_ak_column_i32(events, "n_jet", ak.num(events.Jet.pt, axis=1))
 
-    # PU variables npvs, pu_nTrue_Int, nPU #here1#
+    # ########################################### #
+    #     PU variables npvs, pu_nTrue_Int, nPU    #     #here1#
+    # ########################################### #
 
     #here1# events = set_ak_column_f32(events, "npvs", PV.npvs)
     #here1# events = set_ak_column_f32(events, "pu_nTrue_Int", Pileup.nTrueInt)
     #here1# events = set_ak_column_f32(events, "nPU", Pileup.nPU)
 
 
-    events, P4_dict     = self[reArrangeDecayProducts](events)
-    events              = self[ProduceDetPhiCP](events, P4_dict)
-    #events              = self[ProduceDetCosPsi](events, P4_dict)
+    # ################## #
+    #     Run FastMTT    #
+    # ################## #
+    logger.info(" >>>--- FastMTT Wiktor --->>> [Not as fast as you think]")
+    events = self[apply_fastMTT_Wiktor](events, **kwargs)
+    #logger.info(" >>>--- FastMTT IC --->>> [Not as fast as you think]")
+    #events = self[apply_fastMTT_IC](events, **kwargs)
+    
+
+    # ########################### #
+    # -------- For PhiCP -------- #
+    # ########################### #
+    events, P4_dict = self[reArrangeDecayProducts](events)
+    events   = self[ProduceDetPhiCP](events, P4_dict)
+    #events  = self[ProduceDetCosPsi](events, P4_dict) # for CosPsi only
     
     if self.config_inst.x.extra_tags.genmatch:
         if "is_signal" in list(self.dataset_inst.aux.keys()):
             events, P4_gen_dict = self[reArrangeGenDecayProducts](events)
-            events = self[ProduceGenPhiCP](events, P4_gen_dict)
-            #events = self[ProduceGenCosPsi](events, P4_gen_dict)
+            events = self[ProduceGenPhiCP](events, P4_gen_dict) 
+            #events = self[ProduceGenCosPsi](events, P4_gen_dict) # for CosPsi only
+
+
     return events
 
 

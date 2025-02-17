@@ -5,33 +5,33 @@ era     : 2022
 postfix : PreEE
 wrapper : true
 limited : true
-workers : 3
+workers : 7
 
 args:
   config    : run3_2022_preEE_nano_cp_tau_v14_limited
   workflow  : local
   branch    : -1
-  version   : dummy #Run3puNmcvertices #PhiCPtt+mt_12jan25 #PrePuwAndIpsigCut_13jan_preEE #here2# #here1#12jan25_preEE_test_PU_vars #dummy 
+  version   : Run3_2022PreEE_limited_20250211_1600 #Run3puNmcvertices_limited_4feb #dummy #PhiCPtt+mt_12jan25 #PrePuwAndIpsigCut_13jan_preEE #here2# #here1#12jan25_preEE_test_PU_vars #dummy 
 
   datasets  :
-    - data_e_C
-    - data_mu_C
-    - data_tau_C
-    - dy_lep_m50_madgraph
-    - wj_incl_madgraph
-    - tt_sl
-    - tt_fh
+    #- data_e_C
+    #- data_mu_C
+    #- data_tau_C
+    #- dy_lep_m50_madgraph
+    #- wj_incl_madgraph
+    #- tt_sl
+    #- tt_fh
     #- h_ggf_tautau_prod_cp_even_sm
     - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
-    - h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
-    - h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+    #- h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
+    #- h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
     #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
 
   processes :
-    - data
-    - dy_m50toinf
-    - w_lnu
-    - tt
+    #- data
+    #- dy_m50toinf
+    #- w_lnu
+    #- tt
     - h_ggf_htt
 
   categories:
@@ -85,12 +85,29 @@ args:
     #- tau_2_phi
     #- hcand_1_pt
     #- hcand_1_eta
+    #- hcand_1_phi
     #- hcand_2_pt
     #- hcand_2_eta
     #- hcand_2_phi
     #- hcand_2_decayMode
     #- hcand_dr
-    #- hcand_invm
+    - hcand_invm
+    - hcand_invm_fastMTT_IC
+    - hcand_invm_fastMTT_W
+    - hcand_1_pt_fastMTT_IC
+    - hcand_1_pt1_fastMTT_IC
+    - hcand_1_pt2_fastMTT_IC
+    - hcand_1_pt_fastMTT_W
+    - hcand_1_eta_fastMTT_W
+    - hcand_1_phi_fastMTT_W
+    - hcand_1_mass_fastMTT_W
+    - hcand_2_pt_fastMTT_IC
+    - hcand_2_pt1_fastMTT_IC
+    - hcand_2_pt2_fastMTT_IC
+    - hcand_2_pt_fastMTT_W
+    - hcand_2_eta_fastMTT_W
+    - hcand_2_phi_fastMTT_W
+    - hcand_2_mass_fastMTT_W
     #- puppi_met_pt
     #- puppi_met_phi
     #- PhiCP_IPIP
@@ -101,7 +118,7 @@ args:
     #- PhiCPGen_IPDP       
     #- pu_weight
     #- pu_weight_log
-    - npvs
+    #- npvs
     #- pu_nTrue_Int
     #- nPU
     #- muon_id_weight

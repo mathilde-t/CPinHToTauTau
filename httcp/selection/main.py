@@ -19,7 +19,7 @@ from columnflow.selection.cms.met_filters import met_filters
 from columnflow.production.processes import process_ids
 from columnflow.production.cms.mc_weight import mc_weight
 from columnflow.production.util import attach_coffea_behavior
-#from columnflow.production.categories import category_ids
+from columnflow.production.categories import category_ids
 
 from columnflow.util import maybe_import
 from columnflow.columnar_util import optional_column as optional
@@ -142,7 +142,7 @@ def get_2n_pairs(etau_indices_pair,
         gentau_selection,
         higgscandprod,
         rel_charge,
-        #category_ids,
+        category_ids,
         #build_abcd_masks,
     },
     produces={
@@ -165,7 +165,7 @@ def get_2n_pairs(etau_indices_pair,
         higgscandprod,
         gentau_selection,
         rel_charge,
-        #category_ids,
+        category_ids,
         increment_stats, 
         custom_increment_stats,
         "trigger_ids",
@@ -461,11 +461,12 @@ def main(
     )
     
 
-    # inspect cuts
-    if self.config_inst.x.verbose.selection.main:
-        debug_main(events,
-                   results,
-                   self.config_inst.x.triggers)
+    ## inspect cuts
+    #if self.config_inst.x.verbose.selection.main:
+    #    debug_main(events,
+    #               results,
+    #               self.config_inst.x.triggers,
+    #               self.dataset_inst.name)
         
     return events, results
 

@@ -158,7 +158,7 @@ def get_jec_config_default(self) -> DotDict:
 @calibrator(
     uses={
         "Jet.pt", "Jet.eta", "Jet.phi", "Jet.mass", "Jet.area", "Jet.rawFactor",
-        "Jet.jetId",
+        "Jet.jetId", "run", "luminosityBlock", "event",
         optional("fixedGridRhoFastjetAll"),
         optional("Rho.fixedGridRhoFastjetAll"),
         attach_coffea_behavior,
@@ -328,7 +328,6 @@ def jec(
 
         # propagate changes to PuppiMET, starting from jets corrected with subset of JEC levels
         # (recommendation is to propagate only L2 corrections and onwards)
-
         met_pt, met_phi = propagate_met(
             jetsum_pt_subset_type1_met,
             jetsum_phi_subset_type1_met,
@@ -336,7 +335,8 @@ def jec(
             jetsum_phi_all_levels,
             events.RawPuppiMET.pt,
             events.RawPuppiMET.phi,
-        )
+            events,
+            )
         
         events = set_ak_column_f32(events, "PuppiMET.pt", met_pt)
         events = set_ak_column_f32(events, "PuppiMET.phi", met_phi)
@@ -372,6 +372,7 @@ def jec(
                 events.Jet[met_prop_mask].phi,
                 met_pt,
                 met_phi,
+                events,
             )
             met_pt_down, met_phi_down = propagate_met(
                 jetsum_pt_all_levels,
@@ -380,6 +381,7 @@ def jec(
                 events.Jet[met_prop_mask].phi,
                 met_pt,
                 met_phi,
+                events,
             )
             
             events = set_ak_column_f32(events, f"PuppiMET.pt_jec_{name}_up", met_pt_up)

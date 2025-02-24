@@ -81,16 +81,16 @@ def keep_columns(cfg: od.Config) -> None:
                 "decayMode", "rawIdx", "ip_sig", "IPx", "IPy","IPz"
             ]
         } | {
-            "GenTau.*", "GenTauProd.*", "nJet",
-            "n_jets", "leading_jet_pt","subleading_jet_pt",
-            "delta_eta_jj","mjj","n_jets_tag",
+            "GenTau.*", "GenTauProd.*", "nJet", "N_b_jets", "n_jets", 
+            "leading_jet_pt","subleading_jet_pt","leading_jet_eta","subleading_jet_eta","leading_jet_phi","subleading_jet_phi","delta_eta_jj","mjj","n_jets_tag",
+            "all_triggers_id", "triggerID_e", "triggerID_mu", "triggerID_tau",
         } | {
             f"hcandprod.{var}" for var in [
                 "pt", "eta", "phi", "mass", "charge",
                 "pdgId", "tauIdx"
             ]
         } | {
-		"hcand_*","tau_decay_prods*"
+		"hcand_*","tau_decay_prods*", "OC_lepton_veto"
 	} | {"is_b_vetoed","channel_id"} | {ColumnCollection.ALL_FROM_SELECTOR},
         "cf.MergeSelectionMasks": {
             "normalization_weight", 
@@ -270,27 +270,57 @@ def add_jet_features(cfg: od.Config) -> None:
         discrete_x=True,
         x_title="N_jets_pT_20_eta_2_5_Tight",
     )
-    
     cfg.add_variable(
-        name="Leading_jet_pt",
+        name="N_b_jets",
+        expression="N_b_jets",
+        binning=(11, -0.5, 10.5),
+        discrete_x=True,
+        x_title="N_b_jets",
+    )
+    cfg.add_variable(
+        name="leading_jet_pt",
         expression="leading_jet_pt",
         binning=(30, 30.0, 330.0),
         unit="GeV",
-        x_title=r"$Leading jet p_{T}$",
+        x_title=r"Leading jet $p_{T}$",
     )        
     cfg.add_variable(
-        name="Subleading_jet_pt",
+        name="subleading_jet_pt",
         expression="subleading_jet_pt",
         binning=(25, 30.0, 280.0),
         unit="GeV",
-        x_title=r"$Subleading jet p_{T}$",
+        x_title=r"Subleading jet $p_{T}$",
     )
+    cfg.add_variable(
+        name="leading_jet_eta",
+        expression="leading_jet_eta",
+        binning=(47, -4.7, 4.7),
+        x_title="Leading Jet $\\eta$",
+    ) 
+    cfg.add_variable(
+        name="subleading_jet_eta",
+        expression="subleading_jet_eta",
+        binning=(47, -4.7, 4.7),
+        x_title="Subleading Jet $\\eta$",
+    ) 
+    cfg.add_variable(
+        name="leading_jet_phi",
+        expression="leading_jet_phi",
+        binning=(32, -3.2, 3.2),
+        x_title="Leading Jet $\\phi$",
+    )  
+    cfg.add_variable(
+        name="subleading_jet_phi",
+        expression="subleading_jet_phi",
+        binning=(32, -3.2, 3.2),
+        x_title="Subleading Jet $\\phi$",
+    ) 
     cfg.add_variable(
         name="delta_eta_jj",
         expression="delta_eta_jj",
         null_value=EMPTY_FLOAT,
         binning=(20,-6,6),
-        x_title=r"$\Delta\eta_{jj}",
+        x_title="$\\Delta \\eta_{jj}$",
     ) 
     cfg.add_variable(
         name="mjj",
@@ -497,12 +527,14 @@ def phi_cp_variables(cfg: od.Config) -> None:
 def add_dilepton_features(cfg: od.Config) -> None:
     channels = cfg.channels.names()
     ch_objects = DotDict.wrap({
-        'etau'   : {'lep0' : 'Electron',
-                    'lep1' : 'Tau'},
-        'mutau'  : {'lep0' : 'Muon',
-                    'lep1' : 'Tau'},
-        'tautau' : {'lep0' : 'Tau',
-                    'lep1' : 'Tau'},
+        'etau'  : {'lep0':'Electron',
+                   'lep1':'Tau'    },
+        'mutau' : {'lep0':'Muon'    ,
+                   'lep1':'Tau'    },
+        'emu'   : {'lep0':'Electron',
+                   'lep1':'Muon'   },
+        'tautau': {'lep0':'Tau'     ,
+                   'lep1':'Tau'    },
     })
     bin_split_factor = 4 #Used to define histograms for kinematic variables with finer binning
     for ch_str in channels:
@@ -531,13 +563,6 @@ def add_dilepton_features(cfg: od.Config) -> None:
             x_title=r"$\Delta R(\ell,\ell)$",
         )
         cfg.add_variable(
-            name=f"{ch_str}_delta_eta",
-            expression=f"hcand_{ch_str}.delta_eta",
-            null_value=EMPTY_FLOAT,
-            binning=(50, -5, 5),
-            x_title=r"$\Delta \eta(\ell,\ell)$",
-        )
-        cfg.add_variable(
                 name=f"{ch_str}_pt",
                 expression=f"hcand_{ch_str}.pt",
                 null_value=EMPTY_FLOAT,
@@ -553,7 +578,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_pt",
                 expression=f"hcand_{ch_str}.{lep}.pt",
                 null_value=EMPTY_FLOAT,
-                binning=(30, 20, 80.),
+                binning=(50, 0, 100.),
                 unit="GeV",
                 x_title= rf"{lep_str} $p_{{T}}$",
             )
@@ -561,7 +586,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_eta",
                 expression=f"hcand_{ch_str}.{lep}.eta",
                 null_value=EMPTY_FLOAT,
-                binning=(32, -3.2, 3.2),
+                binning=(30, -2.3, 2.3),
                 x_title=rf"{lep_str} $\eta$",
             )
             cfg.add_variable(

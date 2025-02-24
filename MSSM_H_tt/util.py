@@ -217,6 +217,12 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
     matched_masks = {}
     trigger_ID = {}
 
+    for trigger, trigger_fired, leg_masks in triggers.x.trigger_data:
+        if trigger.has_tag("single_e"):
+            single_ele_id = trigger.id
+        if trigger.has_tag("single_mu"):
+            single_mu_id = trigger.id
+            
     # Perform each lepton election step separately per trigger
     for trigger, trigger_fired, leg_masks in triggers.x.trigger_data:
         
@@ -225,6 +231,9 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
         is_single_mu = trigger.has_tag("single_mu")
         is_cross_mu  = trigger.has_tag("cross_mu_tau")
         is_cross_tau = trigger.has_tag("cross_tau_tau")
+        
+        dataset_name_tag = self.dataset_inst.keys[0]
+          
         if (is_single_mu or is_cross_mu) & ('mutau' in pair_objects.keys()):
             muons = pair_objects.mutau.lep0
             taus = pair_objects.mutau.lep1
@@ -386,7 +395,46 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
             
             triggerID_e  = hlt_path_fired(events, hlt_path_fired_e)
             triggerID_mu = hlt_path_fired(events, hlt_path_fired_mu)
-            matched_masks['emu'] = ((triggerID_e > 0) | (triggerID_mu > 0))
+            # Trigger selection logic for emu channel:
+            # -----------------------------------------
+            # For Monte Carlo (MC) datasets:
+            #   - Accept events if either of the triggers are fired:
+            #       * HLT_IsoMu24 (represented by triggerID_mu > 0)
+            #       * HLT_Ele30_WPTight_gsf (represented by triggerID_e > 0)
+            #   This corresponds to:
+            #       MC: HLT_IsoMu24 or HLT_Ele30_WPTight_gsf
+            #
+            # For real data, check if the 'emu' pair-object exists:
+            #   - If the dataset is from the SingleMuon (or Muon_Run) channel:
+            #       * Use HLT_IsoMu24 only (i.e., triggerID_mu > 0)
+            #       This corresponds to:
+            #           SingleMuon (Muon) : HLT_IsoMu24
+            #
+            #   - If the dataset is EGamma :
+            #       * Accept events only if HLT_Ele30_WPTight_gsf is fired,
+            #         and HLT_IsoMu24 is not fired.
+            #         This is achieved by applying a mask that selects events where
+            #         the electron trigger is active and the muon trigger is not.
+            #       This corresponds to:
+            #           EGamma : HLT_Ele30_WPTight_gsf and not HLT_IsoMu24
+            # -----------------------------------------
+            # For MC, set the default 'emu' mask to include events that fired any of the two triggers.
+            if self.dataset_inst.is_mc:
+                matched_masks['emu'] = ((triggerID_e > 0) | (triggerID_mu > 0))
+            # For real data, apply the appropriate trigger selection if the 'emu' object is present.
+            if 'emu' in pair_objects:
+                # For SingleMuon or Muon_Run datasets, select events where the muon trigger (HLT_IsoMu24) fired.
+                if 'SingleMuon' in dataset_name_tag or 'Muon_Run' in dataset_name_tag:
+                    matched_masks['emu'] = (triggerID_mu > 0)
+                # For EGamma datasets, select events where:
+                # - The electron trigger (HLT_Ele30_WPTight_gsf) fired.
+                # - The muon trigger (HLT_IsoMu24) did NOT fire.
+                elif 'EGamma' in dataset_name_tag:
+                    mask_e_not_mu_events = (triggerID_e == single_ele_id) & ~(triggerID_mu == single_mu_id)
+                    # For events where the electron trigger is not isolated (i.e., doesn't meet the criteria), set its ID to -1.
+                    triggerID_e = ak.where(mask_e_not_mu_events, triggerID_e, -1)
+                    matched_masks['emu'] = (triggerID_e > 0)
+                    
             trigger_ID["triggerID_e"]  = triggerID_e
             trigger_ID["triggerID_mu"] = triggerID_mu
             
@@ -425,7 +473,7 @@ def hlt_path_matching(self: Producer, events: ak.Array, triggers: ak.Array, pair
         triggerID_tau   = hlt_path_fired(events, hlt_path_fired_tau)
         matched_masks['tautau'] = (triggerID_tau > 0)
         trigger_ID["triggerID_tau"]    = triggerID_tau
-
+            
     for column_name, array in trigger_ID.items():
         events = set_ak_column(events, column_name, array)
     matched_trigger_array = hlt_path_fired(events, trigger_ID)

@@ -72,6 +72,9 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         tauspinner_weight,
         #phi_cp,
         category_ids,
+        jet_pt_def,
+        jets_taggable,
+        number_b_jet,
         "Jet.jec_no_jec_diff",
     },
 )
@@ -89,6 +92,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
+    
     if self.dataset_inst.is_mc:
         events = self[get_mc_weight](events, **kwargs)
         print("Producing Normalization weights...")
@@ -119,5 +123,5 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         raise ValueError(f"attempt to process more than one channel: {ch_str}")
     else: channel = channel[0]
     # if channel=='mutau':
-    #     events = self[phi_cp](events, **kwargs) 
+    #     events = self[phi_cp](events, **kwargs)
     return events

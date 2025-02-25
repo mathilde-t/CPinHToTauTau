@@ -165,14 +165,24 @@ def apply_fastMTT_Wiktor(
 
     hcand_mass_fastMTT = ak.concatenate([h1_mass, p4_h2_reg.mass], axis=1)
 
+    ## only plot the first 300 events to be coherent with IC's
+    ## for test purposes only !
+    #mask = np.arange(len(events)) < 300 # initialise Mask : True für die ersten 300 Events, False für den Rest
+    #mask = ak.Array(mask)
+    #zero_array = lambda x: ak.zeros_like(x)
+    #
+    #hcand_pt_fastMTT = ak.where(mask, hcand_pt_fastMTT, zero_array(hcand_pt_fastMTT))
+    #hcand_eta_fastMTT = ak.where(mask, hcand_eta_fastMTT, zero_array(hcand_eta_fastMTT))
+    #hcand_phi_fastMTT = ak.where(mask, hcand_phi_fastMTT, zero_array(hcand_phi_fastMTT))
+    #hcand_mass_fastMTT = ak.where(mask, hcand_mass_fastMTT, zero_array(hcand_mass_fastMTT))
+    #mass_h = ak.where(mask, mass_h, zero_array(mass_h))
+
     events = set_ak_column(events, "hcand.pt_fastMTT_W",   hcand_pt_fastMTT)
     events = set_ak_column(events, "hcand.eta_fastMTT_W",  hcand_eta_fastMTT)
     events = set_ak_column(events, "hcand.phi_fastMTT_W",  hcand_phi_fastMTT)
     events = set_ak_column(events, "hcand.mass_fastMTT_W", hcand_mass_fastMTT)
 
     events = set_ak_column_f32(events, "hcand_invm_fastMTT_W", mass_h)
-
-    #from IPython import embed; embed()
 
     return events
 

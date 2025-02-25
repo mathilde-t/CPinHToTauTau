@@ -345,7 +345,7 @@ def add_hcand_features(cfg: od.Config) -> None:
             name=f"hcand_{i+1}_pt_fastMTT_IC",
             expression=f"hcand.pt_fastMTT_IC[:,{i}]",
             null_value=EMPTY_FLOAT,
-            binning=(40, 0., 200.),
+            binning=(40, 10., 200.),
             unit="GeV",
             x_title=f"hcand[{i+1}]" + r" $p_{T}^{fastMTT IC}$",
         )
@@ -353,7 +353,7 @@ def add_hcand_features(cfg: od.Config) -> None:
             name=f"hcand_{i+1}_pt1_fastMTT_IC",
             expression=f"hcand.pt1_fastMTT_IC[:,{i}]",
             null_value=EMPTY_FLOAT,
-            binning=(40, 0., 200.),
+            binning=(40, 10., 200.),
             unit="GeV",
             x_title=f"hcand[{i+1}]" + r" $p_{T,1}^{fastMTT IC}$",
         )
@@ -361,7 +361,7 @@ def add_hcand_features(cfg: od.Config) -> None:
             name=f"hcand_{i+1}_pt2_fastMTT_IC",
             expression=f"hcand.pt2_fastMTT_IC[:,{i}]",
             null_value=EMPTY_FLOAT,
-            binning=(40, 0., 200.),
+            binning=(40, 10., 200.),
             unit="GeV",
             x_title=f"hcand[{i+1}]" + r" $p_{T,2}^{fastMTT IC}$",
         )
@@ -369,7 +369,7 @@ def add_hcand_features(cfg: od.Config) -> None:
             name=f"hcand_{i+1}_pt_fastMTT_W",
             expression=f"hcand.pt_fastMTT_W[:,{i}]",
             null_value=EMPTY_FLOAT,
-            binning=(40, 0., 200.),
+            binning=(40, 10., 200.),
             unit="GeV",
             x_title=f"hcand[{i+1}]" + r" $p_{T}^{fastMTT W}$",
         )
@@ -391,7 +391,7 @@ def add_hcand_features(cfg: od.Config) -> None:
         name=f"hcand_{i+1}_mass_fastMTT_W",
         expression=f"hcand.mass_fastMTT_W[:,{i}]",
         null_value=EMPTY_FLOAT,
-        binning=(50, 0, 400),
+        binning=(50, 0.01, 2.5),
         unit="GeV",
         x_title=f"hcand[{i+1}]" + r" $-mass^{fastMTT W}$",
     )
@@ -411,10 +411,26 @@ def add_hcand_features(cfg: od.Config) -> None:
         )    
 
     cfg.add_variable(
+            name=f"hcand_1_mass",
+            expression=f"hcand.mass[:,{0}]",
+            null_value=EMPTY_FLOAT,
+            binning=(100, 0.001, 0.25),
+            unit="GeV",
+            x_title=f"hcand[1]" + r" $m$",
+    )
+    cfg.add_variable(
+            name=f"hcand_2_mass",
+            expression=f"hcand.mass[:,{1}]",
+            null_value=EMPTY_FLOAT,
+            binning=(50, 0.01, 2.5),
+            unit="GeV",
+            x_title=f"hcand[2]" + r" $m$",
+    )
+    cfg.add_variable(
         name="hcand_invm",
         expression="hcand_invm",
         null_value=EMPTY_FLOAT,
-        binning=(50, 0, 350),
+        binning=(50, 0, 140), #(50, 0, 400)
         unit="GeV",
         x_title=r"$m_{h1,h2}$",
     )
@@ -422,7 +438,7 @@ def add_hcand_features(cfg: od.Config) -> None:
         name="hcand_invm_fastMTT_IC",
         expression="hcand_invm_fastMTT_IC",
         null_value=EMPTY_FLOAT,
-        binning=(50, 10, 350),
+        binning=(60, 80, 140), #(50, 0, 400)
         unit="GeV",
         x_title=r"$m_{h1,h2}^{fastMTT IC}$",
     )
@@ -430,7 +446,7 @@ def add_hcand_features(cfg: od.Config) -> None:
         name="hcand_invm_fastMTT_W",
         expression="hcand_invm_fastMTT_W",
         null_value=EMPTY_FLOAT,
-        binning=(50, 0, 350),
+        binning=(15000, 120, 135), #(50,  0, 400)
         unit="GeV",
         x_title=r"$m_{h1,h2}^{fastMTT W}$",
     )

@@ -22,7 +22,8 @@ args=(
         --version ff_method_fine_pt_binning
         
         --variables $variables
-        --file-types pdf
+
+        --file-types pdf,png
 	--hist-hooks ff_method
         --general-settings "cms-label=pw"
         "${@:2}"

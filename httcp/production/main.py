@@ -49,7 +49,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         fake_factors,
         hcand_fields,
         tauspinner_weight,
-        #phi_cp,
+        phi_cp,
         category_ids,
         "Jet.pt",
         "Jet.pt_no_jec",
@@ -67,7 +67,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         fake_factors,
         hcand_fields,
         tauspinner_weight,
-        #phi_cp,
+        phi_cp,
         category_ids,
         "Jet.jec_no_jec_diff",
         "Jet.number_of_jets",
@@ -105,7 +105,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     
     print("Producing Fake Factor weights...")
     events = self[fake_factors](events, **kwargs)
-    #print("Producing phi_cp...") 
+    print("Producing phi_cp...")
+    events = self[phi_cp](events, **kwargs)  
 
     # TEMPORARY FIX. CHANGE AFTERWARDS
     channel = self.config_inst.channels.names()
@@ -114,7 +115,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         raise ValueError(f"attempt to process more than one channel: {ch_str}")
     else: channel = channel[0]
 #    if channel=='mutau':
-        #events = self[phi_cp](events, **kwargs) 
+        
     return events
 
 

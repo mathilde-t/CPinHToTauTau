@@ -25,6 +25,11 @@ def add_categories(config: od.Config,
                 'id'        : 100*(i+1)+ base_cat.id,
                 'label'     :' '.join((base_cat.label.split(' ')[0], cat.label if 'label' in cat else cat_name))
             }
+            if 'aux' in cat.keys():
+                kwargs['aux'] = {}
+                for (aux_spec, aux_content) in cat.aux.items():
+                    kwargs['aux'][aux_spec] = {key: '_'.join((base_cat.name, val)) for (key,val) in aux_content.items()}
+                    
             add_category(config, **kwargs)
             
     
@@ -42,8 +47,13 @@ def add_categories(config: od.Config,
                     'id'        : 10000*(i+1+max_child_id)+ parent_cat.id,
                     'label'     : ' '.join((parent_cat.label, child_cat.label if 'label' in child_cat else child_name))
                 }
-                if 'signal_reg' in parent_cat.aux:
-                    kwargs['aux']['signal_reg'] = True
+                if parent_cat.aux:
+                    for (aux_spec, aux_content) in parent_cat.aux:
+                        if aux_spec == 'signal_reg':
+                            kwargs['aux']['signal_reg'] = True
+                        else:
+                            kwargs['aux'][aux_spec] = aux_content
+
                 add_category(config, **kwargs)
     
     """
@@ -82,28 +92,62 @@ def add_categories(config: od.Config,
     
     #Define initial category map with selections and call the function
     #Don't change this part: it is important for fake factor method    
-    base_selection = [f'cat_{channel}', 'os_charge']
+    base_selection = [f'cat_{channel}']
     
     category_map  = DotDict.wrap({
-        "sr"            : { 'selection' : ["mt_cut",      "deep_tau_wp",      "lep_iso"],
-                            'label'     : r"signal region",
-                            'aux'       : {'is_signal_reg' : True}},
+        "sr"            : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_iso", "os_charge"],
+                            'label'     : "signal region",
+                            'aux'       : {
+                                           #qcd estimation categories
+                                           'abcd_regs' : {
+                                               'ar'    : 'abcd_ar',
+                                               'dr_num': 'abcd_dr_num',
+                                               'dr_den':  'abcd_dr_den',
+                                               },
+                                           #fake factor categories
+                                           'ff_regs': {
+                                               "ar_wj"      : "ar_wj",
+                                               "dr_num_wj"  : "dr_num_wj",
+                                               "dr_den_wj"  : "dr_den_wj",
+                                               "ar_qcd"      : "ar_qcd",
+                                               "dr_num_qcd"  : "dr_num_qcd",
+                                               "dr_den_qcd"  : "dr_den_qcd",
+                                               "ar_yields"   : "ar_yields",
+                                           },},},
         
-        "no_mt"         : { 'selection' : ["deep_tau_wp",      "lep_iso"],
-                            'label'     : r"no mT",},
-        "ar_wj"         : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso"],},
-        "dr_num_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_wp",      "lep_iso", "tau_no_fakes"],},
-        "dr_den_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_inv_wp",  "lep_iso", "tau_no_fakes"],},
+        #categories for QCD estimation via classic ABCD method 
+        "abcd_ar"       : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_iso", "ss_charge"], 'label' : "same sign region"},
+        "abcd_dr_num"   : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_inv_iso", "os_charge"]},
+        "abcd_dr_den"   : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_inv_iso", "ss_charge"]},
         
-        "ar_qcd"        : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso"],},
-        "dr_num_qcd"    : {'selection' : ["mt_cut",      "deep_tau_wp",      "lep_inv_iso", "tau_no_fakes"],},
-        "dr_den_qcd"    : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_inv_iso", "tau_no_fakes"],},
+        #categories for jet fakes estimation via classic Fake Factor method 
+        "ar_wj"         : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
+        "dr_num_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_wp",      "lep_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_inv_wp",  "lep_iso", "tau_no_fakes", "os_charge"],},
         
-        "ar_yields"     : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso"],},
+        "ar_qcd"        : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
+        "dr_num_qcd"    : {'selection' : ["mt_cut",      "deep_tau_wp",      "lep_inv_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_qcd"    : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_inv_iso", "tau_no_fakes", "os_charge"],},
+        
+        "ar_yields"     : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
+        #signal region without mt cut
+        "sr_no_mt"               : { 'selection'   : ["deep_tau_wp",  "lep_iso","os_charge"],
+                                 'label'        : "no mT",
+                                 'aux'          : {
+                                                   #qcd estimation categories
+                                                        'abcd_regs' : {
+                                                            'ar': 'no_mt_abcd_ar',
+                                                            'dr_num'    : 'no_mt_abcd_dr_num',
+                                                            'dr_den'    : 'no_mt_abcd_dr_den',
+                                                        },},},
+        #categories for QCD estimation via classic ABCD method 
+        "no_mt_abcd_ar"       : { 'selection' : ["deep_tau_wp", "lep_iso", "ss_charge"], 'label' : "no mT, same sign region"},
+        "no_mt_abcd_dr_num"   : { 'selection' : ["deep_tau_wp", "lep_inv_iso", "os_charge"]},
+        "no_mt_abcd_dr_den"   : { 'selection' : ["deep_tau_wp", "lep_inv_iso", "ss_charge"]},
         })
     
     add_base_categories(config, channel, category_map, base_selection)
-    
+    #from IPython import embed; embed()
     #Add child categories to base categories
     child_category_map  = DotDict.wrap({
         "tau_barrel"    : {'selection' : ["tau_barrel"],
@@ -111,7 +155,6 @@ def add_categories(config: od.Config,
         "tau_endcap"    : {'selection' : ["tau_endcap"],
                             'label'     : r"$\eta_{\tau} > 1.2$",},
         })
-     
     # add_child_categories(config,
     #                      parent_categories=config.categories.names(),
     #                      child_category_map=child_category_map)

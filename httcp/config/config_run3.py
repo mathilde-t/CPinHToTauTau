@@ -83,7 +83,6 @@ def add_run3(ana: od.Analysis,
     tag, e_sf_tag, e_scale_corrector, e_smearing_corrector, tau_tag = tag_caster(campaign)
     
     # add processes we are interested in
-    
     process_names = [
         "data", 
         "data_mu",
@@ -123,6 +122,8 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #higgs signal ggf
+        "h_ggf_htt"
     ]
     for process_name in process_names:
         # add the process
@@ -206,6 +207,8 @@ def add_run3(ana: od.Analysis,
         #"st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #higgs signal ggf
+        "h_ggf_htt_filtered",
         ]
 
     dataset_era = {

@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./common.sh #to access set_common_vars() function
+source ./common_run3.sh #to access set_common_vars() function
 #The following function defines config, processes, version and datasets variables
 set_common_vars "$1"
 wrapper_args=(
@@ -17,7 +17,7 @@ wrapper_args=(
     --cf.ReduceEvents-workflow $workflow
     --cf.ReduceEvents-htcondor-memory 8192
     --cf.ReduceEvents-max-runtime 2
-    --cf.MergeReducedEvents-workflow local
+    --cf.MergeReducedEvents-workflow $workflow
     "${@:2}"
     )
 echo law run cf.MergeReducedEventsWrapper "${wrapper_args[@]}"

@@ -64,7 +64,6 @@ def muon_selection(
         "mediumID"            : events.Muon.mediumId == 1,
         "muon_dxy_0p045"      : abs(events.Muon.dxy) < 0.045,
         "muon_dz_0p2"         : abs(events.Muon.dz) < 0.2,
-        "muon_iso_0p15"       : events.Muon.pfRelIso04_all < 0.15
     }
     single_veto_selections = {
         "muon_pt_10"          : events.Muon.pt > 10,

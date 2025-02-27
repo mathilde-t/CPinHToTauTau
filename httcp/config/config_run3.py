@@ -87,7 +87,6 @@ def add_run3(ana: od.Analysis,
     tag, e_sf_tag, e_scale_corrector, e_smearing_corrector, tau_tag = tag_caster(campaign)
     
     # add processes we are interested in
-    
     process_names = [
         "data", 
         "data_mu",
@@ -127,6 +126,8 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #higgs signal ggf
+        "h_ggf_htt"
     ]
     for process_name in process_names:
         # add the process
@@ -210,6 +211,8 @@ def add_run3(ana: od.Analysis,
         #"st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #higgs signal ggf
+        "h_ggf_htt_filtered",
         ]
 
     dataset_names_2023preBPix = [
@@ -319,7 +322,7 @@ def add_run3(ana: od.Analysis,
     cfg.x.default_ml_model = None
     cfg.x.default_inference_model = "example"
     cfg.x.default_categories = ("incl",)
-    cfg.x.default_variables = ("event","channel_id")
+    cfg.x.default_variables = ("event")
 
     # process groups for conveniently looping over certain processs
     # (used in wrapper_factory and during plotting)
@@ -547,14 +550,39 @@ def add_run3(ana: od.Analysis,
     # names of muon correction sets and working points
     # (used in the muon producer)   
   
+    # cfg.x.deep_tau = DotDict.wrap({
+    #     "tagger": "DeepTau2018v2p5",
+    #     "vs_e"          : {"mutau": "VVLoose",
+    #                        "etau": "Tight",
+    #                        "tautau": "VVLoose"},        
+    #     "vs_mu"         : {"mutau": "Tight",
+    #                        "etau": "VLoose",
+    #                        "tautau": "VLoose"},
+    #     "vs_jet"        : {"mutau": "Medium",
+    #                        "etau": "Medium",
+    #                        "tautau": "Medium"},
+    #     "vs_e_jet_wps"  : {'VVVLoose'   : 1,
+    #                        'VVLoose'    : 2,
+    #                        'VLoose'     : 3,
+    #                        'Loose'      : 4,
+    #                        'Medium'     : 5,
+    #                        'Tight'      : 6,
+    #                        'VTight'     : 7,
+    #                        'VVTight'    : 8},
+    #     "vs_mu_wps"     : {'VLoose' : 1,
+    #                        'Loose'  : 2,
+    #                        'Medium' : 3,
+    #                        'Tight'  : 4}
+    #     })
+    #Check to compare the plots with IC: set working point for each channl to Medium vs Jet, Tight vs E, Tight vs Mu
     cfg.x.deep_tau = DotDict.wrap({
         "tagger": "DeepTau2018v2p5",
-        "vs_e"          : {"mutau": "VVLoose",
+        "vs_e"          : {"mutau": "Tight",
                            "etau": "Tight",
-                           "tautau": "VVLoose"},        
+                           "tautau": "Tight"},        
         "vs_mu"         : {"mutau": "Tight",
-                           "etau": "VLoose",
-                           "tautau": "VLoose"},
+                           "etau": "Tight",
+                           "tautau": "Tight"},
         "vs_jet"        : {"mutau": "Medium",
                            "etau": "Medium",
                            "tautau": "Medium"},
@@ -628,7 +656,7 @@ def add_run3(ana: od.Analysis,
     jsonpog_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_latest/POG/"
     jsonpog_tau_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_tau_latest/POG/"
     corr_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/"
-    
+
     golden_ls = { 
         2022 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
         2023 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
@@ -649,9 +677,11 @@ def add_run3(ana: od.Analysis,
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),
+      #"fake_factors"                  : (f"{corr_dir}fake_factors_{cfg.x.year}_{campaign.x.tag}_{channel}_fine_pt_pol2.json", "v2"),
+
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
-
+    
     # --------------------------------------------------------------------------------------------- #
     # electron settings
     # names of electron correction sets and working points
@@ -794,6 +824,23 @@ def add_run3(ana: od.Analysis,
                     'lep1' : 'Tau'},
         'tautau' : {'lep0' : 'Tau',
                     'lep1' : 'Tau'},
+    })
+    cfg.x.fake_factor_method = DotDict.wrap({
+    "axes": {'tau_pt': {
+                'var_route': [f'hcand_{channel}', 'lep1', 'pt'],
+                'ax_str'  : 'Variable([20,25,30,35,40,50,60,80,100], name="tau_pt", label="Tau pt", underflow=False, overflow=True)',
+                },
+             'tau_dm_pnet': {
+                'var_route' : [f'hcand_{channel}', 'lep1', 'decayModePNet'],
+                'ax_str'   :'IntCategory([0,1,2,10,11], name="tau_dm_pnet", label="Tau PNet decayMode")',
+             },
+            #  "n_jets": {
+            #     'var_route' : 'Jet.n_jets',
+            #     'var_str'   : 'hist.axis.IntCategory([0,1,2], label="Number of jets")',
+            #  },
+    },
+    "columns" : ['ff_weight_wj','ff_weight_qcd'],
+    "shifts"  : ["up", "nominal", "down"]
     })
     
     if cfg.campaign.x("custom").get("creator") == "desy":  

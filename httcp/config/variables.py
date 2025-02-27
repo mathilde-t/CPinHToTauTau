@@ -484,16 +484,23 @@ def phi_cp_variables(cfg: od.Config) -> None:
             name=f"phi_cp_{the_ch}_reg1",
             expression=f"phi_cp_{the_ch}_reg1",
             null_value=EMPTY_FLOAT,
-            binning=(n_bins_phi_cp, 0, 2*np.pi),
+            binning=(20, 0, 2*np.pi),
             x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha < \pi/4$ (rad)",
         )
         cfg.add_variable(
             name=f"phi_cp_{the_ch}_reg2",
             expression=f"phi_cp_{the_ch}_reg2",
             null_value=EMPTY_FLOAT,
-            binning=(n_bins_phi_cp, 0, 2*np.pi),
+            binning=(20, 0, 2*np.pi),
             x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha \geq \pi/4$ (rad)",
         )
+        cfg.add_variable(
+           name=f"alpha_{the_ch}",
+           expression=f"alpha_{the_ch}",
+           null_value=EMPTY_FLOAT,
+           binning=(6, 0, np.pi/2),
+           x_title=rf"$ \alpha [{title_str}] $(rad)",
+       )
         # 2-bin histograms
         cfg.add_variable(
             name=f"phi_cp_{the_ch}_2bin",

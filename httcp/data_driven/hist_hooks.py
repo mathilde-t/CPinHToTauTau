@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import law
 import order as od
+
 import scinum as sn
 
 from columnflow.util import maybe_import, DotDict
@@ -25,158 +26,115 @@ def add_hist_hooks(config: od.Config) -> None:
     # from variances stored in an array of values
     def hist_to_num(h: hist.Hist, unc_name=str(sn.DEFAULT)) -> sn.Number:
         return sn.Number(h.values(), {unc_name: h.variances()**0.5})
-
-    # # helper to integrate values stored in an array based number object
-    # def integrate_num(num: sn.Number, axis=None) -> sn.Number:
-    #     return sn.Number(
-    #         nominal=num.nominal.sum(axis=axis),
-    #         uncertainties={
-    #             unc_name: (
-    #                 (unc_values_up**2).sum(axis=axis)**0.5,
-    #                 (unc_values_down**2).sum(axis=axis)**0.5,
-    #             )
-    #             for unc_name, (unc_values_up, unc_values_down) in num.uncertainties.items()
-    #         },
-    #     )
-
-    def qcd_estimation(task, hists):
+    
+    
+    def qcd_estimation(task, hists, category_inst):
+        
+        def rel_err(h_arr=[], err_arr=[]):
+            if len(h_arr):  sum_var = np.zeros_like(h_arr[0].values())
+            else: sum_var = np.zeros_like(err_arr[0])
+            for x in h_arr: sum_var += x.variances()/np.maximum(x.values()**2, 1)
+            for the_arr in err_arr: sum_var += err_arr
+            return np.sqrt(sum_var)
+        
+        def get_hists_from_reg(config: od.Config, hists: dict, region: str)-> hist.Hist :
+            hists_ = hists[region]
+            cat_id = config.get_category(region).id
+            data_hists = []
+            mc_hists = []
+            for (proc, h) in hists_.items():
+                if proc.is_data:
+                    data_hists.append(h)
+                elif proc.is_mc:
+                    mc_hists.append(h)
+            
+            mc_hist = sum(mc_hists[1:], mc_hists[0].copy())
+            data_hist = sum(data_hists[1:], data_hists[0].copy())
+            
+            return data_hist, mc_hist
+        
+        sr = category_inst
+        data_num, mc_num = get_hists_from_reg(config, hists,sr.aux['abcd_regs']['dr_num'])
+        data_den, mc_den = get_hists_from_reg(config, hists, sr.aux['abcd_regs']['dr_den']) 
+        data_ar, mc_ar = get_hists_from_reg(config, hists,sr.aux['abcd_regs']['ar'])
+        num = np.sum(data_num.values()) - np.sum(mc_num.values())
+        den = np.sum(data_den.values()) - np.sum(mc_den.values()) 
+        
+        tf = num/np.maximum(den,0.001)
+        tf_err2 = ((np.sum(data_num.variances()) + np.sum(mc_num.variances()))/den**2 + 
+                  tf**2/den**2 *(np.sum(data_den.variances()) + np.sum(mc_den.variances())))
+        
+        from cmsdb.processes.qcd import qcd
+        hists_sr = hists[sr.name].copy()
+        h_donor_name = list(hists_sr.keys())[0]
+        hists_sr[qcd] = hists_sr[h_donor_name].copy().reset()
+        hists_sr[qcd].view().value = np.maximum(data_ar.values() -  mc_ar.values(), 0.) * tf
+        #hists_sr[qcd].view().variance = data_ar.values()**2 * tf_err2 + data_ar.variances() * (tf**2)
+        return hists_sr
+    
+    def ff_method(task, hists, category_inst):
         if not hists:
             return hists
-        from cmsdb.processes.qcd import qcd
         # extract all unique category ids and verify that the axis order is exactly
         # "category -> shift -> variable" which is needed to insert values at the end
-        CAT_AXIS, SHIFT_AXIS, VAR_AXIS = range(3)
-        category_ids = set()
-        for proc, h in hists.items():
-            # validate axes
-            assert len(h.axes) == 3
-            assert h.axes[CAT_AXIS].name == "category"
-            assert h.axes[SHIFT_AXIS].name == "shift"
-            # get the category axis
-            cat_ax = h.axes["category"]
-            for cat_index in range(cat_ax.size):
-                category_ids.add(cat_ax.value(cat_index))
+        def rel_err(h_arr=[], err_arr=[]):
+            if len(h_arr):  sum_var = np.zeros_like(h_arr[0].values())
+            else: sum_var = np.zeros_like(err_arr[0])
+            for x in h_arr: sum_var += x.variances()/np.maximum(x.values()**2, 1)
+            for the_arr in err_arr: sum_var += err_arr
+            return np.sqrt(sum_var)
 
-        # create qcd groups
-        signal_categories : dict[str, dict[str, od.Category]] = defaultdict(DotDict)
-        #Filling the dictionay with signal histograms
-        for the_name in config.categories.names():
-            if 'signal_reg' in the_name:
-                signal_categories[the_name] = config.get_category(the_name)
+        sig_reg = category_inst
         
-
-        # sum up mc and data histograms, stop early when empty
-        mc_hists = [h for p, h in hists.items() if p.is_mc and not p.has_tag("signal")]
-        data_hists = [h for p, h in hists.items() if p.is_data]
-        mc_hist = sum(mc_hists[1:], mc_hists[0].copy())
-        data_hist = sum(data_hists[1:], data_hists[0].copy())
-
-        # start by copying the mc hist and reset it, then fill it at specific category slices
-        hists[qcd] = qcd_hist = mc_hist.copy().reset()
+        def get_ar_data_hist(config: od.Config, hists: dict, region: str)-> hist.Hist :
+            h_reg = hists[region]
+            data_hists = [h for p, h in h_reg.items() if p.is_data]
+            data_hist = sum(data_hists[1:], data_hists[0].copy())
+            cat_id = config.get_category(region).id
+            return data_hist
         
-        def get_hist (h, category): 
-            return h[{"category": hist.loc(category.id)}]
-        
-        
-        def find_by_id(hist, cat_id):
-            cat_axis = hist.axes["category"]
-            for  the_idx, the_id in enumerate(cat_axis): 
-                if the_id == cat_id: return the_idx
-            return -1
-
-        for (the_name, the_category) in signal_categories.items():
-            control_cat = config.get_category(the_category.aux['control_reg'])
-            data_array = hist_to_num(get_hist(data_hist, control_cat))
-            mc_array = hist_to_num(get_hist(mc_hist, control_cat))
-            qcd_array = data_array - mc_array
-            qcd_values = qcd_array()
-            qcd_values[qcd_array() < 0] = 0
-            qcd_variances = qcd_array(sn.UP, sn.ALL, unc=True)**2
+        def calc_wj_yields(config: od.Config, hists: dict, region: str)-> hist.Hist :
+            h_reg = hists[region]
+            data_hists = [h for p, h in h_reg.items() if p.is_data]
+            data_hist = sum(data_hists[1:], data_hists[0].copy())
+            cat_id = config.get_category(region).id
+            data_ar = data_hist
             
-            cat_idx = find_by_id(qcd_hist, the_category.id)
-            qcd_hist.view().value[cat_idx, ...] = qcd_values
-            qcd_hist.view().variance[cat_idx, ...] = qcd_variances
-        #from IPython import embed; embed()            
-        # for group_name in complete_groups:
+            wj_hists = [h for p, h in h_reg.items() if 'wj' in p.name]
+            wj_hist = sum(wj_hists[1:], wj_hists[0].copy())
+            wj_ar = wj_hist
+            
+            r = wj_ar.values() / np.maximum(data_ar.values(), 1)
+            r_err =  np.where((data_ar.values() > 0),
+                              rel_err(h_arr=[wj_ar,data_ar]) * r,
+                              np.ones_like(r)) 
+            return r[0], r_err[0]
         
-        #     group = qcd_groups[group_name]
-
-        #     # get the corresponding histograms and convert them to number objects,
-        #     # each one storing an array of values with uncertainties
-        #     # shapes: (SHIFT, VAR)
-        #     get_hist = lambda h, region_name: h[{"category": hist.loc(group[region_name].id)}]
-        #     os_noniso_mc = hist_to_num(get_hist(mc_hist, "os_noniso"), "os_noniso_mc")
-        #     ss_noniso_mc = hist_to_num(get_hist(mc_hist, "ss_noniso"), "ss_noniso_mc")
-        #     ss_iso_mc = hist_to_num(get_hist(mc_hist, "ss_iso"), "ss_iso_mc")
-        #     os_noniso_data = hist_to_num(get_hist(data_hist, "os_noniso"), "os_noniso_data")
-        #     ss_noniso_data = hist_to_num(get_hist(data_hist, "ss_noniso"), "ss_noniso_data")
-        #     ss_iso_data = hist_to_num(get_hist(data_hist, "ss_iso"), "ss_iso_data")
-
-        #     # estimate qcd shapes in the three sideband regions
-        #     # shapes: (SHIFT, VAR)
-        #     os_noniso_qcd = os_noniso_data - os_noniso_mc
-        #     ss_iso_qcd = ss_iso_data - ss_iso_mc
-        #     ss_noniso_qcd = ss_noniso_data - ss_noniso_mc
-
-        #     # get integrals in ss regions for the transfer factor
-        #     # shapes: (SHIFT,)
-        #     int_ss_iso = integrate_num(ss_iso_qcd, axis=1)
-        #     int_ss_noniso = integrate_num(ss_noniso_qcd, axis=1)
-
-        #     # complain about negative integrals
-        #     int_ss_iso_neg = int_ss_iso <= 0
-        #     int_ss_noniso_neg = int_ss_noniso <= 0
-        #     if int_ss_iso_neg.any():
-        #         shift_ids = list(map(mc_hist.axes["shift"].value, np.where(int_ss_iso_neg)[0]))
-        #         shifts = list(map(config.get_shift, shift_ids))
-        #         logger.warning(
-        #             f"negative QCD integral in ss_iso region for group {group_name} and shifts: "
-        #             f"{', '.join(map(str, shifts))}",
-        #         )
-        #     if int_ss_noniso_neg.any():
-        #         shift_ids = list(map(mc_hist.axes["shift"].value, np.where(int_ss_noniso_neg)[0]))
-        #         shifts = list(map(config.get_shift, shift_ids))
-        #         logger.warning(
-        #             f"negative QCD integral in ss_noniso region for group {group_name} and shifts: "
-        #             f"{', '.join(map(str, shifts))}",
-        #         )
-
-        #     # ABCD method
-        #     # shape: (SHIFT, VAR)
-        #     os_iso_qcd = os_noniso_qcd * ((int_ss_iso / int_ss_noniso)[:, None])
-
-        #     # combine uncertainties and store values in bare arrays
-        #     os_iso_qcd_values = os_iso_qcd()
-        #     os_iso_qcd_variances = os_iso_qcd(sn.UP, sn.ALL, unc=True)**2
-
-        #     # define uncertainties
-        #     unc_data = os_iso_qcd(sn.UP, ["os_noniso_data", "ss_iso_data", "ss_noniso_data"], unc=True)
-        #     unc_mc = os_iso_qcd(sn.UP, ["os_noniso_mc", "ss_iso_mc", "ss_noniso_mc"], unc=True)
-        #     unc_data_rel = abs(unc_data / os_iso_qcd_values)
-        #     unc_mc_rel = abs(unc_mc / os_iso_qcd_values)
-
-        #     # only keep the MC uncertainty if it is larger than the data uncertainty and larger than 15%
-        #     keep_variance_mask = (
-        #         np.isfinite(unc_mc_rel) &
-        #         (unc_mc_rel > unc_data_rel) &
-        #         (unc_mc_rel > 0.15)
-        #     )
-        #     os_iso_qcd_variances[keep_variance_mask] = unc_mc[keep_variance_mask]**2
-        #     os_iso_qcd_variances[~keep_variance_mask] = 0
-
-        #     # retro-actively set values to zero for shifts that had negative integrals
-        #     neg_int_mask = int_ss_iso_neg | int_ss_noniso_neg
-        #     os_iso_qcd_values[neg_int_mask] = 1e-5
-        #     os_iso_qcd_variances[neg_int_mask] = 0
-
-        #     # residual zero filling
-        #     zero_mask = os_iso_qcd_values <= 0
-        #     os_iso_qcd_values[zero_mask] = 1e-5
-        #     os_iso_qcd_variances[zero_mask] = 0
-
-            # insert values into the qcd histogram
-        return hists
+        hist_qcd = get_ar_data_hist(config,hists, sig_reg.replace('sr', 'ar_qcd'))
+        hist_wj  = get_ar_data_hist(config,hists, sig_reg.replace('sr', 'ar_wj'))
+        wj_yield, yield_err = calc_wj_yields(config,hists, sig_reg.replace('sr', 'ar_yields'))
+      
+        fakes_val = hist_wj.values() * wj_yield + hist_qcd.values() * (1. - wj_yield)
+        
+        #Carefull this error estimation is not quite correct because yields errors and hist errors are corellated
+        fakes_err = rel_err([hist_wj,hist_qcd],err_arr=[yield_err]) * fakes_val
+        
+        hists_sr = hists[sig_reg].copy()
+        
+        #Remove wj histogram from the signal region set
+        from cmsdb.processes.qcd import jet_fakes
+        
+        wj_proc = [p for p in hists_sr.keys() if 'wj' in p.name]
+        hists_sr[jet_fakes] = hists_sr[wj_proc[0]].copy().reset()
+        cat_id = config.get_category(sig_reg).id
+        hists_sr[jet_fakes].view().value = fakes_val
+        hists_sr[jet_fakes].view().variance = fakes_err
+        
+        del hists_sr[wj_proc[0]]   
+        return hists_sr
+    
 
     config.x.hist_hooks = {
-        "qcd_hook": qcd_estimation,
+        "good_old_abcd"  : qcd_estimation,
+        "ff_method" : ff_method,
     }

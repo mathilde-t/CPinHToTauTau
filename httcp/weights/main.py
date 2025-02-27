@@ -54,3 +54,39 @@ def main_init(self: WeightProducer) -> None:
        "ts",
     }
     self.shifts |= set(get_shifts_from_sources(self.config_inst, *shift_sources))
+    
+    
+    
+@weight_producer(
+    # both used columns and dependent shifts are defined in init below
+    # only run on mc
+    mc_only=True,
+)
+def ff_weight_producer(self: WeightProducer, events: ak.Array, **kwargs) -> ak.Array:
+    # build the full event weight
+    weight = ak.Array(np.ones(len(events), dtype=np.float32))
+    for column in self.weight_columns:
+        weight = weight * Route(column).apply(events)
+    return events, weight
+
+
+@ff_weight_producer.init
+def ff_weight_producer(self: WeightProducer) -> None:
+    # store column names referring to weights to multiply
+    self.weight_columns = {
+        "normalization_weight",
+        "mc_weight",
+        "pu_weight",
+        "muon_weight_nom",
+        "tau_weight_nom",
+        "electron_weight_nom",
+        "tauspinner_weight",
+        "zpt_weight"
+    }
+    self.uses |= self.weight_columns
+    
+    # declare shifts that the produced event weight depends on
+    shift_sources = {
+       "ts",
+    }
+    self.shifts |= set(get_shifts_from_sources(self.config_inst, *shift_sources))

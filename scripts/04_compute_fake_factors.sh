@@ -3,30 +3,30 @@ source ./common_run3.sh #to access set_common_vars() function
 #The following function defines config, processes, version and datasets variables
 set_common_vars "$1"
 args=(
-        --config $config
-        --processes  $processes
+        --config $config 
         --datasets $datasets
-        
-        --categories $categories
+        --processes $processes
         --cf.CalibrateEvents-workflow $workflow
         --cf.CalibrateEvents-version $version
         
         --cf.SelectEvents-workflow $workflow
         --cf.SelectEvents-version $version
+
+        --cf.ReduceEvents-workflow $workflow
+        --cf.ReduceEvents-version $version
         
         --cf.MergeReducedEvents-workflow $workflow
         --cf.MergeReducedEvents-version $version
-        
-        --cf.MergeSelectionStats-version $version
-        --cf.ProvideReducedEvents-version $version
-        --version ff_method_fine_pt_binning
-        
-        --variables $variables
 
-        --file-types pdf,png
-	--hist-hooks ff_method
-        --general-settings "cms-label=pw"
+        --cf.ProvideReducedEvents-version $version
+
+        --cf.ProduceColumns-producer 'ff_method'
+         
+        --cf.PrepareFakeFactorHistograms-version ff_method_fine_pt_binning
+        --cf.ComputeFakeFactors-version ff_method_fine_pt_binning
+       
+        --cf.ComputeFakeFactors-categories 'cat_mutau_sr'
         "${@:2}"
     )
-echo law run cf.PlotVariables1D "${args[@]}"
-law run cf.PlotVariables1D "${args[@]}"
+echo law run cf.ComputeFakeFactors "${args[@]}"
+law run cf.ComputeFakeFactors "${args[@]}" 

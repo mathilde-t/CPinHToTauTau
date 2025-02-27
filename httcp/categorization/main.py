@@ -147,12 +147,14 @@ def deep_tau_inv_wp(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.A
         channel_mask = ak.ones_like(events[f'hcand_{channel}'].lep1.rawIdx)
         if channel != 'tautau':
             channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet < wp_idx_ejet[deep_tau.vs_jet[channel]])
+            channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSjet >= wp_idx_ejet['VVVLoose'])
             channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_e[channel]])
             channel_mask = channel_mask & (tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
         else:
             tau0 = events[f'hcand_{channel}'].lep0
             for the_tau in [tau, tau0]:
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet < wp_idx_ejet[deep_tau.vs_jet[channel]])
+                channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSjet >= wp_idx_ejet['VVVLoose'])
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSe   >= wp_idx_ejet[deep_tau.vs_jet[channel]])
                 channel_mask = channel_mask & (the_tau.idDeepTau2018v2p5VSmu  >= wp_idx_mu[deep_tau.vs_mu[channel]])
         mask = mask | ak.fill_none(ak.firsts(channel_mask, axis=1),False)
@@ -175,3 +177,39 @@ def tau_barrel(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array,
     for ch_str in channels:
             mask = mask | ak.fill_none(ak.firsts((np.abs(events[f'hcand_{ch_str}'].lep1.eta) <= 1.2), axis=1),False)
     return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def tau_no_fakes(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
+    if self.dataset_inst.is_mc:
+        mask = ak.fill_none(ak.firsts(events[f'hcand_{channel}'].lep1.genPartFlav!=0, axis=1),False)
+    else:
+        mask = ak.ones_like(events.event, dtype=np.bool_)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def lep_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
+    if channel == 'etau': 
+        isolation = events.hcand_etau.lep0.pfRelIso03_all < 0.3
+    elif channel == 'mutau': 
+        isolation = events.hcand_mutau.lep0.pfRelIso04_all < 0.15
+    else:
+        raise NotImplementedError(
+                f'Can not find an isolation criteria for {channel} channel!')
+    mask = ak.fill_none(ak.firsts(isolation, axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
+    if channel == 'etau': 
+        isolation = events.hcand_etau.lep0.pfRelIso03_all >= 0.3
+    elif channel == 'mutau': 
+        isolation = events.hcand_mutau.lep0.pfRelIso04_all >= 0.15
+    else:
+        raise NotImplementedError(
+                f'Can not find an isolation criteria for {channel} channel!')
+    mask = ak.fill_none(ak.firsts(isolation, axis=1),False)
+    return events, mask
+

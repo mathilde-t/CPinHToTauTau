@@ -53,7 +53,7 @@ for counter, value in enumerate(channels):
         channel=value,
         config_name=f"run3_2022_preEE_{value}_limited",
         config_id=6+counter,
-        limit_dataset_files=1)
+        limit_dataset_files=3)
 for counter, value in enumerate(channels):
     add_run3(
         analysis_MSSM_H_tt,

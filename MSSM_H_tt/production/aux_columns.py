@@ -259,10 +259,13 @@ def jets_taggable(
     jet_vs_lep1_pt     = ak.pad_none(jet_vs_lep1.pt, max_len)
     jet_vs_lep1_pt_tag = ak.fill_none(jet_vs_lep1_pt, -999)
     
-    n_jets_vs_lep0_tag = ak.sum(jet_vs_lep0_pt_tag >20,axis=1)
-    n_jets_vs_lep1_tag = ak.sum(jet_vs_lep1_pt_tag >20,axis=1)
-    n_jets_mask_tag    = (n_jets_vs_lep0_tag == n_jets_vs_lep1_tag)
-    n_jets_taggable = ak.where(n_jets_mask_tag, n_jets_vs_lep0_tag, 0)
+    jet_pt_to_plot_0_mask       = (jet_vs_lep0_pt_tag > 0)
+    jet_pt_to_plot_1_mask       = (jet_vs_lep1_pt_tag > 0)
+    jet_pt_to_plot_mask         = (jet_vs_lep0_pt_tag  == jet_vs_lep1_pt_tag) & (jet_pt_to_plot_0_mask) & (jet_pt_to_plot_1_mask)
+    jet_pt_to_plot              = ak.where(jet_pt_to_plot_mask,jet_vs_lep0_pt_tag,-999)
+
+    n_jets_taggable                      = ak.sum(jet_pt_to_plot>0,axis=1) 
+    
     events = set_ak_column(events, "n_jets_tag", n_jets_taggable)
     return events
 

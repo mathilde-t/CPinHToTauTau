@@ -256,11 +256,11 @@ def add_jet_features(cfg: od.Config) -> None:
         )
         
     cfg.add_variable(
-        name="N_jets_pT_30_eta_4_7_Tight",
+        name="N_jets_pT_20_eta_4_7_Tight",
         expression="n_jets",
         binning=(11, -0.5, 10.5),
         discrete_x=True,
-        x_title="N_jets_pT_30_eta_4_7_Tight",
+        x_title="N_jets_pT_20_eta_4_7_Tight",
     )
     
     cfg.add_variable(

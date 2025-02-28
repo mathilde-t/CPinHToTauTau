@@ -21,6 +21,8 @@ from MSSM_H_tt.production.generatorZ import generatorZ
 from MSSM_H_tt.production.dilepton_features import hcand_fields
 
 from MSSM_H_tt.production.aux_columns import jet_pt_def,jets_taggable,number_b_jet
+from MSSM_H_tt.production.btag_SF import btag_weight_SF
+from MSSM_H_tt.production.top_pt_weight import top_pt_weight, gen_parton_top
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -48,6 +50,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         number_b_jet,
         jet_pt_def,
         jets_taggable,
+        btag_weight_SF,
         "Jet.pt",
         "Jet.pt_no_jec",
         },
@@ -67,8 +70,12 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         number_b_jet,
         jet_pt_def,
         jets_taggable,
+        btag_weight_SF,
+        top_pt_weight,
         "Jet.jec_no_jec_diff",       
     },
+    # whether weight producers should be added and called
+    produce_weights=True,
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     
@@ -90,10 +97,11 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             print("Splitting Drell-Yan dataset...")
             events = self[split_dy](events,**kwargs)
     if self.dataset_inst.is_mc:
+        print("Getting mc weights...")
         events = self[get_mc_weight](events, **kwargs)
         print("Producing Normalization weights...")
         events = self[normalization_weights](events, **kwargs)
-        events = self[generatorZ](events, **kwargs)
+        events = self[generatorZ](events, **kwargs) 
         print("Z pt reweighting...")
         events = self[zpt_weight](events,**kwargs)
         print("Producing PU weights...")          
@@ -103,5 +111,23 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         print("Producing Electron weights...")
         events = self[electron_weight](events,do_syst = True, **kwargs)
         print("Producing Tau weights...")
-        events = self[tau_weight](events,do_syst = True, **kwargs)   
+        events = self[tau_weight](events,do_syst = True, **kwargs)
+        print("Producing btag weights...")
+        events = self[btag_weight_SF](events,do_syst = True,**kwargs)
+        print("Producing GenPartonTop...")
+        events = self[gen_parton_top](events, **kwargs)
+        print("Producing Top pT weights...")
+        events = self[top_pt_weight](events, **kwargs)
+
     return events
+    
+@main.init
+def main_init(self: Producer) -> None:
+    if self.produce_weights:
+        weight_producers = {gen_parton_top, top_pt_weight}
+
+        if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
+            weight_producers.add(top_pt_weight)
+
+        self.uses |= weight_producers
+        self.produces |= weight_producers

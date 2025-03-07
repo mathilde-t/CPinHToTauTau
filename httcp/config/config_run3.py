@@ -92,6 +92,7 @@ def add_config (ana: od.Analysis,
         "vvv",
         ## Signal
         "h_ggf_htt",
+        "h_vbf_htt",
         "zh_htt",
         "wh_htt",
     ]

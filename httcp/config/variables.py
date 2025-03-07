@@ -388,13 +388,13 @@ def add_hcand_features(cfg: od.Config) -> None:
             x_title=f"hcand[{i+1}]" + r" $\eta^{fastMTT W}$",
         )
         cfg.add_variable(
-        name=f"hcand_{i+1}_mass_fastMTT_W",
-        expression=f"hcand.mass_fastMTT_W[:,{i}]",
-        null_value=EMPTY_FLOAT,
-        binning=(50, 0.01, 2.5),
-        unit="GeV",
-        x_title=f"hcand[{i+1}]" + r" $-mass^{fastMTT W}$",
-    )
+            name=f"hcand_{i+1}_mass_fastMTT_W",
+            expression=f"hcand.mass_fastMTT_W[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(50, 0.01, 2.5),
+            unit="GeV",
+            x_title=f"hcand[{i+1}]" + r" $-mass^{fastMTT W}$",
+        )
         cfg.add_variable(
             name=f"dphi_met_h{i+1}",
             expression=f"dphi_met_h{i+1}",
@@ -408,7 +408,66 @@ def add_hcand_features(cfg: od.Config) -> None:
             null_value=EMPTY_FLOAT,
             binning=(30, -1.5, 1.5),
             x_title=r"$MET var QCD$",
-        )    
+        )
+
+        ## resolution plots to compare fastMTT
+        cfg.add_variable(
+            name=f"hcand_{i+1}_pt_fastMTT_W_resolution_to_gen",
+            expression=f"hcand.pt_fastMTT_W_resolution_to_gen[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(80, -2., 2.),
+            x_title=f"hcand[{i+1}] resolution" + r" $p_{T}^{fastMTT W}$",
+        )
+        cfg.add_variable(
+            name=f"hcand_{i+1}_phi_fastMTT_W_resolution_to_gen",
+            expression=f"hcand.phi_fastMTT_W_resolution_to_gen[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(80, -0.2, 0.2),
+            x_title=f"hcand[{i+1}] resolution" + r" $\phi^{fastMTT W}$",
+        )
+        cfg.add_variable(
+            name=f"hcand_{i+1}_eta_fastMTT_W_resolution_to_gen",
+            expression=f"hcand.eta_fastMTT_W_resolution_to_gen[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(80, -0.2, 0.2),
+            x_title=f"hcand[{i+1}] resolution" + r" $\eta^{fastMTT W}$",
+        )
+        #cfg.add_variable(
+        #    name=f"hcand_{i+1}_mass_fastMTT_W_resolution_to_gen",
+        #    expression=f"hcand.mass_fastMTT_W_resolution_to_gen[:,{i}]",
+        #    null_value=EMPTY_FLOAT,
+        #    binning=(40, -2., 2.),
+        #    x_title=f"hcand[{i+1}] resolution" + r" $-mass^{fastMTT W}$",
+        #)
+        
+        cfg.add_variable(
+            name=f"hcand_{i+1}_pt_fastMTT_W_resolution_rel",
+            expression=f"hcand.pt_fastMTT_W_resolution_rel[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(40, -2., 2.),
+            x_title=f"hcand[{i+1}] resolution" + r" $p_{T}^{fastMTT W}$",
+        )
+        cfg.add_variable(
+            name=f"hcand_{i+1}_phi_fastMTT_W_resolution_rel",
+            expression=f"hcand.phi_fastMTT_W_resolution_rel[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(80, -0.2, 0.2),
+            x_title=f"hcand[{i+1}] resolution" + r" $\phi^{fastMTT W}$",
+        )
+        cfg.add_variable(
+            name=f"hcand_{i+1}_eta_fastMTT_W_resolution_rel",
+            expression=f"hcand.eta_fastMTT_W_resolution_rel[:,{i}]",
+            null_value=EMPTY_FLOAT,
+            binning=(80, -0.2, 0.2),
+            x_title=f"hcand[{i+1}] resolution" + r" $\eta^{fastMTT W}$",
+        )
+        #cfg.add_variable(
+        #    name=f"hcand_{i+1}_mass_fastMTT_W_resolution_rel",
+        #    expression=f"hcand.mass_fastMTT_W_resolution_rel[:,{i}]",
+        #    null_value=EMPTY_FLOAT,
+        #    binning=(40, -2., 2.),
+        #    x_title=f"hcand[{i+1}] resolution" + r" $-mass^{fastMTT W}$",
+        #)
 
     cfg.add_variable(
             name=f"hcand_1_mass",

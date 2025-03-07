@@ -35,11 +35,27 @@ logger = law.logger.get_logger(__name__)
         # nano columns
         "hcand.*", "channel_id",
         "PuppiMET.pt", "PuppiMET.phi", "PuppiMET.covXX", "PuppiMET.covXY", "PuppiMET.covYY",
+        optional("GenTau.pt"), optional("GenTau.eta"), optional("GenTau.phi"), optional("GenTau.mass"),
     },
     produces={
         # new columns
         "hcand.pt_fastMTT_W", "hcand.eta_fastMTT_W", "hcand.phi_fastMTT_W", "hcand.mass_fastMTT_W",
         "hcand_invm_fastMTT_W",
+        "hcand.px_fastMTT", "hcand.py_fastMTT", "hcand.pz_fastMTT",
+
+        ### gen_reco resolutions
+        "hcand.px_fastMTT_W_resolution_gen_reco","hcand.py_fastMTT_W_resolution_gen_reco","hcand.pz_fastMTT_W_resolution_gen_reco",
+        "hcand.pt_fastMTT_W_resolution_gen_reco_relative","hcand.pt_fastMTT_W_resolution_gen_reco_absolute",
+        "hcand.eta_fastMTT_W_resolution_gen_reco","hcand.phi_fastMTT_W_resolution_gen_rec",
+        ### gen_fastmtt resolutions
+        "hcand.px_fastMTT_W_resolution_gen_fastmtt","hcand.py_fastMTT_W_resolution_gen_fastmtt","hcand.pz_fastMTT_W_resolution_gen_fastmtt",
+        "hcand.pt_fastMTT_W_resolution_gen_fastmtt_relative","hcand.pt_fastMTT_W_resolution_gen_fastmtt_absolute",
+        "hcand.eta_fastMTT_W_resolution_gen_fastmtt","hcand.phi_fastMTT_W_resolution_gen_fastmt",
+        ### reco_fastmtt resolutions
+        "hcand.px_fastMTT_W_resolution_reco_fastmtt","hcand.py_fastMTT_W_resolution_reco_fastmtt","hcand.pz_fastMTT_W_resolution_reco_fastmtt",
+        "hcand.pt_fastMTT_W_resolution_reco_fastmtt_relative","hcand.pt_fastMTT_W_resolution_reco_fastmtt_absolute",
+        "hcand.eta_fastMTT_W_resolution_reco_fastmtt","hcand.phi_fastMTT_W_resolution_reco_fastmt",
+
     },
 )
 def apply_fastMTT_Wiktor(
@@ -94,21 +110,21 @@ def apply_fastMTT_Wiktor(
 
     higgs_mass = ak.to_numpy(hmass)
 
+    gen_pt1    = ak.to_numpy(events.GenTau.pt[:,0:1])
+    gen_eta1   = ak.to_numpy(events.GenTau.eta[:,0:1])
+    gen_phi1   = ak.to_numpy(events.GenTau.phi[:,0:1])
+    gen_mass1  = ak.to_numpy(events.GenTau.mass[:,0:1])
+    gen_pt2    = ak.to_numpy(events.GenTau.pt[:,1:2])
+    gen_eta2   = ak.to_numpy(events.GenTau.eta[:,1:2])
+    gen_phi2   = ak.to_numpy(events.GenTau.phi[:,1:2])
+    gen_mass2  = ak.to_numpy(events.GenTau.mass[:,1:2])
+
     # prepare inputs properly
     metcov = np.concatenate((metcovxx,metcovxy,metcovxy,metcovyy), axis=1)
     metcov = np.reshape(metcov, (metcov.shape[0], 2, 2))
-    measuredTauLeptons = np.concatenate((dm1,
-                                         pt1,
-                                         eta1,
-                                         phi1,
-                                         mass1,
-                                         type1,
-                                         dm2,
-                                         pt2,
-                                         eta2,
-                                         phi2,
-                                         mass2,
-                                         type2), axis=1)
+    measuredTauLeptons = np.concatenate((dm1,pt1,eta1,phi1,mass1,type1,
+                                         dm2,pt2,eta2,phi2,mass2,type2), 
+                                         axis=1)
     measuredTauLeptons = np.reshape(measuredTauLeptons, (measuredTauLeptons.shape[0], 2, 6))
     metx   = (metpt * np.cos(metphi)).reshape(-1)
     mety   = (metpt * np.sin(metphi)).reshape(-1)
@@ -152,6 +168,9 @@ def apply_fastMTT_Wiktor(
         behavior=coffea.nanoevents.methods.vector.behavior,
     )
 
+    hcand_px_fastMTT = ak.concatenate([px_h1, px_h2], axis=1)
+    hcand_py_fastMTT = ak.concatenate([py_h1, py_h2], axis=1)
+    hcand_pz_fastMTT = ak.concatenate([pz_h1, pz_h2], axis=1)
     hcand_pt_fastMTT  = ak.concatenate([p4_h1_reg.pt, p4_h2_reg.pt], axis=1)
     hcand_eta_fastMTT = ak.concatenate([p4_h1_reg.eta, p4_h2_reg.eta], axis=1)
     hcand_phi_fastMTT = ak.concatenate([p4_h1_reg.phi, p4_h2_reg.phi], axis=1)
@@ -177,6 +196,9 @@ def apply_fastMTT_Wiktor(
     #hcand_mass_fastMTT = ak.where(mask, hcand_mass_fastMTT, zero_array(hcand_mass_fastMTT))
     #mass_h = ak.where(mask, mass_h, zero_array(mass_h))
 
+    events = set_ak_column(events, "hcand.px_fastMTT",   hcand_px_fastMTT)
+    events = set_ak_column(events, "hcand.py_fastMTT",   hcand_py_fastMTT)
+    events = set_ak_column(events, "hcand.pz_fastMTT",   hcand_pz_fastMTT)
     events = set_ak_column(events, "hcand.pt_fastMTT_W",   hcand_pt_fastMTT)
     events = set_ak_column(events, "hcand.eta_fastMTT_W",  hcand_eta_fastMTT)
     events = set_ak_column(events, "hcand.phi_fastMTT_W",  hcand_phi_fastMTT)
@@ -184,6 +206,66 @@ def apply_fastMTT_Wiktor(
 
     events = set_ak_column_f32(events, "hcand_invm_fastMTT_W", mass_h)
 
+
+
+    #################################
+    ####       resolution         ###
+    #################################
+
+    def compute_resolutions(events):
+        hcands = [("hcand1", "h1", 1), ("hcand2", "h2", 2)]
+        variables = ["px", "py", "pz", "pt", "eta", "phi"]
+        comparisons = {
+            "gen_reco": ("gen_{var}{num}", "{var}{num}"),
+            "gen_fastmtt": ("gen_{var}{num}", "p4_{h_var}_reg.{var}"),
+            "reco_fastmtt": ("p4_{h_var}_reg.{var}", "{var}{num}")
+        }
+    
+        resolutions = {}
+        for hcand, h_var, num in hcands:
+            for var in variables:
+                for comp, (num_fmt, denom_fmt) in comparisons.items():
+                    num_key = num_fmt.format(var=var, num=num, h_var=h_var)
+                    denom_key = denom_fmt.format(var=var, num=num, h_var=h_var)
+                    
+                    num_val = events[num_key] if num_key in events.fields else None
+                    denom_val = events[denom_key] if denom_key in events.fields else None
+                    
+                    if num_val is not None and denom_val is not None:
+                        key = f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"
+                        #resolutions[key] = (denom_val - num_val) / denom_val if var == "pt" else denom_val - num_val
+                        if "pt" in var:
+                            resolutions[key] = {
+                                "relative": (denom_val - num_val) / denom_val,
+                                "absolute": denom_val - num_val
+                            }
+                        else:
+                            resolutions[key] = denom_val - num_val
+
+    
+    ## Concatenate results
+    #for comp in comparisons.keys():
+    #    for var in variables:
+    #        key_list = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"] for hcand, _, _ in hcands]
+    #        concatenated = ak.concatenate(key_list, axis=1)
+    #        events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}", concatenated)
+
+    for comp in comparisons.keys():
+        for var in variables:
+            if "pt" in var:
+                key_list_rel = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"]["relative"] for hcand, _, _ in hcands]
+                key_list_abs = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"]["absolute"] for hcand, _, _ in hcands]
+
+                concatenated_rel = ak.concatenate(key_list_rel, axis=1)
+                concatenated_abs = ak.concatenate(key_list_abs, axis=1)
+
+                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}_relative", concatenated_rel)
+                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}_absolute", concatenated_abs)
+            else:
+                key_list = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"] for hcand, _, _ in hcands]
+                concatenated = ak.concatenate(key_list, axis=1)
+                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}", concatenated)
+
+
+
     return events
-
-

@@ -2,6 +2,8 @@
 source ./common_run3.sh #to access set_common_vars() function
 #The following function defines config, processes, version and datasets variables
 set_common_vars "$1"
+ff_version='ff_method_njets_mt70_p2_bug_fix'
+main_category='cat_mutau_sr' #Specify the category for which the fake factors should be calculated
 args=(
         --config $config 
         --datasets $datasets
@@ -21,11 +23,16 @@ args=(
         --cf.ProvideReducedEvents-version $version
 
         --cf.ProduceColumns-producer 'ff_method'
-         
-        --cf.PrepareFakeFactorHistograms-version ff_method_fine_pt_binning
-        --cf.ComputeFakeFactors-version ff_method_fine_pt_binning
-       
-        --cf.ComputeFakeFactors-categories 'cat_mutau_sr'
+        --cf.ProduceColumns-version  $ff_version
+
+        --cf.PrepareFakeFactorHistograms-version $ff_version
+        --cf.PrepareFakeFactorHistograms-categories $main_category
+
+        --cf.MergeFakeFactorHistograms-version $ff_version
+
+        --cf.ComputeFakeFactors-version  $ff_version
+        --cf.ComputeFakeFactors-categories $main_category
+        
         "${@:2}"
     )
 echo law run cf.ComputeFakeFactors "${args[@]}"

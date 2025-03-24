@@ -110,7 +110,7 @@ def add_common_features(cfg: od.config) -> None:
     cfg.add_variable(
         name="event",
         expression="event",
-        binning=(1, 0.0, 1.0e9),
+        binning=(1, 0, 2),
         x_title="Event number",
         discrete_x=True,
     )
@@ -494,13 +494,6 @@ def phi_cp_variables(cfg: od.Config) -> None:
             binning=(20, 0, 2*np.pi),
             x_title=rf"$\varphi_{{CP}} [{title_str}], \alpha \geq \pi/4$ (rad)",
         )
-        cfg.add_variable(
-           name=f"alpha_{the_ch}",
-           expression=f"alpha_{the_ch}",
-           null_value=EMPTY_FLOAT,
-           binning=(6, 0, np.pi/2),
-           x_title=rf"$ \alpha [{title_str}] $(rad)",
-       )
         # 2-bin histograms
         cfg.add_variable(
             name=f"phi_cp_{the_ch}_2bin",
@@ -585,7 +578,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_pt",
                 expression=f"hcand_{ch_str}.{lep}.pt",
                 null_value=EMPTY_FLOAT,
-                binning=(50, 0, 100.),
+                binning=(40, 20, 100.),
                 unit="GeV",
                 x_title= rf"{lep_str} $p_{{T}}$",
             )
@@ -635,6 +628,24 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 unit="",
                 x_title= rf"{lep_str} $\frac{{|IP|}}{{\sigma(IP)}}$",
             )
+            if lep == 'lep0':
+                if ch_str == 'mutau':
+                    cfg.add_variable(
+                        name=f"{ch_str}_{lep}_iso",
+                        expression=f"hcand_{ch_str}.{lep}.pfRelIso04_all",
+                        null_value=EMPTY_FLOAT,
+                        binning=(40,0, 0.2),
+                        x_title=rf"{lep_str} rel. iso",
+                    )
+                elif ch_str == 'etau':
+                     cfg.add_variable(
+                        name=f"{ch_str}_{lep}_iso",
+                        expression=f"hcand_{ch_str}.{lep}.pfRelIso03_all",
+                        null_value=EMPTY_FLOAT,
+                        binning=(40,0,0.6),
+                        x_title=rf"{lep_str} rel. iso",
+                    )
+            
             for proj in ['x','y','z']:
                 cfg.add_variable(
                     name=f"{ch_str}{lep}_ip_{proj}",
@@ -667,6 +678,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 binning=(32*bin_split_factor, -3.2, 3.2),
                 x_title=rf"{lep_str} $\phi$",
             )
+            
 
 
 def add_variables(cfg: od.Config) -> None:
@@ -681,3 +693,5 @@ def add_variables(cfg: od.Config) -> None:
     add_weight_features(cfg)
     add_cutflow_features(cfg)
     add_dilepton_features(cfg)
+    
+   

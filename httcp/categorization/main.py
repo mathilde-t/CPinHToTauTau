@@ -52,21 +52,26 @@ def ss_charge(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, 
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})
-def mt_inv_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channels = self.config_inst.channels.names()
-    mask = ak.zeros_like(events.event, dtype=np.bool_)
-    for ch_str in channels:
-        if ch_str != 'tautau':
-            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt > 50), axis=1),False)
-    return events, mask
-
-@categorizer(uses={'event', 'hcand_*'})
 def mt_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channels = self.config_inst.channels.names()
     mask = ak.zeros_like(events.event, dtype=np.bool_)
+    mt_cut_value = self.config_inst.x.mt_cut_value
     for ch_str in channels:
         if ch_str != 'tautau':
-            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt <= 50), axis=1),False)
+            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt <= mt_cut_value), axis=1),False)
+            mask = mask & ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt >= 0), axis=1),False)
+    #print(f"using mT cut {mt_cut_value}")
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def mt_inv_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channels = self.config_inst.channels.names()
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+    mt_cut_value = self.config_inst.x.mt_cut_value
+    for ch_str in channels:
+        if ch_str != 'tautau':
+            mask = mask | ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt > mt_cut_value), axis=1),False)
+            mask = mask & ak.fill_none(ak.firsts((events[f'hcand_{ch_str}'].mt < 200), axis=1),False)
     return events, mask
 
 @categorizer(uses={"is_b_vetoed"})
@@ -205,11 +210,58 @@ def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array
     channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
     if channel == 'etau': 
         isolation = events.hcand_etau.lep0.pfRelIso03_all >= 0.3
+        upper_lim = events.hcand_etau.lep0.pfRelIso03_all < 2.
     elif channel == 'mutau': 
         isolation = events.hcand_mutau.lep0.pfRelIso04_all >= 0.15
+        upper_lim = events.hcand_mutau.lep0.pfRelIso04_all < 1.
     else:
         raise NotImplementedError(
                 f'Can not find an isolation criteria for {channel} channel!')
     mask = ak.fill_none(ak.firsts(isolation, axis=1),False)
+    mask = mask & ak.fill_none(ak.firsts(upper_lim, axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'n_jets'})
+def njets_geq2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, ak.fill_none(events.n_jets >=2 ,False)
+
+@categorizer(uses={'event', 'n_jets'})
+def njets_eq1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events,  ak.fill_none(events.n_jets == 1 ,False)
+
+@categorizer(uses={'event', 'n_jets'})
+def njets_eq0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    return events, ak.fill_none(events.n_jets == 0 ,False)
+
+
+
+@categorizer(uses={'event', 'hcand_*'})
+def dm0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 0), axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def dm1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 1), axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def dm2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 2), axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def dm10(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 10), axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def dm11(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 11), axis=1),False)
     return events, mask
 

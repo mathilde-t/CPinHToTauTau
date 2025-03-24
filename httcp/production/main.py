@@ -117,7 +117,6 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-        
     print("Producing Fake Factor weights...")
     events = self[fake_factors](events, **kwargs)
     print("Producing phi_cp...")
@@ -139,8 +138,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         hcand_fields,
         tauspinner_weight,
         category_ids,
-        "Jet.pt",
-        "Jet.pt_no_jec",
+        jet_pt_def,
         },
     produces={
         normalization_weights,
@@ -155,14 +153,13 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         hcand_fields,
         tauspinner_weight,
         category_ids,
-        "Jet.jec_no_jec_diff",
-        "Jet.number_of_jets",
+        jet_pt_def,
+
     },
 )
 def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-    print("Producing Jet features...")
-    events = set_ak_column_f32(events, "Jet.jec_no_jec_diff", (events.Jet.pt - events.Jet.pt_no_jec))
-    events = set_ak_column_f32(events, "Jet.number_of_jets", ak.num(events.Jet))
+    print("Producing jet variables...") 
+    events = self[jet_pt_def](events, **kwargs)
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)

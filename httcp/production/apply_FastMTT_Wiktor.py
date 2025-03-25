@@ -39,23 +39,9 @@ logger = law.logger.get_logger(__name__)
     },
     produces={
         # new columns
-        "hcand.pt_fastMTT_W", "hcand.eta_fastMTT_W", "hcand.phi_fastMTT_W", "hcand.mass_fastMTT_W",
-        "hcand_invm_fastMTT_W",
+        "hcand.pt_fastMTT", "hcand.eta_fastMTT", "hcand.phi_fastMTT", "hcand.mass_fastMTT",
+        "hcand_invm_fastMTT",
         "hcand.px_fastMTT", "hcand.py_fastMTT", "hcand.pz_fastMTT",
-
-        ### gen_reco resolutions
-        "hcand.px_fastMTT_W_resolution_gen_reco","hcand.py_fastMTT_W_resolution_gen_reco","hcand.pz_fastMTT_W_resolution_gen_reco",
-        "hcand.pt_fastMTT_W_resolution_gen_reco_relative","hcand.pt_fastMTT_W_resolution_gen_reco_absolute",
-        "hcand.eta_fastMTT_W_resolution_gen_reco","hcand.phi_fastMTT_W_resolution_gen_rec",
-        ### gen_fastmtt resolutions
-        "hcand.px_fastMTT_W_resolution_gen_fastmtt","hcand.py_fastMTT_W_resolution_gen_fastmtt","hcand.pz_fastMTT_W_resolution_gen_fastmtt",
-        "hcand.pt_fastMTT_W_resolution_gen_fastmtt_relative","hcand.pt_fastMTT_W_resolution_gen_fastmtt_absolute",
-        "hcand.eta_fastMTT_W_resolution_gen_fastmtt","hcand.phi_fastMTT_W_resolution_gen_fastmt",
-        ### reco_fastmtt resolutions
-        "hcand.px_fastMTT_W_resolution_reco_fastmtt","hcand.py_fastMTT_W_resolution_reco_fastmtt","hcand.pz_fastMTT_W_resolution_reco_fastmtt",
-        "hcand.pt_fastMTT_W_resolution_reco_fastmtt_relative","hcand.pt_fastMTT_W_resolution_reco_fastmtt_absolute",
-        "hcand.eta_fastMTT_W_resolution_reco_fastmtt","hcand.phi_fastMTT_W_resolution_reco_fastmt",
-
     },
 )
 def apply_fastMTT_Wiktor(
@@ -109,7 +95,8 @@ def apply_fastMTT_Wiktor(
     metcovyy = ak.to_numpy(events.PuppiMET.covYY[:,None])
 
     higgs_mass = ak.to_numpy(hmass)
-
+    
+    #from IPython import embed; embed()
     gen_pt1    = ak.to_numpy(events.GenTau.pt[:,0:1])
     gen_eta1   = ak.to_numpy(events.GenTau.eta[:,0:1])
     gen_phi1   = ak.to_numpy(events.GenTau.phi[:,0:1])
@@ -184,88 +171,14 @@ def apply_fastMTT_Wiktor(
 
     hcand_mass_fastMTT = ak.concatenate([h1_mass, p4_h2_reg.mass], axis=1)
 
-    ## only plot the first 300 events to be coherent with IC's
-    ## for test purposes only !
-    #mask = np.arange(len(events)) < 300 # initialise Mask : True für die ersten 300 Events, False für den Rest
-    #mask = ak.Array(mask)
-    #zero_array = lambda x: ak.zeros_like(x)
-    #
-    #hcand_pt_fastMTT = ak.where(mask, hcand_pt_fastMTT, zero_array(hcand_pt_fastMTT))
-    #hcand_eta_fastMTT = ak.where(mask, hcand_eta_fastMTT, zero_array(hcand_eta_fastMTT))
-    #hcand_phi_fastMTT = ak.where(mask, hcand_phi_fastMTT, zero_array(hcand_phi_fastMTT))
-    #hcand_mass_fastMTT = ak.where(mask, hcand_mass_fastMTT, zero_array(hcand_mass_fastMTT))
-    #mass_h = ak.where(mask, mass_h, zero_array(mass_h))
-
     events = set_ak_column(events, "hcand.px_fastMTT",   hcand_px_fastMTT)
     events = set_ak_column(events, "hcand.py_fastMTT",   hcand_py_fastMTT)
     events = set_ak_column(events, "hcand.pz_fastMTT",   hcand_pz_fastMTT)
-    events = set_ak_column(events, "hcand.pt_fastMTT_W",   hcand_pt_fastMTT)
-    events = set_ak_column(events, "hcand.eta_fastMTT_W",  hcand_eta_fastMTT)
-    events = set_ak_column(events, "hcand.phi_fastMTT_W",  hcand_phi_fastMTT)
-    events = set_ak_column(events, "hcand.mass_fastMTT_W", hcand_mass_fastMTT)
+    events = set_ak_column(events, "hcand.pt_fastMTT",   hcand_pt_fastMTT)
+    events = set_ak_column(events, "hcand.eta_fastMTT",  hcand_eta_fastMTT)
+    events = set_ak_column(events, "hcand.phi_fastMTT",  hcand_phi_fastMTT)
+    events = set_ak_column(events, "hcand.mass_fastMTT", hcand_mass_fastMTT)
 
-    events = set_ak_column_f32(events, "hcand_invm_fastMTT_W", mass_h)
-
-
-
-    #################################
-    ####       resolution         ###
-    #################################
-
-    def compute_resolutions(events):
-        hcands = [("hcand1", "h1", 1), ("hcand2", "h2", 2)]
-        variables = ["px", "py", "pz", "pt", "eta", "phi"]
-        comparisons = {
-            "gen_reco": ("gen_{var}{num}", "{var}{num}"),
-            "gen_fastmtt": ("gen_{var}{num}", "p4_{h_var}_reg.{var}"),
-            "reco_fastmtt": ("p4_{h_var}_reg.{var}", "{var}{num}")
-        }
-    
-        resolutions = {}
-        for hcand, h_var, num in hcands:
-            for var in variables:
-                for comp, (num_fmt, denom_fmt) in comparisons.items():
-                    num_key = num_fmt.format(var=var, num=num, h_var=h_var)
-                    denom_key = denom_fmt.format(var=var, num=num, h_var=h_var)
-                    
-                    num_val = events[num_key] if num_key in events.fields else None
-                    denom_val = events[denom_key] if denom_key in events.fields else None
-                    
-                    if num_val is not None and denom_val is not None:
-                        key = f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"
-                        #resolutions[key] = (denom_val - num_val) / denom_val if var == "pt" else denom_val - num_val
-                        if "pt" in var:
-                            resolutions[key] = {
-                                "relative": (denom_val - num_val) / denom_val,
-                                "absolute": denom_val - num_val
-                            }
-                        else:
-                            resolutions[key] = denom_val - num_val
-
-    
-    ## Concatenate results
-    #for comp in comparisons.keys():
-    #    for var in variables:
-    #        key_list = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"] for hcand, _, _ in hcands]
-    #        concatenated = ak.concatenate(key_list, axis=1)
-    #        events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}", concatenated)
-
-    for comp in comparisons.keys():
-        for var in variables:
-            if "pt" in var:
-                key_list_rel = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"]["relative"] for hcand, _, _ in hcands]
-                key_list_abs = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"]["absolute"] for hcand, _, _ in hcands]
-
-                concatenated_rel = ak.concatenate(key_list_rel, axis=1)
-                concatenated_abs = ak.concatenate(key_list_abs, axis=1)
-
-                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}_relative", concatenated_rel)
-                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}_absolute", concatenated_abs)
-            else:
-                key_list = [resolutions[f"resolution_{hcand}_{var}_fastMTT_resolution_{comp}"] for hcand, _, _ in hcands]
-                concatenated = ak.concatenate(key_list, axis=1)
-                events = set_ak_column(events, f"hcand.{var}_fastMTT_W_resolution_{comp}", concatenated)
-
-
+    events = set_ak_column_f32(events, "hcand_invm_fastMTT", mass_h)
 
     return events

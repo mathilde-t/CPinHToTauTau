@@ -206,6 +206,7 @@ def add_config (ana: od.Analysis,
         "wph_tautau_uncorrelatedDecay_UnFiltered",
         "wmh_tautau_uncorrelatedDecay_Filtered",
         "wmh_tautau_uncorrelatedDecay_UnFiltered",
+        "h_vbf_tautau_UncorrelatedDecay_Filtered",
     ]
     
     datasets_data = []
@@ -259,6 +260,8 @@ def add_config (ana: od.Analysis,
             dataset.add_tag("is_w")
         elif re.match(r"^h_ggf_tautau.*$", dataset.name):
             dataset.add_tag("is_ggf_signal")
+        elif re.match(r"^h_vbf_tautau.*$", dataset.name):
+            dataset.add_tag("is_vbf_signal")
         elif re.match(r"^(.*)h_tautau(.*)Filtered$", dataset.name):
             dataset.add_tag("is_vh_signal")
         
@@ -1089,7 +1092,7 @@ def add_config (ana: od.Analysis,
             "TauProd.*",
             # general event info
             "run", "luminosityBlock", "event", "LHEPdfWeight",
-            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP", #here1#
+            "PV.npvs","Pileup.nTrueInt","Pileup.nPU","genWeight", "LHEWeight.originalXWGTUP",
             "trigger_ids",
             "single_triggered", "cross_triggered",
             "single_e_triggered", "cross_e_triggered",

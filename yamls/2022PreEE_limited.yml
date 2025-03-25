@@ -22,17 +22,20 @@ args:
     #- tt_sl
     #- tt_fh
     #- h_ggf_tautau_prod_cp_even_sm
-    - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
+    #- h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
     #- h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
     #- h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
     #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
+    #- zh_tautau_uncorrelatedDecay_Filtered
+    - h_vbf_tautau_UncorrelatedDecay_Filtered
 
   processes :
     #- data
     #- dy_m50toinf
     #- w_lnu
     #- tt
-    - h_ggf_htt
+    #- h_ggf_htt
+    - h_vbf_htt
 
   categories:
     #- etau
@@ -138,5 +141,5 @@ args:
     #- tau_trigger
     #- tau_trigger_log
 
-  #extras:
-    - process-settings "h_ggf_tautau,unstack,10"
+  extras:
+    - process-settings "h_ggf_tautau,unstack,10:h_vbf_tautau,unstack,10"

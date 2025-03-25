@@ -83,42 +83,44 @@ args:
     - h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay
     - h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+    #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
     #- zh_tautau_uncorrelatedDecay_Filtered
     #- wph_tautau_uncorrelatedDecay_Filtered
     #- wmh_tautau_uncorrelatedDecay_Filtered
-    #- h_ggf_tautau_uncorrelated_filter #inclusive sample (6 root files)
+    #- h_vbf_tautau_UncorrelatedDecay_Filtered
 
   processes :
     #- data
-    #- w
+    ##- w
     #- w_lnu
-    #- dy_m10to50
-    #- dy_m50toinf_lep
-    #- dy_m50toinf_tau
-    #- dy_m50toinf_jet
+    ##- dy_m10to50
+    ##- dy_m50toinf_lep
+    ##- dy_m50toinf_tau
+    ##- dy_m50toinf_jet
     #- dy
     #- tt
     #- st
-    #- st_tchannel  #either st ot one of these two channels !
-    #- st_twchannel
+    ##- st_tchannel  #either st or one of these two channels !
+    ##- st_twchannel
     #- vv
     #- vvv
     - h_ggf_htt
-    - h_vbf_htt
     #- zh_htt
     #- wh_htt
+    #- h_vbf_htt
 
   categories:
     #- etau__*
     #- mutau__*
-    - mutau__lepD
-    - mutau__lepD__a1dm10_2
+    #- mutau__lepD
+    #- mutau__lepD__a1dm10_2
     #- mutau__lepD__a1dm2_2
     #- mutau__lepD__a1dm11_2
     #- mutau__lepD__pi_2
     #- mutau__lepD__rho_2
     #- tautau__hadD__pi_a1dm10
     #- tautau__hadD__pi_rho
+    - tautau__real_1__hadD__rho_rho
     #- tautau__hadD__pi_pi
     #- tautau__hadD__pi_a1dm2
     #- tautau__hadD__pi_a1dm11
@@ -279,8 +281,10 @@ args:
     #- mu_trig
     #- mu_xtrig
     #- zpt
+    - tauspinner
     
 
   extras:
-    - process-settings "h_ggf_htt,unstack,300:zh_htt,unstack,300:wh_htt,unstack,300"
+    - process-settings "h_ggf_htt,unstack,300:h_vbf_htt,unstack,300"
     #- variable-settings "pu_weight,overflow"
+    #- skip-ratio

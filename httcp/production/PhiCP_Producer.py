@@ -26,8 +26,8 @@ logger = law.logger.get_logger(__name__)
         "channel_id",
         "hcand.pt","hcand.eta", "hcand.phi", "hcand.mass", "hcand.decayMode", "hcand.charge",
         "hcand.IPx", "hcand.IPy", "hcand.IPz",
-        #"hcand.pt_fastMTT_W", 
-        #"hcand.eta_fastMTT_W", "hcand.phi_fastMTT_W", "hcand.mass_fastMTT_W", "hcand_invm_fastMTT_W",
+        #"hcand.pt_fastMTT", 
+        #"hcand.eta_fastMTT", "hcand.phi_fastMTT", "hcand.mass_fastMTT", "hcand_invm_fastMTT",
         "hcandprod.pt","hcandprod.eta", "hcandprod.phi", "hcandprod.mass", "hcandprod.pdgId",
         optional("GenTau.pt"), optional("GenTau.eta"), optional("GenTau.phi"), optional("GenTau.mass"),
         optional("GenTau.IPx"), optional("GenTau.IPy"), optional("GenTau.IPz"),
@@ -173,10 +173,10 @@ def ProducePhiCP(
     keys_list = list(p4hcandinfo_fastMTT.keys())  # = ['p4h1', 'p4h1pi', 'p4h1pi0', 'p4h2', 'p4h2pi', 'p4h2pi0']
     
     for key in keys_list:
-        if "pt_fastMTT_W" in p4hcandinfo_fastMTT[key].fields:
+        if "pt_fastMTT" in p4hcandinfo_fastMTT[key].fields:
             p4hcandinfo_fastMTT[key] = ak.without_field(p4hcandinfo_fastMTT[key], "pt")
-            p4hcandinfo_fastMTT[key] = ak.with_field(p4hcandinfo_fastMTT[key], p4hcandinfo_fastMTT[key].pt_fastMTT_W, "pt")
-            p4hcandinfo_fastMTT[key] = ak.without_field(p4hcandinfo_fastMTT[key], "pt_fastMTT_W")
+            p4hcandinfo_fastMTT[key] = ak.with_field(p4hcandinfo_fastMTT[key], p4hcandinfo_fastMTT[key].pt_fastMTT, "pt")
+            p4hcandinfo_fastMTT[key] = ak.without_field(p4hcandinfo_fastMTT[key], "pt_fastMTT")
 
 
     # -- pi-pi

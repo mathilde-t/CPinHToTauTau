@@ -49,8 +49,9 @@ from httcp.production.columnvalid import make_column_valid
 from httcp.util import IF_DATASET_HAS_LHE_WEIGHTS, IF_DATASET_IS_DY, IF_DATASET_IS_W, IF_DATASET_IS_SIGNAL
 from httcp.util import IF_RUN2, IF_RUN3, IF_ALLOW_STITCHING
     
-from httcp.production.apply_FastMTT_Wiktor import apply_fastMTT_Wiktor
-#from httcp.production.apply_FastMTT_IC import apply_fastMTT_IC
+#from httcp.production.apply_FastMTT_Wiktor import apply_fastMTT_Wiktor
+#here5 from httcp.production.produce_px_py_pz import produce_px_py_pz
+from httcp.production.produce_px_py_pz import calculate_higgs_mass_genlevel
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")        
@@ -73,9 +74,10 @@ logger = law.logger.get_logger(__name__)
         reArrangeGenDecayProducts,
         ProduceGenPhiCP, #ProduceGenCosPsi, 
         ProduceDetPhiCP, #ProduceDetCosPsi,
-        #here1# "PV.npvs","Pileup.nTrueInt","Pileup.nPU",
-        apply_fastMTT_Wiktor,
-        #apply_fastMTT_IC,
+        #"Pileup.nTrueInt","Pileup.nPU","PV.npvs", #here4
+        #apply_fastMTT_Wiktor,
+        #here5 produce_px_py_pz,
+        #calculate_higgs_mass_genlevel,
     },
     produces={
         # new columns
@@ -87,9 +89,10 @@ logger = law.logger.get_logger(__name__)
         "dphi_met_h1", "dphi_met_h2",
         "met_var_qcd_h1", "met_var_qcd_h2",
         "hT",
-        #here1# npvs, pu_nTrue_Int, nPU,
-        apply_fastMTT_Wiktor,
-        #apply_fastMTT_IC,
+        #"pu_nTrue_Int", "nPU", "npvs", #here4
+        #apply_fastMTT_Wiktor,
+        #here5 produce_px_py_pz,
+        #calculate_higgs_mass_genlevel,
     },
 )
 def hcand_features(
@@ -126,21 +129,22 @@ def hcand_features(
     events = set_ak_column_i32(events, "n_jet", ak.num(events.Jet.pt, axis=1))
 
     # ########################################### #
-    #     PU variables npvs, pu_nTrue_Int, nPU    #     #here1#
+    #     PU variables npvs, pu_nTrue_Int, nPU    #
     # ########################################### #
 
-    #here1# events = set_ak_column_f32(events, "npvs", PV.npvs)
-    #here1# events = set_ak_column_f32(events, "pu_nTrue_Int", Pileup.nTrueInt)
-    #here1# events = set_ak_column_f32(events, "nPU", Pileup.nPU)
+    #events = set_ak_column_f32(events, "npvs", PV.npvs)
+    #events = set_ak_column_f32(events, "pu_nTrue_Int", Pileup.nTrueInt)
+    #events = set_ak_column_f32(events, "nPU", Pileup.nPU)
 
 
     # ################## #
     #     Run FastMTT    #
     # ################## #
-    logger.info(" >>>--- FastMTT Wiktor --->>> [Not as fast as you think]")
-    events = self[apply_fastMTT_Wiktor](events, **kwargs)
-    #logger.info(" >>>--- FastMTT IC --->>> [Not as fast as you think]")
-    #events = self[apply_fastMTT_IC](events, **kwargs)
+    #logger.info(" >>>--- FastMTT Wiktor --->>> [Not as fast as you think]")
+    #events = self[apply_fastMTT_Wiktor](events, **kwargs)
+    #here5 logger.info(" >>>--- produce .px, .py, .pz's --->>>")
+    #here5 events = self[produce_px_py_pz](events, **kwargs)
+    #events = self[calculate_higgs_mass_genlevel](events, **kwargs)
     
 
     # ########################### #

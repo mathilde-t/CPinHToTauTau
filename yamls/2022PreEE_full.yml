@@ -5,14 +5,14 @@ era     : 2022
 postfix : PreEE
 wrapper : true
 limited : false
-workers : 13
+workers : 7
 tasks_per_job  : 3
 
 args:
   config    : run3_2022_preEE_nano_cp_tau_v14
   workflow  : htcondor
   branch    : -1
-  version   : Run3_preEE_2022_full_fastMTT_0p01mH_26_fev #Run3_preEE_2022_full_fastMTT_4MeV_26_fev #Run3_preEE_2022_full_Control_26_fev
+  version   : G_tautau_rhorho_DPDP #Run3_preEE_2022_full_fastMTT_wo_massconstrain_Gen_mass #Run3_preEE_2022_full_fastMTT_on_4MeV_18_mars #Run3_preEE_2022_full_fastMTT_wo_masscontrain_22_mars #Run3_preEE_2022_full_fastMTT_4MeV_18_mars #Run3_preEE_2022_full_fastMTT_0p01mH_8_mars #Run3_preEE_2022_full_Control_26_fev
 
   datasets  :
     ## == data ==
@@ -23,43 +23,43 @@ args:
     #- data_single_mu_C
     #- data_e_C
     #- data_e_D
-    ## == wj ==
-    #- wj_incl_amcatnlo
-    #- wj_0j_amcatnlo
-    #- wj_1j_amcatnlo
-    #- wj_2j_amcatnlo
+    ### == wj ==
+    ##- wj_incl_amcatnlo
+    ##- wj_0j_amcatnlo
+    ##- wj_1j_amcatnlo
+    ##- wj_2j_amcatnlo
     #- wj_incl_madgraph
-    #- wj_1j_madgraph
-    #- wj_2j_madgraph
-    #- wj_3j_madgraph
-    #- wj_4j_madgraph    
-    ## == dy ==
+    ##- wj_1j_madgraph
+    ##- wj_2j_madgraph
+    ##- wj_3j_madgraph
+    ##- wj_4j_madgraph    
+    ### == dy ==
     #- dy_lep_m10to50_madgraph
     #- dy_lep_m50_madgraph
-    #- dy_lep_m50_1j_madgraph
-    #- dy_lep_m50_2j_madgraph
-    #- dy_lep_m50_3j_madgraph
-    #- dy_lep_m50_4j_madgraph    
-    #- dy_lep_m10to50_amcatnlo
-    #- dy_lep_m50_amcatnlo
-    #- dy_lep_m50_0j_amcatnlo
-    #- dy_lep_m50_1j_amcatnlo
-    #- dy_lep_m50_2j_amcatnlo
-    #- dy_lep_m50_1j_pt40to100_amcatnlo
-    #- dy_lep_m50_2j_pt40to100_amcatnlo
-    #- dy_lep_m50_1j_pt100to200_amcatnlo
-    #- dy_lep_m50_2j_pt100to200_amcatnlo
-    #- dy_lep_m50_1j_pt200to400_amcatnlo
-    #- dy_lep_m50_2j_pt200to400_amcatnlo
-    #- dy_lep_m50_1j_pt400to600_amcatnlo
-    #- dy_lep_m50_2j_pt400to600_amcatnlo
-    #- dy_lep_m50_1j_pt600toInf_amcatnlo
-    #- dy_lep_m50_2j_pt600toInf_amcatnlo
-    ## == tt ==
+    ##- dy_lep_m50_1j_madgraph
+    ##- dy_lep_m50_2j_madgraph
+    ##- dy_lep_m50_3j_madgraph
+    ##- dy_lep_m50_4j_madgraph    
+    ##- dy_lep_m10to50_amcatnlo
+    ##- dy_lep_m50_amcatnlo
+    ##- dy_lep_m50_0j_amcatnlo
+    ##- dy_lep_m50_1j_amcatnlo
+    ##- dy_lep_m50_2j_amcatnlo
+    ##- dy_lep_m50_1j_pt40to100_amcatnlo
+    ##- dy_lep_m50_2j_pt40to100_amcatnlo
+    ##- dy_lep_m50_1j_pt100to200_amcatnlo
+    ##- dy_lep_m50_2j_pt100to200_amcatnlo
+    ##- dy_lep_m50_1j_pt200to400_amcatnlo
+    ##- dy_lep_m50_2j_pt200to400_amcatnlo
+    ##- dy_lep_m50_1j_pt400to600_amcatnlo
+    ##- dy_lep_m50_2j_pt400to600_amcatnlo
+    ##- dy_lep_m50_1j_pt600toInf_amcatnlo
+    ##- dy_lep_m50_2j_pt600toInf_amcatnlo
+    ### == tt ==
     #- tt_dl # di-lepton tt -> bbWW -> ll
     #- tt_sl # semi-leptonic
     #- tt_fh # hadronic
-    ## == st ==
+    ### == st ==
     #- st_tchannel_tbar
     #- st_tw_t_sl
     #- st_tchannel_t
@@ -70,11 +70,11 @@ args:
     #- st_tw_tb_fh
     #- st_schannel_t
     #- st_schannel_tbar
-    ## == vv ==
+    ### == vv ==
     #- ww
     #- wz
     #- zz
-    ## == vvv ==
+    ### == vvv ==
     #- www
     #- wwz
     #- wzz

@@ -578,7 +578,7 @@ def gentau_selection(
         **kwargs
 ) -> tuple[ak.Array, SelectionResult]:
     """
-    Selecting the generator level taus only, no martching here
+    Selecting the generator level taus only, no matching here
     select the gen tau decay products as well
     
     References:

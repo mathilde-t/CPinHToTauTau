@@ -5,13 +5,13 @@ era     : 2022
 postfix : PreEE
 wrapper : true
 limited : true
-workers : 7
+workers : 6
 
 args:
   config    : run3_2022_preEE_nano_cp_tau_v14_limited
   workflow  : local
-  branch    : -1
-  version   : Run3_2022PreEE_limited_20250211_1600 #Run3puNmcvertices_limited_4feb #dummy #PhiCPtt+mt_12jan25 #PrePuwAndIpsigCut_13jan_preEE #here2# #here1#12jan25_preEE_test_PU_vars #dummy 
+  branch    : 1
+  version   : testGenMass #Run3_preEE_2022_limited_fastMTT_4MeV_18_mars_1737 #Run3_preEE_2022_limited_fastMTT_0p01mH_8_mars #Run3_preEE_2022_limited_fastMTT_4MeV_3_mars
 
   datasets  :
     #- data_e_C
@@ -94,23 +94,77 @@ args:
     #- hcand_2_phi
     #- hcand_2_decayMode
     #- hcand_dr
-    - hcand_invm
-    - hcand_invm_fastMTT_IC
-    - hcand_invm_fastMTT_W
-    - hcand_1_pt_fastMTT_IC
-    - hcand_1_pt1_fastMTT_IC
-    - hcand_1_pt2_fastMTT_IC
-    - hcand_1_pt_fastMTT_W
-    - hcand_1_eta_fastMTT_W
-    - hcand_1_phi_fastMTT_W
-    - hcand_1_mass_fastMTT_W
-    - hcand_2_pt_fastMTT_IC
-    - hcand_2_pt1_fastMTT_IC
-    - hcand_2_pt2_fastMTT_IC
-    - hcand_2_pt_fastMTT_W
-    - hcand_2_eta_fastMTT_W
-    - hcand_2_phi_fastMTT_W
-    - hcand_2_mass_fastMTT_W
+    #- hcand_invm
+    - hcand_invm_fastMTT
+    - GenHiggs_mass
+    - hcand_1_pt_fastMTT
+    - hcand_1_eta_fastMTT
+    - hcand_1_phi_fastMTT
+    - hcand_1_mass_fastMTT
+    - hcand_2_pt_fastMTT
+    - hcand_2_eta_fastMTT
+    - hcand_2_phi_fastMTT
+    - hcand_2_mass_fastMTT
+    #- hcand_resolution_rel__gen_to_reco__px_1
+    #- hcand_resolution_abs__gen_to_reco__px_1
+    #- hcand_resolution_rel__gen_to_fastMTT__px_1
+    #- hcand_resolution_abs__gen_to_fastMTT__px_1
+    #- hcand_resolution_rel__reco_to_fastMTT__px_1
+    #- hcand_resolution_abs__reco_to_fastMTT__px_1
+    #- hcand_resolution_rel__gen_to_reco__py_1
+    #- hcand_resolution_abs__gen_to_reco__py_1
+    #- hcand_resolution_rel__gen_to_fastMTT__py_1
+    #- hcand_resolution_abs__gen_to_fastMTT__py_1
+    #- hcand_resolution_rel__reco_to_fastMTT__py_1
+    #- hcand_resolution_abs__reco_to_fastMTT__py_1
+    #- hcand_resolution_rel__gen_to_reco__pz_1
+    #- hcand_resolution_abs__gen_to_reco__pz_1
+    #- hcand_resolution_rel__gen_to_fastMTT__pz_1
+    #- hcand_resolution_abs__gen_to_fastMTT__pz_1
+    #- hcand_resolution_rel__reco_to_fastMTT__pz_1
+    #- hcand_resolution_abs__reco_to_fastMTT__pz_1
+    #- hcand_resolution_rel__gen_to_reco__pt_1
+    #- hcand_resolution_abs__gen_to_reco__pt_1
+    #- hcand_resolution_rel__gen_to_fastMTT__pt_1
+    #- hcand_resolution_abs__gen_to_fastMTT__pt_1
+    #- hcand_resolution_rel__reco_to_fastMTT__pt_1
+    #- hcand_resolution_abs__reco_to_fastMTT__pt_1
+    #- hcand_resolution_rel__gen_to_reco__eta_1
+    #- hcand_resolution_rel__gen_to_fastMTT__eta_1
+    #- hcand_resolution_rel__reco_to_fastMTT__eta_1
+    #- hcand_resolution_rel__gen_to_reco__phi_1
+    #- hcand_resolution_rel__gen_to_fastMTT__phi_1
+    #- hcand_resolution_rel__reco_to_fastMTT__phi_1
+    #- hcand_resolution_rel__gen_to_reco__px_2
+    #- hcand_resolution_abs__gen_to_reco__px_2
+    #- hcand_resolution_rel__gen_to_fastMTT__px_2
+    #- hcand_resolution_abs__gen_to_fastMTT__px_2
+    #- hcand_resolution_rel__reco_to_fastMTT__px_2
+    #- hcand_resolution_abs__reco_to_fastMTT__px_2
+    #- hcand_resolution_rel__gen_to_reco__py_2
+    #- hcand_resolution_abs__gen_to_reco__py_2
+    #- hcand_resolution_rel__gen_to_fastMTT__py_2
+    #- hcand_resolution_abs__gen_to_fastMTT__py_2
+    #- hcand_resolution_rel__reco_to_fastMTT__py_2
+    #- hcand_resolution_abs__reco_to_fastMTT__py_2
+    #- hcand_resolution_rel__gen_to_reco__pz_2
+    #- hcand_resolution_abs__gen_to_reco__pz_2
+    #- hcand_resolution_rel__gen_to_fastMTT__pz_2
+    #- hcand_resolution_abs__gen_to_fastMTT__pz_2
+    #- hcand_resolution_rel__reco_to_fastMTT__pz_2
+    #- hcand_resolution_abs__reco_to_fastMTT__pz_2
+    #- hcand_resolution_rel__gen_to_reco__pt_2
+    #- hcand_resolution_abs__gen_to_reco__pt_2
+    #- hcand_resolution_rel__gen_to_fastMTT__pt_2
+    #- hcand_resolution_abs__gen_to_fastMTT__pt_2
+    #- hcand_resolution_rel__reco_to_fastMTT__pt_2
+    #- hcand_resolution_abs__reco_to_fastMTT__pt_2
+    #- hcand_resolution_rel__gen_to_reco__eta_2
+    #- hcand_resolution_rel__gen_to_fastMTT__eta_2
+    #- hcand_resolution_rel__reco_to_fastMTT__eta_2
+    #- hcand_resolution_rel__gen_to_reco__phi_2
+    #- hcand_resolution_rel__gen_to_fastMTT__phi_2
+    #- hcand_resolution_rel__reco_to_fastMTT__phi_2
     #- puppi_met_pt
     #- puppi_met_phi
     #- PhiCP_IPIP

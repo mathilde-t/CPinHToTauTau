@@ -95,7 +95,7 @@ def add_categories(config: od.Config,
 
     #Define initial category map with selections and call the function
     #Don't change this part: it is important for fake factor method    
-    base_selection = [f'cat_{channel}']
+    base_selection = [f'cat_{channel}','tau_eta2p3']
     
     category_map  = DotDict.wrap({
         "sr"            : { 'selection' : ['mt_cut', "deep_tau_wp", "lep_iso", "os_charge"],
@@ -201,6 +201,6 @@ def add_categories(config: od.Config,
                             'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 11",},
         })
     
-    #create_child_categories(config,
+    # create_child_categories(config,
     #                     parent_categories=config.categories.names(),
     #                     child_category_map=child_category_map)

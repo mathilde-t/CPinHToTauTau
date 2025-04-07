@@ -586,14 +586,14 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_eta",
                 expression=f"hcand_{ch_str}.{lep}.eta",
                 null_value=EMPTY_FLOAT,
-                binning=(30, -2.3, 2.3),
+                binning=(30, -3, 3),
                 x_title=rf"{lep_str} $\eta$",
             )
             cfg.add_variable(
                 name=f"{ch_str}_{lep}_phi",
                 expression=f"hcand_{ch_str}.{lep}.phi",
                 null_value=EMPTY_FLOAT,
-                binning=(32, -3.2, 3.2),
+                binning=(32, -3.3, 3.3),
                 x_title=rf"{lep_str} $\phi$",
             )
             cfg.add_variable(
@@ -637,12 +637,26 @@ def add_dilepton_features(cfg: od.Config) -> None:
                         binning=(40,0, 0.2),
                         x_title=rf"{lep_str} rel. iso",
                     )
+                    cfg.add_variable(
+                        name=f"{ch_str}_{lep}_iso_full_range",
+                        expression=f"hcand_{ch_str}.{lep}.pfRelIso04_all",
+                        null_value=EMPTY_FLOAT,
+                        binning=(40,0, 1.2),
+                        x_title=rf"{lep_str} rel. iso",
+                    )
                 elif ch_str == 'etau':
-                     cfg.add_variable(
+                    cfg.add_variable(
                         name=f"{ch_str}_{lep}_iso",
                         expression=f"hcand_{ch_str}.{lep}.pfRelIso03_all",
                         null_value=EMPTY_FLOAT,
                         binning=(40,0,0.6),
+                        x_title=rf"{lep_str} rel. iso",
+                    )
+                    cfg.add_variable(
+                        name=f"{ch_str}_{lep}_iso_full_range",
+                        expression=f"hcand_{ch_str}.{lep}.pfRelIso03_all",
+                        null_value=EMPTY_FLOAT,
+                        binning=(40,0,2.4),
                         x_title=rf"{lep_str} rel. iso",
                     )
             

@@ -28,33 +28,42 @@ def add_categories(config: od.Config,
             if 'aux' in cat.keys():
                 kwargs['aux'] = {}
                 for (aux_spec, aux_content) in cat.aux.items():
-                    kwargs['aux'][aux_spec] = {key: '_'.join((base_cat.name, val)) for (key,val) in aux_content.items()}
-                    
+                    if 'regs' in aux_spec:
+                        kwargs['aux'][aux_spec] = {key: '_'.join((base_cat.name, val)) for (key,val) in aux_content.items()}
+                    else:
+                        kwargs['aux'][aux_spec] = aux_content
+
             add_category(config, **kwargs)
             
     
-    def add_child_categories(config, parent_categories, child_category_map):
-        max_child_id = int(np.max(config.categories.ids())/10000)
-        for cat_name in parent_categories:
-            if cat_name in ['incl', 'cat_mutau', 'cat_etau']: continue
-            parent_cat = config.get_category(cat_name)
-            #in case of add_child_categories function was applied previosly its needed to provide unique ids, 
-            # max_child_id will be added to iterator
-            for i, (child_name, child_cat) in enumerate(child_category_map.items()):
-                kwargs = {
+    def add_child_category(config, parent_cat, child_cat, child_name):
+        max_cat_id = np.max(config.categories.ids())
+        kwargs = {
                     'name'      : '__'.join((parent_cat.name, child_name)),
                     'selection' : parent_cat.selection + child_cat.selection,
-                    'id'        : 10000*(i+1+max_child_id)+ parent_cat.id,
+                    'id'        : int(max_cat_id+1),
                     'label'     : ' '.join((parent_cat.label, child_cat.label if 'label' in child_cat else child_name))
                 }
-                if parent_cat.aux:
-                    for (aux_spec, aux_content) in parent_cat.aux:
-                        if aux_spec == 'signal_reg':
-                            kwargs['aux']['signal_reg'] = True
-                        else:
-                            kwargs['aux'][aux_spec] = aux_content
-
-                add_category(config, **kwargs)
+        if parent_cat.aux:
+            kwargs['aux'] = {}
+            for (aux_key, aux_content) in parent_cat.aux.items():
+                if 'regs' in aux_key:
+                    reg_map = parent_cat.aux[aux_key]
+                    add_tag = lambda cat_name, tag=child_name : '__'.join((cat_name, tag))
+                    reg_map_tagged = dict(zip(reg_map.keys(), map(add_tag, reg_map.values())))
+                    kwargs['aux'][aux_key] = reg_map_tagged
+                else:
+                    kwargs['aux'][aux_key] = aux_content
+        add_category(config, **kwargs)
+    
+    
+    def create_child_categories(config, parent_categories, child_category_map):
+        for cat_name in parent_categories:
+            #skip 0-level categories that are used to define channelss
+            if cat_name in ['incl', 'cat_mutau', 'cat_etau']: continue
+            parent_cat = config.get_category(cat_name)
+            for child_name, child_cat in child_category_map.items():
+                add_child_category(config, parent_cat, child_cat, child_name)
     
     """
     Adds all categories to a *config*.
@@ -68,13 +77,28 @@ def add_categories(config: od.Config,
         selection=["cat_incl"],
         label="inclusive",
     )
+    if channel=='mutau':
+        add_category(
+            config,
+            name="cat_mutau",
+            id=2,
+            selection=["cat_mutau"],
+            label=r"$\mu\tau$ inclusive",)
+        
+    if channel=='etau':
+        add_category(
+            config,
+            name="cat_etau",
+            id=3,
+            selection=["cat_etau"],
+            label=r"$e\tau$ inclusive")
 
     #Define initial category map with selections and call the function
     #Don't change this part: it is important for fake factor method    
-    base_selection = [f'cat_{channel}']
+    base_selection = [f'cat_{channel}','tau_eta2p3']
     
     category_map  = DotDict.wrap({
-        "sr"            : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_iso", "os_charge"],
+        "sr"            : { 'selection' : ['mt_cut', "deep_tau_wp", "lep_iso", "os_charge"],
                             'label'     : "signal region",
                             'aux'       : {
                                            #qcd estimation categories
@@ -92,187 +116,91 @@ def add_categories(config: od.Config,
                                                "dr_num_qcd"  : "dr_num_qcd",
                                                "dr_den_qcd"  : "dr_den_qcd",
                                                "ar_yields"   : "ar_yields",
+                                               #categories for closure tests
+                                               "dr_den_wj_w_ff": "dr_den_wj_w_ff",
+                                               "dr_den_qcd_w_ff": "dr_den_qcd_w_ff",
                                            },},},
-        
-        #categories for QCD estimation via classic ABCD method 
-        "abcd_ar"       : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_iso", "ss_charge"], 'label' : "same sign region"},
-        "abcd_dr_num"   : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_inv_iso", "os_charge"]},
-        "abcd_dr_den"   : { 'selection' : ["mt_cut", "deep_tau_wp", "lep_inv_iso", "ss_charge"]},
-        
         #categories for jet fakes estimation via classic Fake Factor method 
-        "ar_wj"         : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
-        "dr_num_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_wp",      "lep_iso", "tau_no_fakes", "os_charge"],},
-        "dr_den_wj"     : {'selection' : ["mt_inv_cut",  "deep_tau_inv_wp",  "lep_iso", "tau_no_fakes", "os_charge"],},
+        "ar_wj"          : {'selection' : ['mt_cut',      "deep_tau_inv_wp",  "lep_iso", "os_charge"],
+                            'aux'       : {'apply_ff': 'wj'}},
+        "dr_num_wj"      : {'selection' : ['mt_inv_cut',  "deep_tau_wp",      "lep_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_wj"      : {'selection' : ['mt_inv_cut',  "deep_tau_inv_wp",  "lep_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_wj_w_ff" : {'selection' : ['mt_inv_cut',  "deep_tau_inv_wp",  "lep_iso", "tau_no_fakes", "os_charge"],
+                            'aux'       : {'apply_ff': 'wj'}},
         
-        "ar_qcd"        : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
-        "dr_num_qcd"    : {'selection' : ["mt_cut",      "deep_tau_wp",      "lep_inv_iso", "tau_no_fakes", "os_charge"],},
-        "dr_den_qcd"    : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_inv_iso", "tau_no_fakes", "os_charge"],},
-        
-        "ar_yields"     : {'selection' : ["mt_cut",      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
-        #signal region without mt cut
-        "sr_no_mt"               : { 'selection'   : ["deep_tau_wp",  "lep_iso","os_charge"],
-                                 'label'        : "no mT",
-                                 'aux'          : {
-                                                   #qcd estimation categories
-                                                        'abcd_regs' : {
-                                                            'ar': 'no_mt_abcd_ar',
-                                                            'dr_num'    : 'no_mt_abcd_dr_num',
-                                                            'dr_den'    : 'no_mt_abcd_dr_den',
-                                                        },},},
+        "ar_qcd"         : {'selection' : ['mt_cut',      "deep_tau_inv_wp",  "lep_iso"    , "os_charge"],
+                            'aux'       : {'apply_ff': 'qcd'}},
+        "dr_num_qcd"     : {'selection' : ['mt_cut',      "deep_tau_wp",      "lep_inv_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_qcd"     : {'selection' : ['mt_cut',      "deep_tau_inv_wp",  "lep_inv_iso", "tau_no_fakes", "os_charge"],},
+        "dr_den_qcd_w_ff": {'selection' : ['mt_cut',      "deep_tau_inv_wp",  "lep_inv_iso", "tau_no_fakes", "os_charge"],
+                            'aux'       : {'apply_ff': 'qcd'}},
+        "ar_yields"      : {'selection' : ['mt_cut',      "deep_tau_inv_wp",  "lep_iso", "os_charge"],},
         #categories for QCD estimation via classic ABCD method 
-        "no_mt_abcd_ar"       : { 'selection' : ["deep_tau_wp", "lep_iso", "ss_charge"], 'label' : "no mT, same sign region"},
-        "no_mt_abcd_dr_num"   : { 'selection' : ["deep_tau_wp", "lep_inv_iso", "os_charge"]},
-        "no_mt_abcd_dr_den"   : { 'selection' : ["deep_tau_wp", "lep_inv_iso", "ss_charge"]},
+        "abcd_ar"       : { 'selection' : ['mt_cut', "deep_tau_wp", "lep_iso", "ss_charge"], 'label' : "same sign region"},
+        "abcd_dr_num"   : { 'selection' : ['mt_cut', "deep_tau_wp", "lep_inv_iso", "os_charge"]},
+        "abcd_dr_den"   : { 'selection' : ['mt_cut', "deep_tau_wp", "lep_inv_iso", "ss_charge"]},
         })
     
     add_base_categories(config, channel, category_map, base_selection)
     #Add child categories to base categories
     child_category_map  = DotDict.wrap({
-        "tau_barrel"    : {'selection' : ["tau_barrel"],
-                            'label'     : r"$\eta_{\tau} \leq 1.2$",},
-        "tau_endcap"    : {'selection' : ["tau_endcap"],
-                            'label'     : r"$\eta_{\tau} > 1.2$",},
-        })
-    # add_child_categories(config,
-    #                      parent_categories=config.categories.names(),
-    #                      child_category_map=child_category_map)
-    
-#       if channel=='etau':
-#         add_category(
-#             config,
-#             name="cat_etau",
-#             id=3,
-#             selection=["cat_etau"],
-#             label=r"$e\tau$ inclusive",
-#         )
-      
-#      =======
-#         etau_signal_reg_barrel_tau = add_category(
-#             config,
-#             name="etau_signal_reg_barrel_tau",
-#             id=400 + etau.id,
-#             selection=["cat_etau"  ,
-#                         "os_charge"  ,
-#                         "mt_cut"     ,
-#                         "deep_tau_wp",
-#                         "b_veto"     ,
-#                         "tau_barrel" ,
-#                         ],
-#             label=r"$e\tau$ signal region\n $\eta_{\tau} \leq 1.2$",
-#             aux={'control_reg': "etau_control_reg_barrel_tau"}
-#         )
         
-#         etau_control_reg_barrel_tau = add_category(
-#             config,
-#             name="etau_control_reg_barrel_tau",
-#             id=450 + etau.id,
-#             selection=["cat_etau"  ,
-#                         "ss_charge"  ,
-#                         "mt_cut"     ,
-#                         "deep_tau_wp",
-#                         "b_veto"     ,
-#                         "tau_barrel" ,
-#                         ],
-#             label=r"$e\tau$ control region\n $\eta_{\tau} \leq 1.2$",
-#         )
+        "dm0"     : {'selection': ["dm0"], 'label': f" \n tau PNet DM = 0",},
+        "dm1"     : {'selection': ["dm1"], 'label': f" \n tau PNet DM = 1",},
+        "dm2"     : {'selection': ["dm2"], 'label': f" \n tau PNet DM = 2",},
+        "dm10"    : {'selection': ["dm10"], 'label': f" \n tau PNet DM = 10",},
+        "dm11"    : {'selection': ["dm11"], 'label': f" \n tau PNet DM = 11",},
 
-#         etau_signal_reg_endcap_tau_no_mt = add_category(
-#             config,
-#             name="etau_signal_reg_endcap_tau_no_mt",
-#             id=500 + etau.id,
-#             selection=["cat_etau"   ,
-#                        "os_charge"  ,
-#                        "deep_tau_wp",
-#                        "b_veto"     ,
-#                        "tau_endcap" ,
-#                        ],
-#             label=r"$e\tau$ no mt signal region\n $\eta_{\tau} > 1.2$",
-#             aux={'control_reg': "etau_control_reg_endcap_tau_no_mt"}
-#         )
-#         etau_control_reg_endcap_tau_no_mt = add_category(
-#             config,
-#             name="etau_control_reg_endcap_tau_no_mt",
-#             id=550 + etau.id,
-#             selection=["cat_etau"   ,
-#                        "ss_charge"  ,
-#                        "deep_tau_wp",
-#                        "b_veto"     ,
-#                        "tau_endcap" ,
-#                        ],
-#             label=r"$e\tau$ no mt control region\n $\eta_{\tau} > 1.2$",
-#         )
-
-#         etau_signal_reg_barrel_tau_no_mt = add_category(
-#             config,
-#             name="etau_signal_reg_barrel_tau_no_mt",
-#             id=600 + etau.id,
-#             selection=["cat_etau"  ,
-#                         "os_charge"  ,
-#                         "deep_tau_wp",
-#                         "b_veto"     ,
-#                         "tau_barrel" ,
-#                         ],
-#             label=r"$e\tau$ no mt signal region\n $\eta_{\tau} \leq 1.2$",
-#             aux={'control_reg': "etau_control_reg_barrel_tau_no_mt"}
-#         )
-
-#         etau_control_reg_barrel_tau_no_mt = add_category(
-#             config,
-#             name="etau_control_reg_barrel_tau_no_mt",
-#             id=650 + etau.id,
-#             selection=["cat_etau"  ,
-#                         "ss_charge"  ,
-#                         "deep_tau_wp",
-#                         "b_veto"     ,
-#                         "tau_barrel" ,
-#                         ],
-#             label=r"$e\tau$ no mt control region\n $\eta_{\tau} \leq 1.2$",
-#         )
-
-
-#         etau_signal_reg_no_mt_bveto_wp_mtt = add_category(
-#             config,
-#             name="etau_signal_reg_no_mt_bveto_wp_mtt",
-#             id=700 + etau.id,
-#             selection=["cat_etau"  ,
-#                        "os_charge"  ,
-#                        "deep_tau_wp_mtt",
-#                       ],
-#             label=r"$e\tau$ signal region no mt, mtt wp, no b veto",
-#             aux={'control_reg': "etau_contol_reg_no_mt_bveto_wp_mtt"}
-#         )
-
-#         etau_contol_reg_no_mt_bveto_wp_mtt = add_category(
-#             config,
-#             name="etau_contol_reg_no_mt_bveto_wp_mtt",
-#             id=750 + etau.id,
-#             selection=["cat_etau"  ,
-#                        "ss_charge"  ,
-#                        "deep_tau_wp_mtt",
-#                       ],
-#             label=r"$e\tau$ control region no mt, mtt wp, no b veto",
-#         )
-
-
-#         etau_signal_reg_no_mt_bveto_wp_mtt = add_category(
-#             config,
-#             name="etau_signal_reg_no_mt_bveto",
-#             id=800 + etau.id,
-#             selection=["cat_etau"  ,
-#                        "os_charge"  ,
-#                        "deep_tau_wp",
-#                       ],
-#             label=r"$e\tau$ signal region no mt, no b veto",
-#             aux={'control_reg': "etau_contol_reg_no_mt_bveto"}
-#         )
-
-#         etau_contol_reg_no_mt_bveto = add_category(
-#             config,
-#             name="etau_contol_reg_no_mt_bveto",
-#             id=850 + etau.id,
-#             selection=["cat_etau"  ,
-#                        "ss_charge"  ,
-#                        "deep_tau_wp",
-#                       ],
-#             label=r"$e\tau$ control region no mt, no b veto",
-#         )
+        "nj0_dm0"    : {'selection' : ["njets_eq0", "dm0"],
+                            'label'     : f" \n $n_{{jets}}= 0$ \n tau PNet DM = 0",},
+        
+        "nj1_dm0"    : {'selection' : ["njets_eq1", "dm0"],
+                            'label'     : f" \n $n_{{jets}}= 1$ \n tau PNet DM = 0",},
+        
+        "nj2_dm0"    : {'selection' : ["njets_geq2","dm0"],
+                            'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 0",},
+        
+        # DM1
+        "nj0_dm1"    : {'selection' : ["njets_eq0", "dm1"],
+                            'label'     : f" \n $n_{{jets}}= 0$ \n tau PNet DM = 1",},
+        
+        "nj1_dm1"    : {'selection' : ["njets_eq1", "dm1"],
+                            'label'     : f" \n $n_{{jets}}= 1$ \n tau PNet DM = 1",},
+        
+        "nj2_dm1"    : {'selection' : ["njets_geq2","dm1"],
+                            'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 1",},
+        
+        # DM2
+        "nj0_dm2"    : {'selection' : ["njets_eq0", "dm2"],
+                            'label'     : f" \n $n_{{jets}}= 0$ \n tau PNet DM = 2",},
+        
+        "nj1_dm2"    : {'selection' : ["njets_eq1", "dm2"],
+                            'label'     : f" \n $n_{{jets}}= 1$ \n tau PNet DM = 2",},
+        
+        "nj2_dm2"    : {'selection' : ["njets_geq2","dm2"],
+                            'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 2",},
+        
+        # DM10
+        "nj0_dm10"    : {'selection' : ["njets_eq0", "dm10"],
+                            'label'     : f" \n $n_{{jets}}= 0$ \n tau PNet DM = 10",},
+        
+        "nj1_dm10"    : {'selection' : ["njets_eq1", "dm10"],
+                            'label'     : f" \n $n_{{jets}}= 1$ \n tau PNet DM = 10",},
+        
+        "nj2_dm10"    : {'selection' : ["njets_geq2","dm10"],
+                            'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 10",},
+        
+        # DM11
+        "nj0_dm11"    : {'selection' : ["njets_eq0", "dm11"],
+                            'label'     : f" \n $n_{{jets}}= 0$ \n tau PNet DM = 11",},
+        
+        "nj1_dm11"    : {'selection' : ["njets_eq1", "dm11"],
+                            'label'     : f" \n $n_{{jets}}= 1$ \n tau PNet DM = 11",},
+        
+        "nj2_dm11"    : {'selection' : ["njets_geq2","dm11"],
+                            'label'     : f" \n $n_{{jets}}\geq 2$ \n tau PNet DM = 11",},
+        })
+    
+    # create_child_categories(config,
+    #                     parent_categories=config.categories.names(),
+    #                     child_category_map=child_category_map)

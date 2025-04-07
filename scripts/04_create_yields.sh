@@ -7,7 +7,7 @@ args=(
         --processes $processes
         --datasets $datasets
         --version $version
-        --categories 'etau_signal_reg_0_bjets'
+        --categories 'cat_mutau_sr'
         --cf.CalibrateEvents-workflow $workflow
         --cf.SelectEvents-workflow $workflow
         --cf.ReduceEvents-workflow $workflow
@@ -16,6 +16,3 @@ args=(
     )
 echo law run cf.CreateYieldTable "${args[@]}"
 law run cf.CreateYieldTable "${args[@]}" 
-
-
-#,etau_signal_reg_endcap_tau,etau_signal_reg_barrel_tau,etau_signal_reg_endcap_tau_no_mt,etau_signal_reg_barrel_tau_no_mt'

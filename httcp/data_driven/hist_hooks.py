@@ -18,24 +18,65 @@ hist = maybe_import("hist")
 logger = law.logger.get_logger(__name__)
 
 
+
+
+def calc_yields(hists: dict)-> hist.Hist :
+    data_hists = [h for p, h in hists.items() if p.is_data]
+    data_hist = sum(data_hists[1:], data_hists[0].copy())
+    data = data_hist.values()
+    
+    mc_hists = [h for p, h in hists.items() if (p.is_mc and not p.has_tag("signal"))]
+    mc_hist = sum(mc_hists[1:], mc_hists[0].copy())
+    mc = mc_hist.values()
+    
+    wj_hists = [h for p, h in hists.items() if (p.is_mc and (not p.has_tag("signal")) and 'wj' in p.name)]
+    wj_hist = sum(wj_hists[1:], wj_hists[0].copy())
+    wj = wj_hist.values()
+    
+    wj_ratio =  wj / np.maximum(data, 1)
+    wj_err   =  np.where(data > 0,
+                            rel_err(h_arr=[wj_hist,data_hist]) * wj_ratio,
+                            np.ones_like(wj_ratio)) 
+    
+    qcd_ratio =  np.maximum((data - mc), 0)/ np.maximum(data, 1)
+    qcd_err   =  np.where((data - mc) > 0,
+                        rel_err(h_arr=[wj_hist,data_hist]) * qcd_ratio,
+                        np.ones_like(wj_ratio)) 
+    
+    return {'wj': wj_ratio[0],
+            'wj_err': wj_err[0],
+            'qcd': qcd_ratio[0],
+            'qcd_err': qcd_err[0],}
+
+def get_data_hist(hists: dict)-> hist.Hist :
+    data_hists = [h for p, h in hists.items() if p.is_data]
+    data_hist = sum(data_hists[1:], data_hists[0].copy())
+    return data_hist
+
+def get_mc_hist(hists: dict, remove_wj=False)-> hist.Hist :
+    data_hists = [h for 
+                  p, h in hists.items() 
+                  if p.is_mc 
+                  and not p.has_tag("signal")
+                  and ((remove_wj * ('wj' not in p.name)) or ~remove_wj) ]
+    data_hist = sum(data_hists[1:], data_hists[0].copy())
+    return data_hist
+
+def rel_err(h_arr=[], err_arr=[]):
+    if len(h_arr):  sum_var = np.zeros_like(h_arr[0].values())
+    else: sum_var = np.zeros_like(err_arr[0])
+    for x in h_arr: sum_var += x.variances()/np.maximum(x.values()**2, 1)
+    for the_arr in err_arr: sum_var += err_arr
+    return np.sqrt(sum_var)
+
+
 def add_hist_hooks(config: od.Config) -> None:
     """
     Add histogram hooks to a configuration.
     """
-    # helper to convert a histogram to a number object containing bin values and uncertainties
-    # from variances stored in an array of values
-    def hist_to_num(h: hist.Hist, unc_name=str(sn.DEFAULT)) -> sn.Number:
-        return sn.Number(h.values(), {unc_name: h.variances()**0.5})
     
     
     def qcd_estimation(task, hists, category_inst):
-        
-        def rel_err(h_arr=[], err_arr=[]):
-            if len(h_arr):  sum_var = np.zeros_like(h_arr[0].values())
-            else: sum_var = np.zeros_like(err_arr[0])
-            for x in h_arr: sum_var += x.variances()/np.maximum(x.values()**2, 1)
-            for the_arr in err_arr: sum_var += err_arr
-            return np.sqrt(sum_var)
         
         def get_hists_from_reg(config: od.Config, hists: dict, region: str)-> hist.Hist :
             hists_ = hists[region]
@@ -45,7 +86,7 @@ def add_hist_hooks(config: od.Config) -> None:
             for (proc, h) in hists_.items():
                 if proc.is_data:
                     data_hists.append(h)
-                elif proc.is_mc:
+                elif proc.is_mc and not proc.has_tag("signal"):
                     mc_hists.append(h)
             
             mc_hist = sum(mc_hists[1:], mc_hists[0].copy())
@@ -75,66 +116,72 @@ def add_hist_hooks(config: od.Config) -> None:
     def ff_method(task, hists, category_inst):
         if not hists:
             return hists
-        # extract all unique category ids and verify that the axis order is exactly
-        # "category -> shift -> variable" which is needed to insert values at the end
-        def rel_err(h_arr=[], err_arr=[]):
-            if len(h_arr):  sum_var = np.zeros_like(h_arr[0].values())
-            else: sum_var = np.zeros_like(err_arr[0])
-            for x in h_arr: sum_var += x.variances()/np.maximum(x.values()**2, 1)
-            for the_arr in err_arr: sum_var += err_arr
-            return np.sqrt(sum_var)
-
-        sig_reg = category_inst
         
-        def get_ar_data_hist(config: od.Config, hists: dict, region: str)-> hist.Hist :
-            h_reg = hists[region]
-            data_hists = [h for p, h in h_reg.items() if p.is_data]
-            data_hist = sum(data_hists[1:], data_hists[0].copy())
-            cat_id = config.get_category(region).id
-            return data_hist
+        sr = category_inst
         
-        def calc_wj_yields(config: od.Config, hists: dict, region: str)-> hist.Hist :
-            h_reg = hists[region]
-            data_hists = [h for p, h in h_reg.items() if p.is_data]
-            data_hist = sum(data_hists[1:], data_hists[0].copy())
-            cat_id = config.get_category(region).id
-            data_ar = data_hist
-            
-            wj_hists = [h for p, h in h_reg.items() if 'wj' in p.name]
-            wj_hist = sum(wj_hists[1:], wj_hists[0].copy())
-            wj_ar = wj_hist
-            
-            r = wj_ar.values() / np.maximum(data_ar.values(), 1)
-            r_err =  np.where((data_ar.values() > 0),
-                              rel_err(h_arr=[wj_ar,data_ar]) * r,
-                              np.ones_like(r)) 
-            return r[0], r_err[0]
-        
-        hist_qcd = get_ar_data_hist(config,hists, sig_reg.replace('sr', 'ar_qcd'))
-        hist_wj  = get_ar_data_hist(config,hists, sig_reg.replace('sr', 'ar_wj'))
-        wj_yield, yield_err = calc_wj_yields(config,hists, sig_reg.replace('sr', 'ar_yields'))
+        hist_qcd = get_data_hist(hists[sr.aux['ff_regs']['ar_qcd']])
+        hist_wj  = get_data_hist(hists[sr.aux['ff_regs']['ar_wj']])
+        yields = calc_yields(hists[sr.aux['ff_regs']['ar_yields']])
       
-        fakes_val = hist_wj.values() * wj_yield + hist_qcd.values() * (1. - wj_yield)
+        fakes_wj  = hist_wj.values() * yields['wj']
+        fakes_qcd = hist_qcd.values() * yields['qcd']
         
-        #Carefull this error estimation is not quite correct because yields errors and hist errors are corellated
-        fakes_err = rel_err([hist_wj,hist_qcd],err_arr=[yield_err]) * fakes_val
-        
-        hists_sr = hists[sig_reg].copy()
+        hists_sr = hists[sr.name].copy()
         
         #Remove wj histogram from the signal region set
-        from cmsdb.processes.qcd import jet_fakes
+        from cmsdb.processes.qcd import jet_fakes,qcd
         
         wj_proc = [p for p in hists_sr.keys() if 'wj' in p.name]
-        hists_sr[jet_fakes] = hists_sr[wj_proc[0]].copy().reset()
-        cat_id = config.get_category(sig_reg).id
-        hists_sr[jet_fakes].view().value = fakes_val
-        hists_sr[jet_fakes].view().variance = fakes_err
+        
+        tmp_h = list(hists_sr.values())
+        tmp_h = sum(tmp_h[1:],tmp_h[0].copy())
+        hists_sr[jet_fakes] = tmp_h.copy().reset()
+        hists_sr[jet_fakes].view().value = fakes_wj
+        
+        hists_sr[qcd] = tmp_h.copy().reset()
+        hists_sr[qcd].view().value = fakes_qcd
         
         del hists_sr[wj_proc[0]]   
+        return hists_sr
+    
+    def ff_method_dr_closure_test(task, hists, category_inst):
+        if not hists:
+            return hists
+        cat_tag = category_inst.name.split('__')
+        if len(cat_tag) > 1:
+            cat_tag = '__' + cat_tag[1] 
+        else:
+            cat_tag = ''
+        sr = task.config_inst.get_category('cat_mutau_sr' + cat_tag)
+        
+        hist_qcd = get_data_hist(hists[sr.aux['ff_regs']['dr_den_qcd_w_ff']])
+        hist_wj  = get_data_hist(hists[sr.aux['ff_regs']['dr_den_wj_w_ff']])
+        
+        hist_qcd_mc = get_mc_hist(hists[sr.aux['ff_regs']['dr_den_qcd_w_ff']])
+        hist_wj_mc  = get_mc_hist(hists[sr.aux['ff_regs']['dr_den_wj_w_ff']])
+        #from IPython import embed; embed()
+        fakes_wj  = (hist_wj.values()  - hist_wj_mc.values()) 
+        fakes_qcd = (hist_qcd.values() - hist_qcd_mc.values()) 
+        
+        hists_sr = hists[category_inst.name].copy()
+        tmp_h = list(hists_sr.values())
+        tmp_h = sum(tmp_h[1:],tmp_h[0].copy())
+        #Remove wj histogram from the signal region set
+        from cmsdb.processes.qcd import jet_fakes,qcd
+        wj_proc = [p for p in hists_sr.keys() if 'wj' in p.name]
+        if 'wj' in category_inst.name:
+            hists_sr[jet_fakes] = tmp_h.copy().reset()
+            hists_sr[jet_fakes].view().value = fakes_wj
+            del hists_sr[wj_proc[0]]
+        else:
+            hists_sr[qcd] = tmp_h.copy().reset()
+            hists_sr[qcd].view().value = fakes_qcd
+            
         return hists_sr
     
 
     config.x.hist_hooks = {
         "good_old_abcd"  : qcd_estimation,
         "ff_method" : ff_method,
+        "ff_method_dr_closure_test": ff_method_dr_closure_test,
     }

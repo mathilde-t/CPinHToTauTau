@@ -322,15 +322,6 @@ args:
     #- dphi_met_h1-met_var_qcd_h1
     #- jet_1_pt-met_var_qcd_h1
     #- jet_2_pt-met_var_qcd_h1
-    #- hcand_dr-met_var_qcd_h1
-    #- hcand_1_pt-met_var_qcd_h1
-    #- hcand_2_pt-met_var_qcd_h1
-    #- n_jet-met_var_qcd_h1
-    #- hT-met_var_qcd_h1
-    #- hcand_invm-met_var_qcd_h1
-    #- dphi_met_h1-met_var_qcd_h1
-    #- jet_1_pt-met_var_qcd_h1
-    #- jet_2_pt-met_var_qcd_h1
     ## -- Y vs DR -- ##
     #- met_var_qcd_h1-hcand_dr
     #- hcand_1_pt-hcand_dr

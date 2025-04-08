@@ -174,8 +174,3 @@ def calculate_higgs_mass_genlevel(
     return events
 
     
-    return events
-
-
-
-    

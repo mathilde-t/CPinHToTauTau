@@ -50,7 +50,7 @@ from httcp.util import IF_DATASET_HAS_LHE_WEIGHTS, IF_DATASET_IS_DY, IF_DATASET_
 from httcp.util import IF_RUN2, IF_RUN3, IF_ALLOW_STITCHING
     
 #from httcp.production.apply_FastMTT import apply_fastMTT
-#here5 from httcp.production.produce_px_py_pz import produce_px_py_pz
+#from httcp.production.produce_px_py_pz import produce_px_py_pz
 from httcp.production.produce_px_py_pz import calculate_higgs_mass_genlevel
 
 np = maybe_import("numpy")
@@ -74,9 +74,9 @@ logger = law.logger.get_logger(__name__)
         reArrangeGenDecayProducts,
         ProduceGenPhiCP, #ProduceGenCosPsi, 
         ProduceDetPhiCP, #ProduceDetCosPsi,
-        #"Pileup.nTrueInt","Pileup.nPU","PV.npvs", #here4
+        #"Pileup.nTrueInt","Pileup.nPU","PV.npvs", #here1
         #apply_fastMTT,
-        #here5 produce_px_py_pz,
+        #produce_px_py_pz,
         #calculate_higgs_mass_genlevel,
     },
     produces={
@@ -89,9 +89,9 @@ logger = law.logger.get_logger(__name__)
         "dphi_met_h1", "dphi_met_h2",
         "met_var_qcd_h1", "met_var_qcd_h2",
         "hT",
-        #"pu_nTrue_Int", "nPU", "npvs", #here4
+        #"pu_nTrue_Int", "nPU", "npvs", #here1
         #apply_fastMTT,
-        #here5 produce_px_py_pz,
+        #produce_px_py_pz,
         #calculate_higgs_mass_genlevel,
     },
 )
@@ -142,8 +142,8 @@ def hcand_features(
     # ################## #
     #logger.info(" >>>--- FastMTT --->>> [Not as fast as you think]")
     #events = self[apply_fastMTT](events, **kwargs)
-    #here5 logger.info(" >>>--- produce .px, .py, .pz's --->>>")
-    #here5 events = self[produce_px_py_pz](events, **kwargs)
+    #logger.info(" >>>--- produce .px, .py, .pz's --->>>")
+    #events = self[produce_px_py_pz](events, **kwargs)
     #events = self[calculate_higgs_mass_genlevel](events, **kwargs)
     
 

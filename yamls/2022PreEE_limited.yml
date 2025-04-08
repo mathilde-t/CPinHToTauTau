@@ -68,7 +68,7 @@ args:
     #- tautau__hadB0
     #- tautau__hadC
     #- tautau__real_1__hadD
-    #- tautau__hadD* #here2#
+    #- tautau__hadD*
     #- tautau__hadC0
     #- tautau__hadD0
 

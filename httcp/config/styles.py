@@ -25,7 +25,7 @@ def stylize_processes(config: od.Config) -> None:
         col_st="#5ab4ac",
         col_vv="#5a3a1a",
         col_vvv="#b3987d",
-        col_w="#d78a7e",
+        col_w="#b06eb5",#"#d78a7e",
         col_dy="#fec44f",
         col_dy_lep="#3690c0",
         col_dy_tau="#fec44f",
@@ -49,6 +49,7 @@ def stylize_processes(config: od.Config) -> None:
         maroon="#800000",
         brown="#8f3007",
         black="#000000",
+        fake="#fbb4ae",
     )
 
     if (p := config.get_process("h_ggf_htt", default=None)):
@@ -78,6 +79,11 @@ def stylize_processes(config: od.Config) -> None:
     if (p := config.get_process("st", default=None)):
         p.color1 = cfg.x.colors.col_st
         p.label = r"$Single ~t(W)$"
+
+    if (p := config.get_process("top", default=None)):
+        p.color1 = cfg.x.colors.col_st
+        p.label = "Top"
+        
         
     #if (p := config.get_process("dy", default=None)):
     #    p.color1 = cfg.x.colors.brown
@@ -137,4 +143,5 @@ def stylize_processes(config: od.Config) -> None:
         p.color1 = cfg.x.colors.grey
 
     if (p := config.get_process("qcd", default=None)):
-        p.color1 = cfg.x.colors.red
+        p.color1 = cfg.x.colors.fake
+        p.label = r"$j \to \tau_h fakes$"

@@ -20,8 +20,9 @@ from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
 from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight,fake_factors
 from httcp.production.sample_split import split_dy
-from httcp.production.generatorZ import generatorZ
-from httcp.production.dilepton_features import hcand_fields
+from httcp.production.generatorZ import genZ
+from httcp.production.met_recoil import gen_boson, met_recoil
+from httcp.production.dilepton_features import hcand_fields,hcand_mt
 
 from httcp.production.phi_cp import phi_cp
 from httcp.production.aux_columns import jet_pt_def,jets_taggable, number_b_jet
@@ -44,11 +45,14 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         muon_weight,
         tau_weight,
         electron_weight,
-        generatorZ,
+        genZ,
         zpt_weight,
+        gen_boson,
+        met_recoil,
         get_mc_weight,
         fake_factors,
         hcand_fields,
+        hcand_mt,
         tauspinner_weight,
         phi_cp,
         category_ids,
@@ -67,10 +71,13 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         get_mc_weight,
         tau_weight,
         electron_weight,
-        generatorZ,
+        genZ,
         zpt_weight,
+        gen_boson,
+        met_recoil,
         fake_factors,
         hcand_fields,
+        hcand_mt,
         tauspinner_weight,
         phi_cp,
         category_ids,
@@ -93,6 +100,10 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     events = self[number_b_jet](events, **kwargs)
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
+    if self.dataset_inst.is_mc:
+        events = self[gen_boson](events, **kwargs)
+    events = self[met_recoil](events,**kwargs)
+    events = self[hcand_mt](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
     
     if self.dataset_inst.is_mc:
@@ -104,9 +115,10 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
             print("Splitting Drell-Yan dataset...")
             events = self[split_dy](events,**kwargs)
 
-        events = self[generatorZ](events, **kwargs)
+        events = self[genZ](events, **kwargs)
         print("Z pt reweighting...")
         events = self[zpt_weight](events,**kwargs)
+       
         print("Producing PU weights...")          
         events = self[pu_weight](events, **kwargs)
         print("Producing Muon weights...")
@@ -132,10 +144,13 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         muon_weight,
         tau_weight,
         electron_weight,
-        generatorZ,
+        genZ,
         zpt_weight,
+        gen_boson,
+        met_recoil,
         get_mc_weight,
         hcand_fields,
+        hcand_mt,
         tauspinner_weight,
         category_ids,
         jet_pt_def,
@@ -148,9 +163,12 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         get_mc_weight,
         tau_weight,
         electron_weight,
-        generatorZ,
+        genZ,
         zpt_weight,
+        gen_boson,
+        met_recoil,
         hcand_fields,
+        hcand_mt,
         tauspinner_weight,
         category_ids,
         jet_pt_def,
@@ -161,7 +179,11 @@ def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     print("Producing jet variables...") 
     events = self[jet_pt_def](events, **kwargs)
     print("Producing Hcand features...")
-    events = self[hcand_fields](events, **kwargs) 
+    events = self[hcand_fields](events, **kwargs)
+    if self.dataset_inst.is_mc:
+        events = self[gen_boson](events, **kwargs)
+    events = self[met_recoil](events,**kwargs)
+    events = self[hcand_mt](events, **kwargs)  
     events = self[category_ids](events, **kwargs)
     if self.dataset_inst.is_mc:
         events = self[get_mc_weight](events, **kwargs)
@@ -171,8 +193,7 @@ def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         if ak.any(['dy' in proc for proc in processes]):
             print("Splitting Drell-Yan dataset...")
             events = self[split_dy](events,**kwargs)
-
-        events = self[generatorZ](events, **kwargs)
+        events = self[genZ](events, **kwargs)
         print("Z pt reweighting...")
         events = self[zpt_weight](events,**kwargs)
         print("Producing PU weights...")          

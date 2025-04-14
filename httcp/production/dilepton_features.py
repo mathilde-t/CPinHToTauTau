@@ -15,7 +15,6 @@ def hcand_mt(lep: ak.Array, MET: ak.Array) -> ak.Array:
     delta_phi = lep.phi - MET.phi
     delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
     delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)
-    #cos_dphi = np.cos(lep.delta_phi(MET))
     cos_dphi = np.cos(delta_phi)
     mT_values = np.sqrt(2*lep.pt*MET.pt * (1 - cos_dphi))
     return ak.fill_none(mT_values, EMPTY_FLOAT)
@@ -50,16 +49,43 @@ def hcand_fields(
         hcand['delta_r'] = ak.where(delta_r > 0, delta_r , EMPTY_FLOAT)
         hcand['delta_eta'] = ak.where(abs(delta_eta) < 10, delta_eta , EMPTY_FLOAT)
         hcand['rel_charge'] = hcand.lep0.charge * hcand.lep1.charge
-        if ch_str !=' tautau':
-            mt = hcand_mt(p4['lep0'], events.PuppiMET)
-            hcand['mt'] = ak.where(mt >= 0, mt, EMPTY_FLOAT)
-            if ak.any(mt < 0):
-                n_less0 = ak.sum(ak.firsts(hcand['mt'],axis=1) < 0)
-                n_evt = ak.count(mt)
-                print(f'found {n_less0} events out of {n_evt} where mT < 0')
+        # if ch_str !=' tautau':
+        #     mt = hcand_mt(p4['lep0'], events.PuppiMET)
+        #     hcand['mt'] = ak.where(mt >= 0, mt, EMPTY_FLOAT)
+        #     if ak.any(mt < 0):
+        #         n_less0 = ak.sum(ak.firsts(hcand['mt'],axis=1) < 0)
+        #         n_evt = ak.count(mt)
+        #         print(f'found {n_less0} events out of {n_evt} where mT < 0')
         
         events = set_ak_column(events, f'hcand_{ch_str}', hcand) 
     return events
 
     
-   
+@producer(
+    uses={
+        'hcand_*', 'PuppiMET*'
+    },
+    produces={
+        'hcand_*'
+    },
+)
+def hcand_mt(self: Producer, 
+             events: ak.Array,
+             **kwargs
+             ) -> ak.Array:
+    print("producing mT...")
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    for ch_str in channels:
+        hcand = events[f'hcand_{ch_str}']
+        lep = get_lep_p4(hcand.lep0)
+        MET = events.PuppiMET
+        delta_phi = lep.phi - MET.phi
+        delta_phi = ak.where(delta_phi > np.pi, delta_phi - 2*np.pi, delta_phi)
+        delta_phi = ak.where(delta_phi < -np.pi, delta_phi + 2*np.pi, delta_phi)
+        cos_dphi = np.cos(delta_phi)
+        mt_values = ak.fill_none(np.sqrt(2*lep.pt*MET.pt * (1 - cos_dphi)), EMPTY_FLOAT)
+        mt_values = ak.where(np.isnan(mt_values), EMPTY_FLOAT, mt_values)
+        #hcand['mt'] = mt_values 
+        events = set_ak_column_f32(events, f'hcand_{ch_str}.mt', mt_values) 
+    return events 

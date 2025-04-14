@@ -395,7 +395,31 @@ def add_highlevel_features(cfg: od.Config) -> None:
         null_value=EMPTY_FLOAT,
         binning=(32, -3.2,3.2),
         x_title=r"PUPPI MET $\phi$",
+    ) 
+    cfg.add_variable(
+        name="puppi_met_pt_no_recoil",
+        expression="PuppiMET_no_recoil.pt",
+        null_value=EMPTY_FLOAT,
+        binning=(50, 0,100),
+        unit="GeV",
+        x_title=r"PUPPI MET $p_T$ (no recoil corr)",
+    )
+    cfg.add_variable(
+        name="puppi_met_phi_no_recoil",
+        expression="PuppiMET_no_recoil.phi",
+        null_value=EMPTY_FLOAT,
+        binning=(32, -3.2,3.2),
+        x_title=r"PUPPI MET $\phi$ (no recoil corr)",
+    ) 
+    cfg.add_variable(
+        name="puppi_met_recoil_effect",
+        expression="PuppiMET.pt_recoil_effect",
+        null_value=EMPTY_FLOAT,
+        binning=(50, -10,10),
+        unit="GeV",
+        x_title=r"PUPPI MET $p_T^{recoil corr}$ - $p_T^{no corr}$ ",
     )  
+    
     
     
     
@@ -641,7 +665,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                         name=f"{ch_str}_{lep}_iso_full_range",
                         expression=f"hcand_{ch_str}.{lep}.pfRelIso04_all",
                         null_value=EMPTY_FLOAT,
-                        binning=(40,0, 1.2),
+                        binning=(30,0, 0.6),
                         x_title=rf"{lep_str} rel. iso",
                     )
                 elif ch_str == 'etau':

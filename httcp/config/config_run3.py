@@ -126,9 +126,9 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
-        #higgs signal ggf
-        "h_ggf_htt"
     ]
+    if campaign.x.year == 2022: process_names.append("h_ggf_htt")
+        
     for process_name in process_names:
         # add the process
         proc = cfg.add_process(procs.get(process_name))
@@ -172,6 +172,8 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #SM Higgs signal
+        "h_ggf_htt_filtered"
         ]
 
     dataset_names_2022postEE = [
@@ -667,6 +669,16 @@ def add_run3(ana: od.Analysis,
     )
     
     
+    ##########################
+    ###### mT cut value ######
+    ##########################
+    
+    cfg.x.mt_cut_value = 70
+    
+    ##########################
+    ##########################
+    ##########################
+    
     jsonpog_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_latest/POG/"
     jsonpog_tau_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_tau_latest/POG/"
     corr_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/"
@@ -675,7 +687,6 @@ def add_run3(ana: od.Analysis,
         2022 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
         2023 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
     }    
-
     cfg.x.external_files = DotDict.wrap({
         "lumi": {
             "golden": (golden_ls[year], "v1"),
@@ -691,8 +702,7 @@ def add_run3(ana: od.Analysis,
         "zpt_weight"      : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),
-      #"fake_factors"                  : (f"{corr_dir}fake_factors_{cfg.x.year}_{campaign.x.tag}_{channel}_fine_pt_pol2.json", "v2"),
-
+        #"fake_factors"                  : (f"{corr_dir}fake_factors_{channel}_{cfg.x.year}_{campaign.x.tag}_mt{cfg.x.mt_cut_value}_exp_and_pol2.json", "v2"),
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
     
@@ -836,9 +846,6 @@ def add_run3(ana: od.Analysis,
                   'mutau': 2,
                   'tautau': 4}
     cfg.add_channel(name=channel,   id=channel_id[channel])
-    #cfg.add_channel(name="mutau",  id=2)
-    #cfg.add_channel(name="emu"  ,  id=3)
-    #cfg.add_channel(name="tautau", id=4)
     
     cfg.x.ch_objects = DotDict.wrap({
         'etau'   : {'lep0' : 'Electron',
@@ -851,16 +858,16 @@ def add_run3(ana: od.Analysis,
     cfg.x.fake_factor_method = DotDict.wrap({
     "axes": {'tau_pt': {
                 'var_route': [f'hcand_{channel}', 'lep1', 'pt'],
-                'ax_str'  : 'Variable([20,25,30,35,40,50,60,80,100], name="tau_pt", label="Tau pt", underflow=False, overflow=True)',
+                'ax_str'  : 'Variable([20,30,40,60,80,200], name="tau_pt", label="Tau pt", underflow=False, overflow=False)',
                 },
              'tau_dm_pnet': {
                 'var_route' : [f'hcand_{channel}', 'lep1', 'decayModePNet'],
                 'ax_str'   :'IntCategory([0,1,2,10,11], name="tau_dm_pnet", label="Tau PNet decayMode")',
              },
-            #  "n_jets": {
-            #     'var_route' : 'Jet.n_jets',
-            #     'var_str'   : 'hist.axis.IntCategory([0,1,2], label="Number of jets")',
-            #  },
+             "n_jets": {
+                'var_route' : ['n_jets'],
+                'ax_str'   : 'Integer(0, 3, name="n_jets", label="Number of jets",underflow=False, overflow=False)',
+            },
     },
     "columns" : ['ff_weight_wj','ff_weight_qcd'],
     "shifts"  : ["up", "nominal", "down"]

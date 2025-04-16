@@ -52,8 +52,11 @@ def hcand_fields(
         hcand['rel_charge'] = hcand.lep0.charge * hcand.lep1.charge
         if ch_str !=' tautau':
             mt = hcand_mt(p4['lep0'], events.PuppiMET)
-            hcand['mt'] = ak.where(mt > 0, mt , EMPTY_FLOAT)
-            
+            hcand['mt'] = ak.where(mt >= 0, mt, EMPTY_FLOAT)
+            if ak.any(mt < 0):
+                n_less0 = ak.sum(ak.firsts(hcand['mt'],axis=1) < 0)
+                n_evt = ak.count(mt)
+                print(f'found {n_less0} events out of {n_evt} where mT < 0')
         
         events = set_ak_column(events, f'hcand_{ch_str}', hcand) 
     return events

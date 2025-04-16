@@ -53,11 +53,11 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         tauspinner_weight,
         phi_cp,
         category_ids,
+        gen_parton_top,
+        top_pt_weight,
         jet_pt_def,
         jets_taggable,
         number_b_jet,
-        # gen_parton_top,
-        # top_pt_weight,
         "Jet.pt",
         "Jet.pt_no_jec",
         },
@@ -77,11 +77,11 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         tauspinner_weight,
         phi_cp,
         category_ids,
+        gen_parton_top,
+        top_pt_weight,
         jet_pt_def,
         jets_taggable,
         number_b_jet,
-        # gen_parton_top,
-        top_pt_weight,
         "Jet.jec_no_jec_diff",
     },
     # whether weight producers should be added and called
@@ -124,15 +124,21 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-<<<<<<< Updated upstream
-        
-    print("Producing Fake Factor weights...")
-    events = self[fake_factors](events, **kwargs)
-    print("Producing phi_cp...")
-    events = self[phi_cp](events, **kwargs)  
+        print("Producing GenPartonTop...")
+        events = self[gen_parton_top](events, **kwargs)
+        top_pt_weight_dummy = ak.where(events.GenPartonTop.pt > 500.0, 500.0, events.GenPartonTop.pt)
+        top_pt_weight_dummy = ak.ones_like(top_pt_weight_dummy)
+        for variation in ("", "_up", "_down"):
+            events = set_ak_column(events, f"top_pt_weight{variation}", top_pt_weight_dummy)
+        if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
+            print("Producing Top pT weights...")
+            events = self[top_pt_weight](events, **kwargs)
+        print("Producing Fake Factor weights...")
+        events = self[fake_factors](events, **kwargs)
+        print("Producing phi_cp...")
+        events = self[phi_cp](events, **kwargs)
     return events
-
-
+        
 @producer(
     uses={
         normalization_weights,
@@ -147,8 +153,9 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         hcand_fields,
         tauspinner_weight,
         category_ids,
-        "Jet.pt",
-        "Jet.pt_no_jec",
+        gen_parton_top,
+        top_pt_weight,
+        jet_pt_def,
         },
     produces={
         normalization_weights,
@@ -163,14 +170,14 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         hcand_fields,
         tauspinner_weight,
         category_ids,
-        "Jet.jec_no_jec_diff",
-        "Jet.number_of_jets",
+        gen_parton_top,
+        top_pt_weight,
+        jet_pt_def,
     },
 )
 def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
-    print("Producing Jet features...")
-    events = set_ak_column_f32(events, "Jet.jec_no_jec_diff", (events.Jet.pt - events.Jet.pt_no_jec))
-    events = set_ak_column_f32(events, "Jet.number_of_jets", ak.num(events.Jet))
+    print("Producing jet variables...") 
+    events = self[jet_pt_def](events, **kwargs)
     print("Producing Hcand features...")
     events = self[hcand_fields](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
@@ -196,34 +203,17 @@ def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-  
-    return events
-=======
-    
-
         print("Producing GenPartonTop...")
         events = self[gen_parton_top](events, **kwargs)
-        print("Producing Top pT weights...")
-        events = self[top_pt_weight](events, **kwargs)
-
-    # print("Producing phi_cp...") 
-    # TEMPORARY FIX. CHANGE AFTERWARDS
-    channel = self.config_inst.channels.names()
-    if len(channel) > 1:
-        ch_str = ' '.join([str(ch) for ch in channel])
-        raise ValueError(f"attempt to process more than one channel: {ch_str}")
-    else: channel = channel[0]
-    # if channel=='mutau':
-    #     events = self[phi_cp](events, **kwargs)
-    return events
-@main.init
-def main_init(self: Producer) -> None:
-    if self.produce_weights:
-        weight_producers = {gen_parton_top, top_pt_weight}
-
+        top_pt_weight_dummy = ak.where(events.GenPartonTop.pt > 500.0, 500.0, events.GenPartonTop.pt)
+        top_pt_weight_dummy = ak.ones_like(top_pt_weight_dummy)
+        for variation in ("", "_up", "_down"):
+            events = set_ak_column(events, f"top_pt_weight{variation}", top_pt_weight_dummy)
         if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
-            weight_producers.add(top_pt_weight)
+            print("Producing Top pT weights...")
+            events = self[top_pt_weight](events, **kwargs)
+  
+    return events
 
-        self.uses |= weight_producers
-        self.produces |= weight_producers
->>>>>>> Stashed changes
+
+

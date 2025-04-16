@@ -422,7 +422,7 @@ def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 
 @producer(
     uses={
-        'event','hcand_*',
+        'event','hcand_*','n_jets',
     },
     produces={
         'ff_weight*'
@@ -437,17 +437,21 @@ def fake_factors(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     tau = events[f'hcand_{channel}'].lep1 # fake factor method works for nutau/etau channel
     pt = flat_np_view(tau.pt, axis=1)
     dm = flat_np_view(tau.decayModePNet, axis=1)
+    n_jets = flat_np_view(events.n_jets).copy()
+    n_jets = np.where(n_jets>2,
+                      2*np.ones_like(n_jets),
+                      n_jets)#scale factors are calculated for nj=0,1,>=2 aka 2
     mask = (pt > 20) & (dm >= 0)
     fake_factors = {}
     for the_name in self.config_inst.x.fake_factor_method.columns:
         for the_shift in self.config_inst.x.fake_factor_method.shifts:
             ff_evaluator = self.fake_factor_qcd if 'qcd' in the_name else self.fake_factor_wjets
-            args = lambda mask, shift : (pt[mask],
-                                         dm[mask],
-                                         #shift, comment this out for a time
+            args = lambda mask : (pt[mask],
+                                  dm[mask],
+                                  n_jets[mask].astype(int),
             )
             ff_vals = np.zeros_like(pt, dtype=np.float32)
-            ff_vals[mask] = ff_evaluator(*args(mask, the_shift))
+            ff_vals[mask] = ff_evaluator(*args(mask))
             events = set_ak_column_f32(events,'_'.join((the_name,the_shift)), ff_vals)
     return events
 

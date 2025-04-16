@@ -3,11 +3,10 @@
 set_common_vars() {
 
 
-version="dev" 
+version="njets_included" 
     
-categories_mutau='cat_mutau_sr,cat_mutau_ar_wj,cat_mutau_ar_qcd,cat_mutau_ar_yields' #cat_mutau_sr #,cat_mutau_no_mt,cat_mutau_ar_wj,cat_mutau_ar_qcd,cat_mutau_ar_wj__tau_h,cat_mutau_ar_wj__tau_not_h
-#categories_mutau="mutau_signal_reg,mutau_signal_reg_no_mt,mutau_signal_reg_endcap_tau,mutau_signal_reg_barrel_tau,mutau_signal_reg_endcap_tau_no_mt,mutau_signal_reg_barrel_tau_no_mt" 
-variables_mutau='mutau_lep0_pt,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep1_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_eta,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
+categories_mutau='cat_mutau_sr'
+variables_mutau='mutau_lep1_pt,N_jets_pT_20_eta_4_7_Tight,mutau_mvis,mutau_delta_r,mutau_lep0_iso,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep0_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
 
 categories_etau="etau_signal_reg,etau_signal_reg_no_mt,etau_signal_reg_endcap_tau,etau_signal_reg_barrel_tau,etau_signal_reg_endcap_tau_no_mt,etau_signal_reg_barrel_tau_no_mt" 
 #"etau_signal_reg_0_bjets,etau_signal_reg_0_bjets_endcap_tau,etau_signal_reg_0_bjets_barrel_tau,etau_signal_reg_0_bjets_no_mt,etau_signal_reg_0_bjets_endcap_tau_no_mt,etau_signal_reg_0_bjets_barrel_tau_no_mt,etau_signal_reg_1_bjets,etau_signal_reg_1_bjets_endcap_tau,etau_signal_reg_1_bjets_barrel_tau,etau_signal_reg_1_bjets_no_mt,etau_signal_reg_1_bjets_endcap_tau_no_mt,etau_signal_reg_1_bjets_barrel_tau_no_mt,etau_signal_reg_2_bjets,etau_signal_reg_2_bjets_endcap_tau,etau_signal_reg_2_bjets_barrel_tau,etau_signal_reg_2_bjets_no_mt,etau_signal_reg_2_bjets_endcap_tau_no_mt,etau_signal_reg_2_bjets_barrel_tau_no_mt"
@@ -21,7 +20,8 @@ data_mu_2022postEE='data_mu_E,data_mu_F,data_mu_G,'
 
 bkg_ewk='wj_incl_madgraph,ww,wz,zz,dy_lep_madgraph,'
 bkg_top='st_twchannel_t_sl,st_twchannel_t_dl,st_twchannel_tbar_sl,st_twchannel_tbar_dl,st_tchannel_tbar,st_tchannel_t,st_schannel_t_lep,st_schannel_tbar_lep,'
-bkg_ttbar='tt_sl,tt_dl,tt_fh'
+bkg_ttbar='tt_sl,tt_dl,tt_fh,'
+signal='h_ggf_htt_filtered,'
 
 data_e_2023preBPix='data_e_Cv123,data_e_Cv4,'
 data_e_2023postBPix='data_e_D,'
@@ -55,8 +55,8 @@ case $1 in
         bkg_ewk=$bkg_ewk
         bkg_top=$bkg_top
         bkg_ttbar=$bkg_ttbar
-        datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
-        processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
+        datasets="$data$bkg_ewk$bkg_top$bkg_ttbar$signal"
+        processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,h_ggf_htt,data'
 	    categories=$categories_etau
 	    variables=$variables_etau
         workflow='htcondor'

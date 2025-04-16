@@ -39,24 +39,6 @@ ana.x.config_groups = {}
 # setup configs #
 # ------------- #
 
-#------------------------ Run3 2022 preEE signal samples with TauSpinner weights ---------------#
-#from httcp.config.run3_2022_preEE_tau_spinner import add_run3_2022_preEE_tau_spinner
-#from cmsdb.campaigns.run3_2022_preEE_tau_spinner import campaign_run3_2022_preEE_tau_spinner
-#
-#add_run3_2022_preEE_tau_spinner(
-#    analysis_httcp,
-#    campaign_run3_2022_preEE_tau_spinner.copy(),
-#    config_name=f"{campaign_run3_2022_preEE_tau_spinner.name}_limited",
-#    config_id=4,
-#    limit_dataset_files=1)
-#
-#add_run3_2022_preEE_tau_spinner(
-#    analysis_httcp,
-#    campaign_run3_2022_preEE_tau_spinner.copy(),
-#    config_name=f"{campaign_run3_2022_preEE_tau_spinner.name}",
-#    config_id=5,)
-
-
 from httcp.config.config_run3 import add_run3
 # ------------------------------------------------------------- #
 
@@ -64,6 +46,7 @@ channels = ['mutau','etau']
 
 #------------------------ Run3 2022 preEE samples ----------------------- #
 from cmsdb.campaigns.run3_2022_preEE_nano_tau_skim_v2 import campaign_run3_2022_preEE_nano_tau_skim_v2
+
 for counter, value in enumerate(channels):
     add_run3(
         analysis_httcp,

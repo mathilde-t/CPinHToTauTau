@@ -47,7 +47,6 @@ def gen_parton_top(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
 
     # save the column
     events = set_ak_column(events, "GenPartonTop", t)
-
     return events
 
 

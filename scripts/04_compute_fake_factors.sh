@@ -2,7 +2,7 @@
 source ./common_run3.sh #to access set_common_vars() function
 #The following function defines config, processes, version and datasets variables
 set_common_vars "$1"
-ff_version='ff_method_njets_mt70_p2_bug_fix'
+ff_version='debug_include_tes'
 main_category='cat_mutau_sr' #Specify the category for which the fake factors should be calculated
 args=(
         --config $config 
@@ -30,7 +30,7 @@ args=(
 
         --cf.MergeFakeFactorHistograms-version $ff_version
 
-        --cf.ComputeFakeFactors-version  "test_exp_fix" #$ff_version
+        --cf.ComputeFakeFactors-version  "met_recoil" 
         --cf.ComputeFakeFactors-categories $main_category
         
         "${@:2}"

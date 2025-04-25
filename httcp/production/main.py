@@ -25,7 +25,7 @@ from httcp.production.met_recoil import gen_boson, met_recoil
 from httcp.production.dilepton_features import hcand_fields,hcand_mt
 
 from httcp.production.phi_cp import phi_cp
-from httcp.production.aux_columns import jet_pt_def,jets_taggable, number_b_jet
+from httcp.production.aux_columns import jet_pt_def,jets_taggable, number_b_jet, pion_energy_split
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -59,8 +59,8 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         jet_pt_def,
         jets_taggable,
         number_b_jet,
-        "Jet.pt",
-        "Jet.pt_no_jec",
+        "Jet.*",
+        pion_energy_split,
         },
     produces={
         attach_coffea_behavior,
@@ -85,12 +85,15 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         jets_taggable,
         number_b_jet,
         "Jet.jec_no_jec_diff",
+        pion_energy_split,
     },
 )
 def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     
     # ensure coffea behaviors are loaded
     events = self[attach_coffea_behavior](events, **kwargs)
+    print("Producing pion energy split...")
+    events = self[pion_energy_split](events, **kwargs)
     print("Producing Jet features...")
     events = set_ak_column_f32(events, "Jet.jec_no_jec_diff", (events.Jet.pt - events.Jet.pt_no_jec))
     print("Producing jet variables for plotting...") 
@@ -154,6 +157,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         tauspinner_weight,
         category_ids,
         jet_pt_def,
+        pion_energy_split,
         },
     produces={
         normalization_weights,
@@ -172,10 +176,13 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         tauspinner_weight,
         category_ids,
         jet_pt_def,
+        pion_energy_split,
 
     },
 )
 def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
+    print("Producing pion energy split...")
+    events = self[pion_energy_split](events, **kwargs)
     print("Producing jet variables...") 
     events = self[jet_pt_def](events, **kwargs)
     print("Producing Hcand features...")

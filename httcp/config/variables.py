@@ -37,19 +37,19 @@ def keep_columns(cfg: od.Config) -> None:
                 "pt", "eta", "phi", "mass", "jetId", 
                 "btagDeepFlavB", "hadronFlavour", 
                 "pt_no_jec", "phi_no_jec","eta_no_jec", 
-                "mass_no_jec", "jec_no_jec_diff",
+                "mass_no_jec", "jec_no_jec_diff","chEmEF","neEmEF",
             ] 
         } | {
             f"Tau.{var}" for var in [
                 "pt","eta","phi","mass","dxy","dz", "charge", 
                 "rawDeepTau2018v2p5VSjet","idDeepTau2018v2p5VSjet", "idDeepTau2018v2p5VSe", "idDeepTau2018v2p5VSmu", 
                 "decayMode", "decayModePNet", "genPartFlav", "rawIdx",
-                "pt_no_tes", "mass_no_tes", "IPx", "IPy", "IPz","ip_sig", "jetIdx"
+                "pt_no_tes", "mass_no_tes", "IPx", "IPy", "IPz", "ip_sig", "jetIdx", "hasSV", "hasRefitSV",
             ] 
         } | {
             f"Muon.{var}" for var in [
                 "pt","eta","phi","mass","dxy","dz", "charge",
-                "decayMode", "pfRelIso04_all","mT", "rawIdx","IPx", "IPy", "IPz","ip_sig"
+                "decayMode", "pfRelIso04_all","mT", "rawIdx","IPx", "IPy", "IPz","ip_sig", "isPFcand"
             ] 
         } | {
             f"Electron.{var}" for var in [
@@ -209,51 +209,20 @@ def add_jet_features(cfg: od.Config) -> None:
         unit="GeV",
         x_title=r"$p_{T} of all jets$",
     )
-    for i in range(2):
-        cfg.add_variable(
-            name=f"jet_{i+1}_pt",
-            expression=f"Jet.pt[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(40, 0.0, 400.0),
-            unit="GeV",
-            x_title=r"Jet $p_{T}$",
-        )
-        cfg.add_variable(
-            name=f"jet_{i+1}_eta",
-            expression=f"Jet.eta[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(30, -3., 3.),
-            x_title=r"Jet $\eta$",
-        )
-        cfg.add_variable(
-            name=f"jet_{i+1}_phi",
-            expression=f"Jet.phi[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(32, -3.2, 3.2),
-            x_title=r"Jet $\varphi$",
-        )
-        cfg.add_variable(
-            name=f"jet_{i+1}_pt_no_jec",
-            expression=f"Jet.pt_no_jec[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(40, 0.0, 400.0),
-            unit="GeV",
-            x_title=r"Jet $p_{T} no jec $",
-        )
-        cfg.add_variable(
-            name=f"jet_{i+1}_eta_no_jec",
-            expression=f"Jet.eta_no_jec[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(30, -3.0, 3.0),
-            x_title=r"Jet $\eta$ no jec ",
-        )
-        cfg.add_variable(
-            name=f"jet_{i+1}_phi_no_jec",
-            expression=f"Jet.phi_no_jec[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(32, -3.2, 3.2),
-            x_title=r"Jet $\phi$ no jec",
-        )
+    cfg.add_variable(
+        name="jets_eta",
+        expression="Jet.eta",
+        binning=(82, -5.191, 5.191),
+        unit="",
+        x_title="$\\eta$ of all jets",
+    )
+    cfg.add_variable(
+        name="jets_phi",
+        expression="Jet.phi",
+        null_value=EMPTY_FLOAT,
+        binning=(72, -np.pi, np.pi),
+        x_title="$\\phi$ of all jets",
+    )  
         
     cfg.add_variable(
         name="N_jets_pT_20_eta_4_7_Tight",
@@ -280,6 +249,7 @@ def add_jet_features(cfg: od.Config) -> None:
     cfg.add_variable(
         name="leading_jet_pt",
         expression="leading_jet_pt",
+        null_value=EMPTY_FLOAT,
         binning=(30, 30.0, 330.0),
         unit="GeV",
         x_title=r"Leading jet $p_{T}$",
@@ -287,6 +257,7 @@ def add_jet_features(cfg: od.Config) -> None:
     cfg.add_variable(
         name="subleading_jet_pt",
         expression="subleading_jet_pt",
+        null_value=EMPTY_FLOAT,
         binning=(25, 30.0, 280.0),
         unit="GeV",
         x_title=r"Subleading jet $p_{T}$",
@@ -294,24 +265,28 @@ def add_jet_features(cfg: od.Config) -> None:
     cfg.add_variable(
         name="leading_jet_eta",
         expression="leading_jet_eta",
+        null_value=EMPTY_FLOAT,
         binning=(47, -4.7, 4.7),
         x_title="Leading Jet $\\eta$",
     ) 
     cfg.add_variable(
         name="subleading_jet_eta",
         expression="subleading_jet_eta",
+        null_value=EMPTY_FLOAT,
         binning=(47, -4.7, 4.7),
         x_title="Subleading Jet $\\eta$",
     ) 
     cfg.add_variable(
         name="leading_jet_phi",
         expression="leading_jet_phi",
+        null_value=EMPTY_FLOAT,
         binning=(32, -3.2, 3.2),
         x_title="Leading Jet $\\phi$",
     )  
     cfg.add_variable(
         name="subleading_jet_phi",
         expression="subleading_jet_phi",
+        null_value=EMPTY_FLOAT,
         binning=(32, -3.2, 3.2),
         x_title="Subleading Jet $\\phi$",
     ) 
@@ -325,6 +300,7 @@ def add_jet_features(cfg: od.Config) -> None:
     cfg.add_variable(
         name="mjj",
         expression="mjj",
+        null_value=EMPTY_FLOAT,
         binning=(40, 10.0, 410.0),
         unit="GeV",
         x_title=r"$m_{jj}$",
@@ -338,7 +314,6 @@ def add_jet_features(cfg: od.Config) -> None:
     )
     cfg.add_variable(
         name="ht",
-        # expression=lambda events: ak.sum(events.Jet.pt, axis=1),
         expression="ht",
         binning=(40, 0.0, 800.0),
         unit="GeV",
@@ -418,7 +393,15 @@ def add_highlevel_features(cfg: od.Config) -> None:
         binning=(50, -10,10),
         unit="GeV",
         x_title=r"PUPPI MET $p_T^{recoil corr}$ - $p_T^{no corr}$ ",
-    )  
+    )
+    cfg.add_variable(
+        name="pion_E_split",
+        expression="pion_E_split",
+        null_value=EMPTY_FLOAT,
+        binning=(50, 0,1.2),
+        unit="",
+        x_title=r"$\frac{|E(\pi^{\pm}) - E(\pi^{0})|}{E(\pi^{\pm}) + E(\pi^{0})}$",
+    ) 
     
     
     
@@ -567,6 +550,14 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 expression=f"hcand_{ch_str}.mass",
                 null_value=EMPTY_FLOAT,
                 binning=(40, 0.0, 200.0),
+                unit="GeV",
+                x_title=r"$m_{vis}$",
+            )
+        cfg.add_variable(
+                name=f"{ch_str}_mvis_fine",
+                expression=f"hcand_{ch_str}.mass",
+                null_value=EMPTY_FLOAT,
+                binning=(115, 15, 130),
                 unit="GeV",
                 x_title=r"$m_{vis}$",
             )

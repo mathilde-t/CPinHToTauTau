@@ -3,7 +3,7 @@
 set_common_vars() {
 
 
-version="njets_included" 
+version="jet_veto_fix" #"njets_included" 
     
 categories_mutau='cat_mutau_sr'
 variables_mutau='mutau_lep1_pt,N_jets_pT_20_eta_4_7_Tight,mutau_mvis,mutau_delta_r,mutau_lep0_iso,mutau_lep0_eta,mutau_lep0_phi,mutau_lep0_ip_sig,mutau_lep0_pt,mutau_lep1_eta,mutau_lep1_phi,mutau_lep1_mass,mutau_lep1_decayModePNet,mutau_lep1_decayMode,mutau_mt,mutau_mvis,mutau_delta_r,mutau_pt,puppi_met_pt,puppi_met_phi'
@@ -43,8 +43,8 @@ case $1 in
     ;;
     "run3_2022preEE_mutau_lim")
         config="run3_2022_preEE_mutau_limited"	
-        datasets='dy_lep_madgraph'
-        processes='dy_z2mumu,dy_z2ee,dy_z2tautau'
+        datasets='wj_incl_madgraph'
+        processes='wj'
 	    categories=$categories_mutau
 	    variables=$variables_mutau
         workflow='local'
@@ -86,10 +86,8 @@ case $1 in
     ;;
     "run3_2022postEE_mutau_lim")
         config="run3_2022_postEE_mutau_limited"	
-        datasets='dy_lep_madgraph' 
-        processes='dy_z2mumu,dy_z2ee,dy_lep' 
-	      categories=$categories_mutau
-	      variables=$variables_mutau
+        datasets='wj_incl_madgraph' 
+        processes='wj' 
         workflow='local'
     ;;
     "run3_2022postEE_etau")

@@ -4,7 +4,7 @@ Produce channel_id column. This function is called in the main selector
 
 from columnflow.production import Producer, producer
 from columnflow.selection import Selector, SelectionResult, selector
-from columnflow.columnar_util import set_ak_column
+from columnflow.columnar_util import set_ak_column, EMPTY_FLOAT
 from columnflow.util import maybe_import, DotDict
 from httcp.util import get_lep_p4, find_fields_with_nan
 
@@ -159,21 +159,21 @@ def jet_pt_def(
     max_len                   = ak.max([lep0_max_obj,lep1_max_obj])
     
     jet_vs_lep0_pt            = ak.pad_none(jet_vs_lep0.pt, max_len)
-    jet_vs_lep0_pt            = ak.fill_none(jet_vs_lep0_pt, -999)
+    jet_vs_lep0_pt            = ak.fill_none(jet_vs_lep0_pt, EMPTY_FLOAT)
     jet_vs_lep1_pt            = ak.pad_none(jet_vs_lep1.pt, max_len)
-    jet_vs_lep1_pt            = ak.fill_none(jet_vs_lep1_pt, -999)
+    jet_vs_lep1_pt            = ak.fill_none(jet_vs_lep1_pt, EMPTY_FLOAT)
 
 
     jet_vs_lep0_eta            = ak.pad_none(jet_vs_lep0.eta, max_len)
-    jet_vs_lep0_eta            = ak.fill_none(jet_vs_lep0_eta, 10**1)
+    jet_vs_lep0_eta            = ak.fill_none(jet_vs_lep0_eta, EMPTY_FLOAT)
     jet_vs_lep1_eta            = ak.pad_none(jet_vs_lep1.eta, max_len)
-    jet_vs_lep1_eta            = ak.fill_none(jet_vs_lep1_eta, 10**1)
+    jet_vs_lep1_eta            = ak.fill_none(jet_vs_lep1_eta, EMPTY_FLOAT)
     
     
     jet_vs_lep0_phi            = ak.pad_none(jet_vs_lep0.phi, max_len)
-    jet_vs_lep0_phi            = ak.fill_none(jet_vs_lep0_phi, 10**1)
+    jet_vs_lep0_phi            = ak.fill_none(jet_vs_lep0_phi, EMPTY_FLOAT)
     jet_vs_lep1_phi            = ak.pad_none(jet_vs_lep1.phi, max_len)
-    jet_vs_lep1_phi            = ak.fill_none(jet_vs_lep1_phi, 10**1)
+    jet_vs_lep1_phi            = ak.fill_none(jet_vs_lep1_phi, EMPTY_FLOAT)
     
     jet_vs_lep0_eta_2_5_mask     = abs(jet_vs_lep0_eta) <= 2.5
     jet_vs_lep1_eta_2_5_mask     = abs(jet_vs_lep1_eta) <= 2.5
@@ -197,47 +197,54 @@ def jet_pt_def(
     
     final_mask = (final_mask_p_T_20_eta_2_5 | final_mask_p_T_50_eta_2_5_3_0 | final_mask_p_T_30_eta_3_0)
     
-    jet_pt_to_plot_0            = ak.where(final_mask,jet_vs_lep0_pt,-999)
-    jet_pt_to_plot_1            = ak.where(final_mask,jet_vs_lep1_pt,-999)
+    jet_pt_to_plot_0            = ak.where(final_mask,jet_vs_lep0_pt, EMPTY_FLOAT)
+    jet_pt_to_plot_1            = ak.where(final_mask,jet_vs_lep1_pt, EMPTY_FLOAT)
     jet_pt_to_plot_0_mask       = (jet_pt_to_plot_0 > 0)
     jet_pt_to_plot_1_mask       = (jet_pt_to_plot_1 > 0)
     jet_pt_to_plot_mask         = (jet_pt_to_plot_0  == jet_pt_to_plot_1) & (jet_pt_to_plot_0_mask) & (jet_pt_to_plot_1_mask)
-    jet_pt_to_plot              = ak.where(jet_pt_to_plot_mask,jet_pt_to_plot_0,-999)
+    jet_pt_to_plot              = ak.where(jet_pt_to_plot_mask,jet_pt_to_plot_0, EMPTY_FLOAT)
 
     leading_jet_pt            = jet_pt_to_plot[:,0]
     subleading_jet_pt         = jet_pt_to_plot[:,1]
     
-    jet_eta_to_plot_0          = ak.where(final_mask,jet_vs_lep0_eta,10**1)
-    jet_eta_to_plot_1          = ak.where(final_mask,jet_vs_lep1_eta, 10**1)
-    jet_eta_to_plot_mask       = (jet_eta_to_plot_0 == jet_eta_to_plot_1) & (jet_eta_to_plot_0 != 10) & (jet_eta_to_plot_1 != 10)
-    jet_eta_to_plot            = ak.where(jet_eta_to_plot_mask,jet_eta_to_plot_0,10)
+    jet_eta_to_plot_0          = ak.where(final_mask,jet_vs_lep0_eta, EMPTY_FLOAT)
+    jet_eta_to_plot_1          = ak.where(final_mask,jet_vs_lep1_eta, EMPTY_FLOAT)
+    jet_eta_to_plot_mask       = (jet_eta_to_plot_0 == jet_eta_to_plot_1) & (jet_eta_to_plot_0 != EMPTY_FLOAT)
+    jet_eta_to_plot            = ak.where(jet_eta_to_plot_mask,jet_eta_to_plot_0, EMPTY_FLOAT)
     
-    leading_jet_eta            = jet_eta_to_plot[:,0]
-    subleading_jet_eta         = jet_eta_to_plot[:,1]
+    leading_jet_eta             = jet_eta_to_plot[:,0]
+    subleading_jet_eta          = jet_eta_to_plot[:,1]
 
-    jet_phi_to_plot_0          = ak.where(final_mask,jet_vs_lep0_phi,10**1)
-    jet_phi_to_plot_1          = ak.where(final_mask,jet_vs_lep1_phi,10**1)
-    jet_phi_to_plot_mask       = (jet_phi_to_plot_0 == jet_phi_to_plot_1) & (jet_phi_to_plot_0 != 10) & (jet_phi_to_plot_1 != 10)
-    jet_phi_to_plot            = ak.where(jet_phi_to_plot_mask,jet_phi_to_plot_0,10)
+    jet_phi_to_plot_0          = ak.where(final_mask,jet_vs_lep0_phi, EMPTY_FLOAT)
+    jet_phi_to_plot_1          = ak.where(final_mask,jet_vs_lep1_phi, EMPTY_FLOAT)
+    jet_phi_to_plot_mask       = (jet_phi_to_plot_0 == jet_phi_to_plot_1) & (jet_phi_to_plot_0 != EMPTY_FLOAT) 
+    jet_phi_to_plot            = ak.where(jet_phi_to_plot_mask,jet_phi_to_plot_0, EMPTY_FLOAT)
     
     leading_jet_phi            = jet_phi_to_plot[:,0]
     subleading_jet_phi         = jet_phi_to_plot[:,1]
     
-    n_jets         = ak.sum(jet_pt_to_plot>0,axis=1) 
+    n_jets         = ak.sum(jet_pt_to_plot > 0, axis=1) 
     
     delta_eta_0_1              = leading_jet_eta - subleading_jet_eta
     delta_phi_0_1              = leading_jet_phi - subleading_jet_phi
-    delta_phi = ak.where(delta_phi_0_1 > np.pi, delta_phi_0_1 - 2*np.pi, delta_phi_0_1)
-    delta_phi = ak.where(delta_phi_0_1 < -np.pi, delta_phi_0_1 + 2*np.pi, delta_phi_0_1)
+    delta_phi = ak.where(np.abs(delta_phi_0_1) > np.pi,
+                         delta_phi_0_1 - 2*np.pi*np.sign(delta_phi_0_1),
+                         delta_phi_0_1)
     
     ls_product_mask = ((leading_jet_pt > 0) & (subleading_jet_pt > 0))
     ls_product = ak.where(ls_product_mask, leading_jet_pt*subleading_jet_pt, 0)
     
-    delta_eta = ak.where(n_jets>=2 , delta_eta_0_1, -100)
-    delta_phi =  ak.where(n_jets>=2, delta_phi    , -999)
-    mjj_mask = ((n_jets>=2) & (delta_phi != -999) & (delta_eta != -100) & (ls_product > 0))
     
-    mjj = ak.where(mjj_mask,np.sqrt(2*ls_product*(np.cosh(delta_eta) - np.cos(delta_phi))),-999) 
+    mjj_mask = ((n_jets>=2) & (ls_product > 0))
+    delta_eta = ak.where(mjj_mask , delta_eta_0_1, EMPTY_FLOAT)
+    delta_phi =  ak.where(mjj_mask, delta_phi    , EMPTY_FLOAT)
+    mjj = np.ones_like(leading_jet_pt) * EMPTY_FLOAT
+    #cosh causes warning if an EMPTY_FLOAT is being passed into it, we are taking care of the np.inf here, so this warning can be omitted
+    with np.errstate(invalid='ignore'):
+        mjj = ak.where(mjj_mask,
+                    np.sqrt(2*ls_product*(np.cosh(delta_eta) - np.cos(delta_phi))),
+                    mjj)
+        mjj = ak.where(np.isinf(mjj), EMPTY_FLOAT, mjj)
     
     events = set_ak_column(events, "n_jets"            , n_jets            )
     events = set_ak_column(events, "leading_jet_pt"    , leading_jet_pt    )
@@ -503,3 +510,40 @@ def add_tau_prods(
             "decay_prods_are_ok": mask,
         },
     )
+    
+def egamma_mask(tauprod): return ((np.abs(tauprod.pdgId) == 11) + (tauprod.pdgId == 22))
+
+def pion_mask(tauprod): return np.abs(tauprod.pdgId) == 211
+
+    
+@producer(
+    uses={
+        "tau_decay_prods_*",
+    },
+    produces={
+        "pion_E_split", 
+    },
+    exposed=False,
+)
+def pion_energy_split(
+        self: Producer,
+        events: ak.Array,
+        **kwargs
+) -> ak.Array:
+    channel = self.config_inst.channels.names()[0]
+    tauprods = events[f'tau_decay_prods_{channel}_lep1']
+    charged_pion_mask = pion_mask(tauprods)
+    em_mask = egamma_mask(tauprods)
+    charged_pion = ak.firsts(get_lep_p4(tauprods[charged_pion_mask]),axis=1)
+    neutral_pion = get_lep_p4(tauprods[em_mask]).sum()
+    
+    mask = (ak.num(charged_pion_mask, axis=1) > 0) & (ak.num(em_mask, axis=1) > 0)
+    mask =  mask & (charged_pion.E > 0) & (neutral_pion.E > 0)
+   
+    pion_E_split = ak.where(mask, 
+                            np.abs(charged_pion.E - neutral_pion.E)/(charged_pion.E + neutral_pion.E),
+                            EMPTY_FLOAT)
+    pion_E_split = ak.fill_none(pion_E_split, EMPTY_FLOAT)
+    events = set_ak_column_f32(events, "pion_E_split", pion_E_split)
+    return events
+

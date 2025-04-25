@@ -6,6 +6,7 @@ Main categories file for the Higgs CP analysis
 
 from columnflow.categorization import Categorizer, categorizer
 from columnflow.util import maybe_import
+from httcp.util import get_lep_p4, get_ip_p4
 
 ak = maybe_import("awkward")
 np = maybe_import("numpy")
@@ -247,30 +248,59 @@ def njets_eq0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, 
 @categorizer(uses={'event', 'hcand_*'})
 def dm0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 0), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == 0), axis=1),False)
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})
 def dm1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 1), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == 1), axis=1),False)
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})
 def dm2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 2), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == 2), axis=1),False)
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})
 def dm10(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 10), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == 10), axis=1),False)
     return events, mask
 
 @categorizer(uses={'event', 'hcand_*'})
 def dm11(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 11), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == 11), axis=1),False)
+    return events, mask
+
+#Helper category for check of jet veto maps (not used in the main analysis)
+@categorizer(uses={"Jet*", "Muon*"}) 
+def jet_veto_maps_jets(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    jet = events.Jet
+    muon = events.Muon[events.Muon.isPFcand]
+    jet_mask = (
+        (jet.pt > 15) &
+        (jet.jetId >= 2) &  # tight id 
+        ((jet.chEmEF + jet.neEmEF) < 0.9) &
+        ak.all(jet.metric_table(muon) >= 0.2, axis=2) &
+        (np.abs(jet.eta) < 5.191)    # https://cms-nanoaod-integration.web.cern.ch/commonJSONSFs/summaries/JME_2022_Prompt_jetvetomaps.html
+    )
+    jet_mask = ak.fill_none(jet_mask, False)
+    
+    return events, ak.all(jet_mask, axis=1)
+
+#Tau impact parameter cut used in definition of mupi category
+@categorizer(uses={'event', 'hcand_*'})
+def tau_ip_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0]
+    mask = ak.fill_none(ak.firsts(events[f'hcand_{channel}'].lep1.ip_sig >= 1.25, axis=1),False)
+    return events, mask
+
+#Cut  on energy split between charged and neutral pion used in definition of murho and mu a1 categories
+@categorizer(uses={'event', 'pion_E_split'})
+def pion_E_split_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = ak.fill_none(events.pion_E_split > 0.2, False)
     return events, mask
 

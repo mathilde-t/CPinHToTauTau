@@ -579,13 +579,13 @@ def add_run3(ana: od.Analysis,
     #Check to compare the plots with IC: set working point for each channl to Medium vs Jet, Tight vs E, Tight vs Mu
     cfg.x.deep_tau = DotDict.wrap({
         "tagger": "DeepTau2018v2p5",
-        "vs_e"          : {"mutau": "Tight",
+        "vs_e"          : {"mutau": "VVLoose",
                            "etau": "Tight",
                            "tautau": "Tight"},        
         "vs_mu"         : {"mutau": "Tight",
                            "etau": "Tight",
                            "tautau": "Tight"},
-        "vs_jet"        : {"mutau": "Medium",
+        "vs_jet"        : {"mutau": "VTight",
                            "etau": "Medium",
                            "tautau": "Medium"},
         "vs_e_jet_wps"  : {'VVVLoose'   : 1,
@@ -688,8 +688,8 @@ def add_run3(ana: od.Analysis,
         "zpt_weight"                    : f"{corr_dir}zpt_reweighting_LO_2022.root",
         "jet_jerc"                      : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"                  : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),
-        "fake_factors"                  : (f"{corr_dir}fake_factors_{channel}_{cfg.x.year}_{campaign.x.tag}_mt{cfg.x.mt_cut_value}_exp_and_pol2.json", "v2"),
-        "met_recoil"                    : (f"{corr_dir}/hleprare/RecoilCorrlib/Recoil_corrections_{cfg.x.year}{campaign.x.tag}_v2.json.gz", "v2"),
+        "fake_factors"                  : (f"{corr_dir}fake_factors_{channel}_{cfg.x.year}_{campaign.x.tag}_mt{cfg.x.mt_cut_value}_exp_and_pol2_jvm_fix.json", "v2"),
+        "met_recoil"                    : (f"{corr_dir}hleprare/RecoilCorrlib/Recoil_corrections_{cfg.x.year}{campaign.x.tag}_v2.json.gz", "v2"),
         #"met_phi_corr": (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
     

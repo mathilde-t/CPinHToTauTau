@@ -36,10 +36,19 @@ def btag_weight_SF(
     sf_values = {}
     tag = self.config_inst.x.tag
     year = self.config_inst.x.year
+
     jet_mask = ((events.Jet.pt >= 20) & 
                 (abs(events.Jet.eta) < 2.5) & 
                 (events.Jet.jetId & 0b10 == 0b10))
+    
+    #Removing NaNs from discriminat
+    dis = events.Jet.btagDeepFlavB 
+    nan_mask = np.isnan(dis)
+    mask = ~np.isnan(dis)
+    jet_mask = jet_mask & mask
+    
     Jet = events.Jet[jet_mask]
+
     for the_shift in shifts: sf_values[the_shift] = np.ones_like(events.event, dtype=np.float32)
     # Create sf array template to make copies and dict for finnal results of all systematics
 
@@ -68,7 +77,7 @@ def btag_weight_SF(
     sum_mc_weight_before_btag_weigth = selection_stats["sum_mc_weight_selected_per_process"][pid]
     sum_mc_weight_after_btag_weigth = selection_stats["sum_mc_weight_selected_with_btag_weight_per_process"][pid]
     r = sum_mc_weight_before_btag_weigth/sum_mc_weight_after_btag_weigth
-    from IPython import embed; embed()
+
     for the_shift in shifts: 
         btag_w = sf_values[the_shift]
         w_event = ak.prod(btag_w,axis=1)
@@ -112,3 +121,29 @@ def btag_weight_SF_setup(
     )
     self.btag_sf_corr = correction_set[self.config_inst.x.btag_sf[0]]
 
+    # nan_mask = np.isnan(discriminant)
+    
+    # mask = ~np.isnan(discriminant)
+
+    # # nan_mask = np.isnan(discriminant)
+    # if ak.any(nan_mask):
+    #     print("NaN values found in the array.")
+    # else:
+    #     print("No NaN values in the array.")
+    # nan_count = ak.sum(np.isnan(discriminant))
+    # print(f"Found {nan_count} NaN values.")
+    
+    # # Filter out the nested subarrays that contain NaN values.
+    # filtered = discriminant[mask]
+
+    # print("Original array:")
+    # print(discriminant)
+    # print("\nMask for subarrays without NaNs:")
+    # print(mask)
+    # print("\nFiltered array (NaN-containing entries removed):")
+    # print(filtered)
+
+    # flavor_ = flavor[mask]
+    # eta_ = eta[mask]
+    # pt_ = pt[mask]
+    # discriminant_ = discriminant[mask]

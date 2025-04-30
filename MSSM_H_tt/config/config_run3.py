@@ -128,6 +128,8 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        # signal
+        "h_ggf_htt",
     ]
     for process_name in process_names:
         # add the process
@@ -174,6 +176,10 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #signal
+        "h_tt_100",
+        "h_tt_125",
+        "h_tt_1200",
         ]
 
     dataset_names_2022postEE = [
@@ -216,6 +222,10 @@ def add_run3(ana: od.Analysis,
         #"st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #signal
+        "h_tt_100",
+        "h_tt_125",
+        "h_tt_1200",
         ]
     
     dataset_names_2023preBPix = [
@@ -252,6 +262,10 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #signal
+        "h_tt_100",
+        "h_tt_125",
+        "h_tt_1200",
         ]
     
     dataset_names_2023postBPix = [
@@ -285,6 +299,10 @@ def add_run3(ana: od.Analysis,
         "st_twchannel_tbar_sl",
         "st_twchannel_tbar_dl",
         "st_twchannel_tbar_fh",
+        #signal
+        "h_tt_100",
+        "h_tt_125",
+        "h_tt_1200",
         ]
     
     dataset_era = {
@@ -332,6 +350,7 @@ def add_run3(ana: od.Analysis,
     # process groups for conveniently looping over certain processs
     # (used in wrapper_factory and during plotting)
     cfg.x.process_groups = {
+        "signal": ["h_tt_100","h_tt_125","h_tt_1200"],
         "data" : ["data_mu", "data_tau","data_e"],
         "vv"   : ["ww", "wz", "zz"],
         "tt"   : ["tt_sl","tt_dl","tt_fh"],
@@ -757,7 +776,7 @@ def add_run3(ana: od.Analysis,
     jsonpog_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_latest/POG/"
     jsonpog_tau_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/jsonpog-integration_tau_latest/POG/"
     corr_dir = "/afs/cern.ch/user/a/anigamov/public/htt_corrections_mirror/"
-    
+
     golden_ls = { 
         2022 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json", 
         2023 : "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions23/Cert_Collisions2023_366442_370790_Golden.json"
@@ -769,7 +788,7 @@ def add_run3(ana: od.Analysis,
             "normtag": ("/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_BRIL.json", "v1"), #/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags
         },
 
-        "pu_sf"                    : (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v1"),
+        "pu_sf"                    : (f"{jsonpog_dir}LUM/{cfg.x.year}_{tag}/puWeights.json.gz", "v2"),
         "muon_correction"          : f"{jsonpog_dir}MUO/{cfg.x.year}_{tag}/muon_Z.json.gz",
         "electron_scaling_smearing": f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electronSS.json.gz",
         "electron_idiso"           : f"{jsonpog_dir}EGM/{cfg.x.year}_{tag}/electron.json.gz",
@@ -779,9 +798,10 @@ def add_run3(ana: od.Analysis,
         "jet_jerc"                 : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jet_jerc.json.gz", "v2"),
         "jet_veto_map"             : (f"{jsonpog_dir}JME/{cfg.x.year}_{tag}/jetvetomaps.json.gz", "v2"),
         "btag_sf_corr"             : (f"{jsonpog_dir}BTV/{cfg.x.year}_{tag}/btagging.json.gz", "v2"),
+        "DY_pTll_recoil_corr"      : (f"{corr_dir}/hleprare/RecoilCorrlib/Recoil_corrections_{cfg.x.year}{campaign.x.tag}_v2.json.gz", "v2"),
         #"met_phi_corr"            : (f"{jsonpog_dir}JME/{cfg.x.year}{tag}/met{cfg.x.year}.json.gz", "v2"), #FIXME: there is no json present in the jsonpog-integration for this year, I retrieve the json frm: https://cms-talk.web.cern.ch/t/2022-met-xy-corrections/53414/2 but it seems corrupted
     })
-
+    
     # --------------------------------------------------------------------------------------------- #
     # electron settings
     # names of electron correction sets and working points

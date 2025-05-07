@@ -30,8 +30,9 @@ from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from httcp.selection.higgscand import new_higgscand, mask_nans
 
-from httcp.production.aux_columns import channel_id, jet_veto, add_tau_prods
+from httcp.production.aux_columns import channel_id, create_jetID_masks, jet_veto, add_tau_prods
 from httcp.selection.jets import jet_veto_map
+from httcp.selection.debug import debug_main
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
@@ -66,6 +67,7 @@ coffea = maybe_import("coffea")
         add_tau_prods,
         mask_nans,
         jet_veto_map,
+        create_jetID_masks,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
@@ -91,6 +93,7 @@ coffea = maybe_import("coffea")
         add_tau_prods,
         mask_nans,
         jet_veto_map,
+        create_jetID_masks,
         "category_ids",
     },
     exposed=True,
@@ -179,6 +182,10 @@ def main(
                                  domatch=True,
                                  **kwargs)
     results += hcand_res
+    
+    #produce masks for tight_jetID and tight_jet_id_lep_veto
+    events = self[create_jetID_masks](events, **kwargs)
+    
     #produce is_b_vetoed columnd
     events = self[jet_veto](events, **kwargs)
 

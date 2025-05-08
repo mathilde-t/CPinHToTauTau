@@ -63,6 +63,7 @@ def main_init(self: WeightProducer) -> None:
         "tauspinner_weight",
         "zpt_weight",
         "top_pt_weight",
+        "trigger_weight_mutau_nom",
     }
     self.uses |= self.weight_columns
     

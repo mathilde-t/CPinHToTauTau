@@ -18,7 +18,7 @@ from columnflow.production.util import attach_coffea_behavior
 from httcp.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
 from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
-from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight,fake_factors
+from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight,fake_factors, trigger_weight_mutau
 from httcp.production.sample_split import split_dy
 from httcp.production.generatorZ import generatorZ
 from httcp.production.dilepton_features import hcand_fields
@@ -42,13 +42,14 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         normalization_weights,
         split_dy,
         pu_weight,
+        trigger_weight_mutau,
         muon_weight,
         tau_weight,
         electron_weight,
         generatorZ,
         zpt_weight,
         get_mc_weight,
-        fake_factors,
+        #fake_factors,
         hcand_fields,
         tauspinner_weight,
         phi_cp,
@@ -66,13 +67,14 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         normalization_weights,
         split_dy,
         pu_weight,
+        trigger_weight_mutau,
         muon_weight,
         get_mc_weight,
         tau_weight,
         electron_weight,
         generatorZ,
         zpt_weight,
-        fake_factors,
+        #fake_factors,
         hcand_fields,
         tauspinner_weight,
         phi_cp,
@@ -116,6 +118,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[zpt_weight](events,**kwargs)
         print("Producing PU weights...")          
         events = self[pu_weight](events, **kwargs)
+        print("Producing MuTau Trigger SFs weights...")          
+        events = self[trigger_weight_mutau](events, **kwargs)      
         print("Producing Muon weights...")
         events = self[muon_weight](events,do_syst = True, **kwargs)
         print("Producing Electron weights...")
@@ -133,8 +137,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
             print("Producing Top pT weights...")
             events = self[top_pt_weight](events, **kwargs)
-        print("Producing Fake Factor weights...")
-        events = self[fake_factors](events, **kwargs)
+        # print("Producing Fake Factor weights...")
+        # events = self[fake_factors](events, **kwargs)
         print("Producing phi_cp...")
         events = self[phi_cp](events, **kwargs)
     return events

@@ -45,7 +45,9 @@ def main_init(self: WeightProducer) -> None:
         "tau_weight_nom",
         "electron_weight_nom",
         "tauspinner_weight",
-        "zpt_weight"
+        "zpt_weight",
+        "top_pt_weight",
+        "trigger_weight_mutau_nom",
     }
     self.uses |= self.weight_columns
     
@@ -81,7 +83,9 @@ def ff_weight_producer(self: WeightProducer) -> None:
         "tau_weight_nom",
         "electron_weight_nom",
         "tauspinner_weight",
-        "zpt_weight"
+        "zpt_weight",
+        "top_pt_weight",
+        "trigger_weight_mutau_nom",
     }
     self.uses |= self.weight_columns
     

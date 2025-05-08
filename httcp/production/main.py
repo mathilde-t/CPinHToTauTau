@@ -18,7 +18,7 @@ from columnflow.production.util import attach_coffea_behavior
 from httcp.production.ReArrangeHcandProds import reArrangeDecayProducts, reArrangeGenDecayProducts
 from httcp.production.PhiCP_Producer import ProduceDetPhiCP, ProduceGenPhiCP
 
-from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight,fake_factors
+from httcp.production.weights import muon_weight, tau_weight, get_mc_weight, tauspinner_weight, zpt_weight, electron_weight,fake_factors, trigger_weight_mutau
 from httcp.production.sample_split import split_dy
 from httcp.production.generatorZ import genZ
 from httcp.production.met_recoil import gen_boson, met_recoil
@@ -42,6 +42,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         normalization_weights,
         split_dy,
         pu_weight,
+        trigger_weight_mutau,
         muon_weight,
         tau_weight,
         electron_weight,
@@ -50,7 +51,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         gen_boson,
         met_recoil,
         get_mc_weight,
-        fake_factors,
+        #fake_factors,
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
@@ -67,15 +68,20 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         normalization_weights,
         split_dy,
         pu_weight,
+        trigger_weight_mutau,
         muon_weight,
         get_mc_weight,
         tau_weight,
         electron_weight,
         genZ,
         zpt_weight,
+<<<<<<< HEAD
         gen_boson,
         met_recoil,
         fake_factors,
+=======
+        #fake_factors,
+>>>>>>> 0265d10 (First implemantation of SFs for mutau channel (singlemu or cross_mutau))
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
@@ -124,6 +130,8 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
        
         print("Producing PU weights...")          
         events = self[pu_weight](events, **kwargs)
+        print("Producing MuTau Trigger SFs weights...")          
+        events = self[trigger_weight_mutau](events, **kwargs)      
         print("Producing Muon weights...")
         events = self[muon_weight](events,do_syst = True, **kwargs)
         print("Producing Electron weights...")
@@ -132,10 +140,19 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-    print("Producing Fake Factor weights...")
-    events = self[fake_factors](events, **kwargs)
-    print("Producing phi_cp...")
-    events = self[phi_cp](events, **kwargs)  
+        print("Producing GenPartonTop...")
+        events = self[gen_parton_top](events, **kwargs)
+        top_pt_weight_dummy = ak.where(events.GenPartonTop.pt > 500.0, 500.0, events.GenPartonTop.pt)
+        top_pt_weight_dummy = ak.ones_like(top_pt_weight_dummy)
+        for variation in ("", "_up", "_down"):
+            events = set_ak_column(events, f"top_pt_weight{variation}", top_pt_weight_dummy)
+        if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
+            print("Producing Top pT weights...")
+            events = self[top_pt_weight](events, **kwargs)
+        print("Producing Fake Factor weights...")
+        events = self[fake_factors](events, **kwargs)
+        print("Producing phi_cp...")
+        events = self[phi_cp](events, **kwargs)
     return events
 
 
@@ -213,5 +230,11 @@ def ff_method(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         events = self[tau_weight](events,do_syst = True, **kwargs)
         print("Producing Tauspinner weights...")
         events = self[tauspinner_weight](events, **kwargs)
-  
+        top_pt_weight_dummy = ak.where(events.GenPartonTop.pt > 500.0, 500.0, events.GenPartonTop.pt)
+        top_pt_weight_dummy = ak.ones_like(top_pt_weight_dummy)
+        for variation in ("", "_up", "_down"):
+            events = set_ak_column(events, f"top_pt_weight{variation}", top_pt_weight_dummy)
+        if self.dataset_inst.has_tag("ttbar"):
+            print("Producing Top pT weights...")
+            events = self[top_pt_weight](events, **kwargs)
     return events

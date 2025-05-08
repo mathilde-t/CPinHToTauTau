@@ -33,7 +33,7 @@ from httcp.selection.higgscand import new_higgscand, mask_nans
 from httcp.production.aux_columns import channel_id, create_jetID_masks, jet_veto, add_tau_prods
 from httcp.selection.jets import jet_veto_map
 from httcp.selection.debug import debug_main
-
+from httcp.selection.met_filters_aux import met_filters_aux
 np = maybe_import("numpy")
 ak = maybe_import("awkward")
 coffea = maybe_import("coffea")
@@ -68,6 +68,7 @@ coffea = maybe_import("coffea")
         mask_nans,
         jet_veto_map,
         create_jetID_masks,
+        met_filters_aux,
     },
     produces={
         # selectors / producers whose newly created columns should be kept
@@ -94,6 +95,7 @@ coffea = maybe_import("coffea")
         mask_nans,
         jet_veto_map,
         create_jetID_masks,
+        met_filters_aux,
         "category_ids",
     },
     exposed=True,
@@ -123,6 +125,9 @@ def main(
     # met filter selection
     events, met_filter_results = self[met_filters](events, **kwargs)
     results += met_filter_results
+    # auxillary met filter selection
+    events, met_filter_aux_results = self[met_filters_aux](events, **kwargs)
+    results += met_filter_aux_results
 
     # muon selection
     # e.g. mu_idx: [ [0,1], [], [1], [0], [] ]

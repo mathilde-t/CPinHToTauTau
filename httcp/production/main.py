@@ -51,7 +51,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         gen_boson,
         met_recoil,
         get_mc_weight,
-        #fake_factors,
+        fake_factors,
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
@@ -75,13 +75,9 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         electron_weight,
         genZ,
         zpt_weight,
-<<<<<<< HEAD
         gen_boson,
         met_recoil,
         fake_factors,
-=======
-        #fake_factors,
->>>>>>> 0265d10 (First implemantation of SFs for mutau channel (singlemu or cross_mutau))
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
@@ -114,7 +110,7 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     events = self[met_recoil](events,**kwargs)
     events = self[hcand_mt](events, **kwargs) 
     events = self[category_ids](events, **kwargs)
-    
+
     if self.dataset_inst.is_mc:
         events = self[get_mc_weight](events, **kwargs)
         print("Producing Normalization weights...")
@@ -149,10 +145,10 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
             print("Producing Top pT weights...")
             events = self[top_pt_weight](events, **kwargs)
-        print("Producing Fake Factor weights...")
-        events = self[fake_factors](events, **kwargs)
-        print("Producing phi_cp...")
-        events = self[phi_cp](events, **kwargs)
+    print("Producing Fake Factor weights...")
+    events = self[fake_factors](events, **kwargs)
+    print("Producing phi_cp...")
+    events = self[phi_cp](events, **kwargs)
     return events
 
 

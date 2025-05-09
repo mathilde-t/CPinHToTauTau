@@ -164,7 +164,7 @@ def get_jec_config_default(self) -> DotDict:
         attach_coffea_behavior,
     },
     produces={
-        "Jet.pt", "Jet.mass", "Jet.rawFactor",
+        "Jet.pt", "Jet.phi", "Jet.mass", "Jet.rawFactor",
     },
     # custom uncertainty sources, defaults to config when empty
     uncertainty_sources=None,
@@ -311,7 +311,14 @@ def jec(
         rho=rho,
         evaluator_key="jec",
     )
-
+    # map jet phi into [-pi, pi] 
+    jet_phi_nc = events.Jet.phi
+    jet_phi = ak.where(
+            np.abs(jet_phi_nc) > np.pi,
+            jet_phi_nc - 2 * np.pi * np.sign(jet_phi_nc),
+            jet_phi_nc)
+    events = set_ak_column_f32(events, "Jet.phi", jet_phi)
+    
     # apply full jet correction
     events = set_ak_column_f32(events, "Jet.pt", events.Jet.pt_raw * jec_factors)
     events = set_ak_column_f32(events, "Jet.mass", events.Jet.mass_raw * jec_factors)

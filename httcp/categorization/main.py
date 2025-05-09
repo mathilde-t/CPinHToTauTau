@@ -6,6 +6,7 @@ Main categories file for the Higgs CP analysis
 
 from columnflow.categorization import Categorizer, categorizer
 from columnflow.util import maybe_import
+from httcp.util import get_lep_p4, get_ip_p4
 
 ak = maybe_import("awkward")
 np = maybe_import("numpy")
@@ -222,7 +223,7 @@ def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array
         upper_lim = events.hcand_etau.lep0.pfRelIso03_all < 2.
     elif channel == 'mutau': 
         isolation = events.hcand_mutau.lep0.pfRelIso04_all >= 0.15
-        upper_lim = events.hcand_mutau.lep0.pfRelIso04_all < 1.
+        upper_lim = events.hcand_mutau.lep0.pfRelIso04_all < 0.5
     else:
         raise NotImplementedError(
                 f'Can not find an isolation criteria for {channel} channel!')
@@ -230,47 +231,73 @@ def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array
     mask = mask & ak.fill_none(ak.firsts(upper_lim, axis=1),False)
     return events, mask
 
-@categorizer(uses={'event', 'n_jets'})
-def njets_geq2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    return events, ak.fill_none(events.n_jets >=2 ,False)
+from types import FunctionType
+from copy import copy
 
-@categorizer(uses={'event', 'n_jets'})
-def njets_eq1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    return events,  ak.fill_none(events.n_jets == 1 ,False)
+def copy_function(fn, name):
+    return FunctionType(
+    copy(fn.__code__),
+    copy(fn.__globals__),
+    name=name,
+    argdefs=copy(fn.__defaults__),
+    closure=copy(fn.__closure__)
+)
 
-@categorizer(uses={'event', 'n_jets'})
-def njets_eq0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    return events, ak.fill_none(events.n_jets == 0 ,False)
-
-
-
-@categorizer(uses={'event', 'hcand_*'})
-def dm0(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+def single_pnet_dm(self: Categorizer, events: ak.Array, dm: int, **kwargs):
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 0), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayModePNet == dm), axis=1),False)
     return events, mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def dm1(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+for the_dm in [0,1,2,10,11]:
+    tmp_func = lambda self, events, **kwargs: single_pnet_dm(self, events, dm=the_dm, **kwargs)
+    globals()[f'pnet_dm{the_dm}'] = categorizer(copy_function(tmp_func,f'pnet_dm{the_dm}'),
+                                               uses={'event', 'hcand_*'}, )
+    
+def single_hps_dm(self: Categorizer, events: ak.Array, dm: int, **kwargs):
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 1), axis=1),False)
+    mask = ak.fill_none(ak.firsts((events[f'hcand_{channel}'].lep1.decayMode == dm), axis=1),False)
     return events, mask
 
+for the_dm in [0,1,10,11]:
+    tmp_func = lambda self, events, **kwargs: single_hps_dm(self, events, dm=the_dm, **kwargs)
+    globals()[f'hps_dm{the_dm}'] = categorizer(copy_function(tmp_func,f'hps_dm{the_dm}'),
+                                               uses={'event', 'hcand_*'}, )
+
+def _njets(self: Categorizer, events: ak.Array, njets, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = (events.n_jets==njets if njets < 2 else events.n_jets>=njets)
+    return events, ak.fill_none(mask,False)
+
+for the_njets in [0,1,2]:
+    tmp_func = lambda self, events, **kwargs: _njets(self, events, njets=the_njets, **kwargs)
+    globals()[f'njets_eq{the_njets}'] = categorizer(copy_function(tmp_func,f'njets_eq{the_njets}'),
+                                               uses={'event', 'n_jets'}, )
+
+#Helper category for check of jet veto maps (not used in the main analysis)
+@categorizer(uses={"Jet*", "Muon*"}) 
+def jet_veto_maps_jets(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    jet = events.Jet
+    muon = events.Muon[events.Muon.isPFcand]
+    jet_mask = (
+        (jet.pt > 15) &
+        (jet.jetId >= 2) &  # tight id 
+        ((jet.chEmEF + jet.neEmEF) < 0.9) &
+        ak.all(jet.metric_table(muon) >= 0.2, axis=2) &
+        (np.abs(jet.eta) < 5.191)    # https://cms-nanoaod-integration.web.cern.ch/commonJSONSFs/summaries/JME_2022_Prompt_jetvetomaps.html
+    )
+    jet_mask = ak.fill_none(jet_mask, False)
+    
+    return events, ak.all(jet_mask, axis=1)
+
+#Tau impact parameter cut used in definition of mupi category
 @categorizer(uses={'event', 'hcand_*'})
-def dm2(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+def tau_ip_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 2), axis=1),False)
+    mask = ak.fill_none(ak.firsts(events[f'hcand_{channel}'].lep1.ip_sig >= 1.25, axis=1),False)
     return events, mask
 
-@categorizer(uses={'event', 'hcand_*'})
-def dm10(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 10), axis=1),False)
-    return events, mask
-
-@categorizer(uses={'event', 'hcand_*'})
-def dm11(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    channel = self.config_inst.channels.names()[0]
-    mask = ak.fill_none(ak.firsts((np.abs(events[f'hcand_{channel}'].lep1.decayModePNet) == 11), axis=1),False)
+#Cut  on energy split between charged and neutral pion used in definition of murho and mu a1 categories
+@categorizer(uses={'event', 'pion_E_split'})
+def pion_E_split_cut(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    mask = ak.fill_none(events.pion_E_split > 0.2, False)
     return events, mask
 

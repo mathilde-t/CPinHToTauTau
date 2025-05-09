@@ -29,7 +29,7 @@ warn = maybe_import("warnings")
     },
     mc_only=True,
 )
-def generatorZ(
+def genZ(
         self : Producer,
         events : ak.Array,
         **kwargs) -> ak.Array:

@@ -23,7 +23,7 @@ set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
                 ] 
     },
     produces={
-        "Tau.pt", "Tau.mass", "Tau.pt_no_tes", "Tau.mass_no_tes" 
+        "Tau.pt","Tau.phi", "Tau.mass", "Tau.pt_no_tes", "Tau.mass_no_tes" 
     },
     mc_only=True,
 )
@@ -81,6 +81,15 @@ def tau_energy_scale(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
     events = set_ak_column_f32(events, "Tau.mass_no_tes", ak.unflatten(tau_mass, arr_shape))
     events = set_ak_column_f32(events, "Tau.pt", ak.unflatten(tau_pt * tes_nom, arr_shape))
     events = set_ak_column_f32(events, "Tau.mass", ak.unflatten(tau_mass * tes_nom, arr_shape))
+    
+    #Set tau phi to be within [-pi,pi]
+    tau_phi_nc = events.Tau.phi
+    tau_phi = ak.where(
+            np.abs(tau_phi_nc) > np.pi,
+            tau_phi_nc - 2 * np.pi * np.sign(tau_phi_nc),
+            tau_phi_nc)
+    events = set_ak_column_f32(events, "Tau.phi", tau_phi)
+    
     return events
 
 @tau_energy_scale.requires

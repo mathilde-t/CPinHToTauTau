@@ -22,7 +22,7 @@ warn = maybe_import("warnings")
 set_ak_column_f32 = functools.partial(set_ak_column, value_type=np.float32)
 set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
 
-def egamma_mask(tauprod): return ((np.abs(tauprod.pdgId) == 11) + (np.abs(tauprod.pdgId) == 22))
+def egamma_mask(tauprod): return ((np.abs(tauprod.pdgId) == 11) + (tauprod.pdgId == 22))
 
 def pion_mask(tauprod): return np.abs(tauprod.pdgId) == 211
 

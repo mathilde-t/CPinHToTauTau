@@ -33,7 +33,6 @@ from httcp.selection.higgscand import new_higgscand, mask_nans
 
 from httcp.production.aux_columns import channel_id, create_jetID_masks, jet_veto, add_tau_prods
 from httcp.selection.jets import jet_veto_map
-from httcp.selection.debug import debug_main
 from httcp.selection.met_filters_aux import met_filters_aux
 np = maybe_import("numpy")
 ak = maybe_import("awkward")

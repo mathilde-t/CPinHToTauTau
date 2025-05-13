@@ -700,22 +700,23 @@ def trigger_weight_mutau(self: Producer, events: ak.Array, **kwargs) -> ak.Array
     one_like_array = np.ones_like(eff_trig_mu_Data_nom, dtype=np.float32)
     
     # Evauation of the nominal efficiencies for data and mc
-    eff_data = Pass_mu_trig*eff_trig_mu_Data_nom + Pass_mu_trig*Pass_mutau_trig*(eff_xtrig_mu_Data_nom - eff_trig_mu_Data_nom)*eff_xtrig_tau_Data_nom
-    eff_mc   = Pass_mu_trig*eff_trig_mu_MC_nom + Pass_mu_trig*Pass_mutau_trig*(eff_xtrig_mu_MC_nom - eff_trig_mu_MC_nom)*eff_xtrig_tau_MC_nom
+    eff_data = Pass_mu_trig*eff_trig_mu_Data_nom - Pass_mu_trig*Pass_mutau_trig*eff_trig_mu_Data_nom*eff_xtrig_tau_Data_nom + Pass_mutau_trig*eff_xtrig_mu_Data_nom*eff_xtrig_tau_Data_nom
+
+    eff_mc = Pass_mu_trig*eff_trig_mu_MC_nom - Pass_mu_trig*Pass_mutau_trig*eff_trig_mu_MC_nom*eff_xtrig_tau_MC_nom + Pass_mutau_trig*eff_xtrig_mu_MC_nom*eff_xtrig_tau_MC_nom
     
     SF = eff_data/eff_mc
     # Evauation of the partial derivaties for data and mc
-    delta_eff_data_nom_delta_eff_trig_mu = Pass_mu_trig + Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_Data_nom
-    delta_eff_data_nom_delta_eff_xtrig_mu = Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_Data_nom
-    delta_eff_data_nom_delta_eff_xtrig_tau = Pass_mu_trig*Pass_mutau_trig*(eff_xtrig_mu_Data_nom - eff_trig_mu_Data_nom)
+    delta_eff_data_nom_delta_eff_trig_mu = Pass_mu_trig - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_Data_nom
+    delta_eff_data_nom_delta_eff_xtrig_mu = Pass_mutau_trig*eff_xtrig_tau_Data_nom
+    delta_eff_data_nom_delta_eff_xtrig_tau = Pass_mutau_trig*eff_xtrig_mu_Data_nom - Pass_mu_trig*Pass_mutau_trig*eff_trig_mu_Data_nom 
     
     delta_eff_data_mu = (eff_trig_mu_Data_up - eff_trig_mu_Data_nom)
     delta_eff_data_xmu = (eff_xtrig_mu_Data_up - eff_xtrig_mu_Data_nom)
     delta_eff_data_xtau =  (eff_xtrig_tau_Data_up - eff_xtrig_tau_Data_nom)
-    
-    delta_eff_mc_nom_delta_eff_trig_mu = Pass_mu_trig + Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_MC_nom
-    delta_eff_mc_nom_delta_eff_xtrig_mu = Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_MC_nom
-    delta_eff_mc_nom_delta_eff_xtrig_tau = Pass_mu_trig*Pass_mutau_trig*(eff_xtrig_mu_MC_nom - eff_trig_mu_MC_nom)
+
+    delta_eff_mc_nom_delta_eff_trig_mu = Pass_mu_trig - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_MC_nom
+    delta_eff_mc_nom_delta_eff_xtrig_mu = Pass_mutau_trig*eff_xtrig_tau_MC_nom
+    delta_eff_mc_nom_delta_eff_xtrig_tau = Pass_mutau_trig*eff_xtrig_mu_MC_nom - Pass_mu_trig*Pass_mutau_trig*eff_trig_mu_MC_nom
     
     delta_eff_mc_mu   = (eff_trig_mu_MC_up - eff_trig_mu_MC_nom)
     delta_eff_mc_xmu  = (eff_xtrig_mu_MC_up - eff_xtrig_mu_MC_nom)
@@ -731,32 +732,44 @@ def trigger_weight_mutau(self: Producer, events: ak.Array, **kwargs) -> ak.Array
     SF_UP   = SF + DELTA_EFF
     SF_DOWN = SF - DELTA_EFF
     
-    
     # If  eff_mu_trig_Data_nom >  eff_mu_xtrig_Data_nom and  eff_mu_trig_MC_nom > eff_mu_xtrig_MC_nom
-    
+
     # Evauation of the nominal efficiencies for data and mc
-    eff_data = eff_trig_mu_Data_nom 
-    eff_mc   = eff_trig_mu_MC_nom
-    SF_1 = eff_data/eff_mc
+
+    eff_data_1 = Pass_mu_trig*eff_trig_mu_Data_nom - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_mu_Data_nom*eff_xtrig_tau_Data_nom + Pass_mutau_trig*eff_xtrig_mu_Data_nom*eff_xtrig_tau_Data_nom
+
+    eff_mc_1 = Pass_mu_trig*eff_trig_mu_MC_nom - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_mu_MC_nom*eff_xtrig_tau_MC_nom + Pass_mutau_trig*eff_xtrig_mu_MC_nom*eff_xtrig_tau_MC_nom
+
+    SF_1 = eff_data_1/eff_mc_1
     
     # Evauation of the partial derivaties for data and mc
-    delta_eff_data_nom_delta_eff_trig_mu = Pass_mu_trig
-    delta_eff_data_mu = (eff_trig_mu_Data_up - eff_xtrig_mu_Data_nom)
+    delta_eff_data_nom_delta_eff_trig_mu = Pass_mu_trig 
+    delta_eff_data_nom_delta_eff_xtrig_mu = Pass_mutau_trig*eff_xtrig_tau_Data_nom - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_Data_nom
+    delta_eff_data_nom_delta_eff_xtrig_tau = Pass_mutau_trig*eff_xtrig_mu_Data_nom - Pass_mutau_trig*eff_xtrig_mu_Data_nom
+
+    delta_eff_data_mu = (eff_trig_mu_Data_up - eff_trig_mu_Data_nom)
+    delta_eff_data_xmu = (eff_xtrig_mu_Data_up - eff_xtrig_mu_Data_nom)
+    delta_eff_data_xtau =  (eff_xtrig_tau_Data_up - eff_xtrig_tau_Data_nom)
+
     delta_eff_mc_nom_delta_eff_trig_mu = Pass_mu_trig 
+    delta_eff_mc_nom_delta_eff_xtrig_mu = Pass_mutau_trig*eff_xtrig_tau_MC_nom - Pass_mu_trig*Pass_mutau_trig*eff_xtrig_tau_MC_nom
+    delta_eff_mc_nom_delta_eff_xtrig_tau = Pass_mutau_trig*eff_xtrig_mu_MC_nom - Pass_mutau_trig*eff_xtrig_mu_MC_nom
+
     delta_eff_mc_mu   = (eff_trig_mu_MC_up - eff_trig_mu_MC_nom)
+    delta_eff_mc_xmu  = (eff_xtrig_mu_MC_up - eff_xtrig_mu_MC_nom)
+    delta_eff_mc_xtau =  (eff_xtrig_tau_MC_up - eff_xtrig_tau_MC_nom)
 
     # Evauation of the partial derivaties for data and mc
-    Delta_eff_data = delta_eff_data_nom_delta_eff_trig_mu*delta_eff_data_mu 
-    Delta_eff_mc   = delta_eff_mc_nom_delta_eff_trig_mu*delta_eff_mc_mu 
-    
-    DELTA_EFF_sq = np.sqrt((Delta_eff_data/eff_data)**2 + (Delta_eff_mc/eff_mc)**2)
+    Delta_eff_data = delta_eff_data_nom_delta_eff_trig_mu*delta_eff_data_mu + delta_eff_data_nom_delta_eff_xtrig_mu*delta_eff_data_xmu + delta_eff_data_nom_delta_eff_xtrig_tau*delta_eff_data_xtau
+    Delta_eff_mc   = delta_eff_mc_nom_delta_eff_trig_mu*delta_eff_mc_mu + delta_eff_mc_nom_delta_eff_xtrig_mu*delta_eff_mc_xmu + delta_eff_mc_nom_delta_eff_xtrig_tau*delta_eff_mc_xtau
+
+    DELTA_EFF_sq = np.sqrt((Delta_eff_data/eff_data_1)**2 + (Delta_eff_mc/eff_mc_1)**2)
     DELTA_EFF    = SF_1*DELTA_EFF_sq
     
     SF_1_UP   = SF_1 + DELTA_EFF
     SF_1_DOWN = SF_1 - DELTA_EFF
     
     mask = (eff_trig_mu_Data_nom < eff_xtrig_mu_Data_nom)
-
     SF_final = ak.where(mask,SF,SF_1)
     SF_final_UP = ak.where(mask,SF_UP,SF_1_UP)
     SF_final_DOWN = ak.where(mask,SF_DOWN,SF_1_DOWN)

@@ -26,20 +26,20 @@ def example(self):
     )
 
    
-    self.add_category(
-        "cat_mutau_abcd_ar",
-        config_category="cat_mutau_abcd_ar",
-        config_variable="mutau_mt",
-        config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
-        mc_stats=True,
-    )
+    # self.add_category(
+    #     "cat_mutau_abcd_ar",
+    #     config_category="cat_mutau_abcd_ar",
+    #     config_variable="mutau_mt",
+    #     config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
+    #     mc_stats=True,
+    # )
 
     
     # processes and datasets
 
     process_vs_dataset_names = {
         "data": ["data_singlemu_C", "data_mu_C", "data_mu_D"],       
-        
+    
         #Drell-Yan
         "dy_z2ee": ["dy_lep_madgraph"],
         "dy_z2mumu": ["dy_lep_madgraph"],
@@ -54,24 +54,30 @@ def example(self):
         "st": ["st_twchannel_t_sl", "st_twchannel_tbar_sl", "st_twchannel_tbar_dl", "st_tchannel_tbar", "st_tchannel_t", "st_schannel_t_lep", "st_schannel_tbar_lep"], #single top inclusive
         #signal
         "h_ggf_htt": ["h_ggf_htt_filtered"], #SM Higgs signal
+        "qcd": [""], #QCD data-driven
     }
  
     find_datasets = functools.partial(get_datasets_from_process, self.config_inst, strategy="all")
 
     for process_name, dataset_names in process_vs_dataset_names.items():
-
+ 
         is_signal = False
-        dataset_names_tmp = [dataset.name for dataset in find_datasets(process_name)]
-        print(process_name, dataset_names_tmp)
+        data_driven = False
         
         if process_name == "h_ggf_htt": 
             is_signal = True
- 
+        if process_name == "qcd": 
+            data_driven = True
+            
+        # if not data_driven:       
+        #     dataset_names_tmp = [dataset.name for dataset in find_datasets(process_name)]
+
         self.add_process(
             process_name,
             config_process=process_name,
             config_mc_datasets=dataset_names,
             is_signal=is_signal,
+#            data_driven = data_driven, 
         )
 
     #

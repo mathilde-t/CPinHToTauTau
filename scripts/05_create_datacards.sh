@@ -17,6 +17,7 @@ args=(
         --cf.MergeSelectionStats-version $version
         --cf.ProvideReducedEvents-version $version
         --inference-model example
+        --hist-hooks good_old_abcd
         "${@:2}"
     )
 echo law run cf.CreateDatacards "${args[@]}"

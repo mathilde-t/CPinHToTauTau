@@ -7,17 +7,14 @@ args=(
 
         --cf.CalibrateEvents-workflow $workflow
         --cf.CalibrateEvents-version $version
-        --version $version
         --cf.SelectEvents-workflow $workflow
         --cf.SelectEvents-version $version
-        
         --cf.MergeReducedEvents-workflow $workflow
         --cf.MergeReducedEvents-version $version
-        
+        --version $version
         --cf.MergeSelectionStats-version $version
         --cf.ProvideReducedEvents-version $version
         --inference-model example
-        --hist-hooks good_old_abcd
         "${@:2}"
     )
 echo law run cf.CreateDatacards "${args[@]}"

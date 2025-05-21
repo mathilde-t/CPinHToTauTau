@@ -24,7 +24,8 @@ def main(self: WeightProducer, events: ak.Array, **kwargs) -> ak.Array:
     
     weight = ak.Array(np.ones(len(events), dtype=np.float32))
     for column in self.weight_columns:
-        if not ak.any(['tt' in proc for proc in processes]) and column == 'top_pt_weight':
+        if ((self.dataset_inst.has_tag("ttbar")^True) & (column == 'top_pt_weight')):
+
             print("===")
             print(weight)
             print(Route(column).apply(events),column)

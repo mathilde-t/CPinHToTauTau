@@ -980,8 +980,8 @@ def add_run3(ana: od.Analysis,
     from MSSM_H_tt.config.variables import add_variables
     add_variables(cfg)
     
-    from MSSM_H_tt.data_driven.hist_hooks import add_hist_hooks
-    add_hist_hooks(cfg)
+    from data_driven.hist_hooks import add_hist_hooks # commond method for data_driven estimation, MSSM should only use good_old_abcd
+    add_hist_hooks(cfg)  
 
 
     

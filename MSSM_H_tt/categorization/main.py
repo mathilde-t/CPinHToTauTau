@@ -35,6 +35,31 @@ def cat_emu(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak
     mask = ak.num(events.hcand_emu.lep0.pt > 0, axis =1) > 0
     return events, mask 
 
+@categorizer(uses={'event', 'hcand_*'})
+def lep_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
+    if channel == 'emu': 
+        isolation = events.hcand_emu.lep1.pfRelIso04_all < 0.2
+    else:
+        raise NotImplementedError(
+                f'Can not find an isolation criteria for {channel} channel!')
+    mask = ak.fill_none(ak.firsts(isolation, axis=1),False)
+    return events, mask
+
+@categorizer(uses={'event', 'hcand_*'})
+def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
+    channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
+    if channel == 'emu':
+        isolation = events.hcand_mutau.lep1.pfRelIso04_all >= 0.2
+        upper_lim = events.hcand_mutau.lep1.pfRelIso04_all < 0.5
+    else:
+        raise NotImplementedError(
+                f'Can not find an isolation criteria for {channel} channel!')
+    mask = ak.fill_none(ak.firsts(isolation, axis=1),False)
+    mask = mask & ak.fill_none(ak.firsts(upper_lim, axis=1),False)
+    return events, mask
+
+
 @categorizer(uses={'hcand_tautau.*'})
 def cat_tautau(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     mask = ak.num(events.hcand_tautau.lep0.pt > 0, axis =1) > 0

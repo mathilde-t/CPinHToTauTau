@@ -50,8 +50,8 @@ def lep_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak
 def lep_inv_iso(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
     channel = self.config_inst.channels.names()[0] #We are processing a single channel at once
     if channel == 'emu':
-        isolation = events.hcand_mutau.lep1.pfRelIso04_all >= 0.2
-        upper_lim = events.hcand_mutau.lep1.pfRelIso04_all < 0.5
+        isolation = events.hcand_emu.lep1.pfRelIso04_all >= 0.2
+        upper_lim = events.hcand_emu.lep1.pfRelIso04_all < 0.5
     else:
         raise NotImplementedError(
                 f'Can not find an isolation criteria for {channel} channel!')

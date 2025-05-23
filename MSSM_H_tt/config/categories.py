@@ -60,7 +60,7 @@ def add_categories(config: od.Config,
     def create_child_categories(config, parent_categories, child_category_map):
         for cat_name in parent_categories:
             #skip 0-level categories that are used to define channelss
-            if cat_name in ['incl', 'cat_mutau', 'cat_etau','cat_emu']: continue
+            if cat_name in ['incl', 'cat_mutau', 'cat_etau', 'cat_tautau', 'cat_emu']: continue
             parent_cat = config.get_category(cat_name)
             for child_name, child_cat in child_category_map.items():
                 add_child_category(config, parent_cat, child_cat, child_name)
@@ -85,6 +85,15 @@ def add_categories(config: od.Config,
             selection=["cat_mutau"],
             label=r"$\mu\tau$ inclusive",)
         
+        
+    if channel=='tautau':
+        add_category(
+            config,
+            name="cat_tautau",
+            id=2,
+            selection=["cat_tautau"],
+            label=r"$\mu\tau$ inclusive",)  
+
     if channel=='etau':
         add_category(
             config,

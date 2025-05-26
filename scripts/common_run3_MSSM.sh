@@ -11,9 +11,9 @@ categories_etau="cat_etau_sr"
 # cat_etau_sr_no_mT,cat_etau_sr_b_jets,cat_etau_sr_b_jets_no_mT,cat_etau_sr_0_bjets,cat_etau_sr_0_bjets_endcap_tau,cat_etau_sr_0_bjets_barrel_tau,cat_etau_sr_0_bjets_no_mt,cat_etau_sr_0_bjets_endcap_tau_no_mt,cat_etau_sr_0_bjets_barrel_tau_no_mt,cat_etau_sr_1_bjets,cat_etau_sr_1_bjets_endcap_tau,cat_etau_sr_1_bjets_barrel_tau,cat_etau_sr_1_bjets_no_mt,cat_etau_sr_1_bjets_endcap_tau_no_mt,cat_etau_sr_1_bjets_barrel_tau_no_mt,cat_etau_sr_2_bjets,cat_etau_sr_2_bjets_endcap_tau,cat_etau_sr_2_bjets_barrel_tau,cat_etau_sr_2_bjets_no_mt,cat_etau_sr_2_bjets_endcap_tau_no_mt,cat_etau_sr_2_bjets_barrel_tau_no_mt"
 variables_etau='N_b_jets,N_jets_pT_20_eta_2_5_Tight,mjj,N_jets_pT_20_eta_4_7_Tight,Leading_jet_pt,Subleading_jet_pt,delta_eta_jj,etau_lep0_pt,etau_lep0_eta,etau_lep0_phi,etau_lep0_ip_sig,etau_lep1_pt,etau_lep1_eta,etau_lep1_phi,etau_lep1_mass,etau_lep1_decayModePNet,etau_lep1_decayMode,etau_mt,etau_mvis,etau_delta_r,etau_pt,puppi_met_pt,puppi_met_phi'
 
-
 categories_emu="cat_emu_sr"
 #,cat_emu_sr_no_mT,cat_emu_sr_b_jets,cat_emu_sr_b_jets_no_mT,cat_emu_sr_0_bjets,cat_emu_sr_0_bjets_endcap_tau,cat_emu_sr_0_bjets_barrel_tau,cat_emu_sr_0_bjets_no_mt,cat_emu_sr_0_bjets_endcap_tau_no_mt,cat_emu_sr_0_bjets_barrel_tau_no_mt,cat_emu_sr_1_bjets,cat_emu_sr_1_bjets_endcap_tau,cat_emu_sr_1_bjets_barrel_tau,cat_emu_sr_1_bjets_no_mt,cat_emu_sr_1_bjets_endcap_tau_no_mt,cat_emu_sr_1_bjets_barrel_tau_no_mt,cat_emu_sr_2_bjets,cat_emu_sr_2_bjets_endcap_tau,cat_emu_sr_2_bjets_barrel_tau,cat_emu_sr_2_bjets_no_mt,cat_emu_sr_2_bjets_endcap_tau_no_mt,cat_emu_sr_2_bjets_barrel_tau_no_mt"
+
 variables_emu='emu_mt_tot,emu_mt_emu,D_zeta,emu_mt_e,emu_mt_mu,N_jets_pT_20_eta_4_7_Tight,leading_jet_eta,subleading_jet_eta,leading_jet_phi,subleading_jet_phi,N_b_jets,mjj,N_jets_pT_20_eta_4_7_Tight,leading_jet_pt,subleading_jet_pt,delta_eta_jj,emu_lep0_pt,emu_lep0_eta,emu_lep0_phi,emu_lep0_ip_sig,emu_lep1_pt,emu_lep1_eta,emu_lep1_phi,emu_lep1_ip_sig,emu_mvis,emu_delta_r,emu_pt,puppi_met_pt,puppi_met_phi'
 
 data_e_2022preEE='data_e_C,data_e_D,'
@@ -44,16 +44,16 @@ case $1 in
         config="run3_2022_preEE_etau_limited"	
         datasets='data_e_C,dy_lep_madgraph'
         processes='data,dy_z2tautau,dy_z2mumu,dy_z2ee'
-	    categories='cat_etau_sr'
-	    variables='N_b_jets'
+	      categories='cat_etau_sr'
+	      variables='N_b_jets'
         workflow='local'
     ;;
     "run3_2022preEE_emu_lim")
         config="run3_2022_preEE_emu_limited"	
         datasets='dy_lep_madgraph,h_tt_100,data_e_C' 
         processes='dy_lep,h_ggf_htt,data'
-	    categories='cat_emu_sr'
-	    variables='emu_lep0_pt'
+	      categories='cat_emu_sr'
+	      variables='emu_lep0_pt'
         workflow='local'
     ;;
     "run3_2022preEE_mutau_lim")
@@ -87,17 +87,17 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$data$bkg_ewk$bkg_top$bkg_ttbar$mssm_signal
         processes='dy_lep,vv,tt,st,wj,data,h_ggf_htt'
-	    categories='cat_emu_sr'
-	    variables=$variables_emu
-	    workflow='htcondor'
+	      categories='cat_emu_sr'
+	      variables=$variables_emu
+	      workflow='htcondor'
     ;;
     "run3_2022preEE_emu_st")
         config="run3_2022_preEE_emu"
         datasets='st_twchannel_t_dl'
         processes='st'
-	    categories='cat_emu_sr'
-	    variables='N_b_jets'
-	    workflow='local'
+	      categories='cat_emu_sr'
+	      variables='N_b_jets'
+	      workflow='local'
     ;;
     "run3_2022preEE_mutau")
         config="run3_2022_preEE_mutau"
@@ -107,8 +107,8 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	    categories=$categories_mutau
-	    variables=$variables_mutau
+	      categories=$categories_mutau
+	      variables=$variables_mutau
         workflow='htcondor'
      ;;
 ################################
@@ -126,8 +126,8 @@ case $1 in
         config="run3_2022_postEE_emu_limited"
         datasets='data_egamma_E'
         processes='data'
-	    categories='cat_emu_sr'
-	    variables='D_zeta' #emu_mt_e,emu_mt_mu,emu_mt_tot,emu_mt_emu'
+	      categories='cat_emu_sr'
+	      variables='D_zeta' #emu_mt_e,emu_mt_mu,emu_mt_tot,emu_mt_emu'
         workflow='local'
     ;;
     "run3_2022postEE_mutau_lim")

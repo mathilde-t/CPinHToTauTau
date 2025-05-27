@@ -51,7 +51,8 @@ from httcp.util import IF_RUN2, IF_RUN3, IF_ALLOW_STITCHING
     
 #from httcp.production.apply_FastMTT import apply_fastMTT
 #from httcp.production.produce_px_py_pz import produce_px_py_pz
-from httcp.production.produce_px_py_pz import calculate_higgs_mass_genlevel
+#from httcp.production.produce_px_py_pz import calculate_higgs_mass_genlevel
+from httcp.production.PV_Theta_GJ import compute_theta_GJ
 
 np = maybe_import("numpy")
 ak = maybe_import("awkward")        
@@ -78,6 +79,7 @@ logger = law.logger.get_logger(__name__)
         #apply_fastMTT,
         #produce_px_py_pz,
         #calculate_higgs_mass_genlevel,
+        compute_theta_GJ,
     },
     produces={
         # new columns
@@ -93,6 +95,7 @@ logger = law.logger.get_logger(__name__)
         #apply_fastMTT,
         #produce_px_py_pz,
         #calculate_higgs_mass_genlevel,
+        compute_theta_GJ,
     },
 )
 def hcand_features(
@@ -145,6 +148,12 @@ def hcand_features(
     #logger.info(" >>>--- produce .px, .py, .pz's --->>>")
     #events = self[produce_px_py_pz](events, **kwargs)
     #events = self[calculate_higgs_mass_genlevel](events, **kwargs)
+
+    # ########################## #
+    #          Theta_GJ          #
+    # ########################## #
+    #logger.info(" >>>--- compute theta_GJ --->>>")
+    events = self[compute_theta_GJ](events, **kwargs)
     
 
     # ########################### #

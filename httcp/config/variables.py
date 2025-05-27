@@ -468,6 +468,13 @@ def add_hcand_features(cfg: od.Config) -> None:
                     )
 
     cfg.add_variable(
+            name=f"theta_GJ_scalar",
+            expression=f"theta_GJ_scalar",
+            null_value=EMPTY_FLOAT,
+            binning=(25, -1.1, 1.1),
+            x_title=r" $\theta_{GJ}$",
+        )
+    cfg.add_variable(
             name=f"GenHiggs_mass",
             expression=f"GenHiggs_mass",
             null_value=EMPTY_FLOAT,

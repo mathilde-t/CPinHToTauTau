@@ -108,9 +108,7 @@ def add_categories(config: od.Config,
             name="cat_emu",
             id=4,
             selection=["cat_emu"],
-            label=r"$e\tau$ inclusive")
-    
-    
+            label=r"$e\mu$ inclusive")
     
     #Define initial category map with selections and call the function
     #Don't change this part: it is important for fake factor method    

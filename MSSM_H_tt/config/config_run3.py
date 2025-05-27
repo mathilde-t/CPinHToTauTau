@@ -94,6 +94,7 @@ def add_run3(ana: od.Analysis,
         "data_tau",
         "data_e",
         "data_egamma",
+        "data_muoneg",
         "data_singlemu",
         #Drell-Yan
         "dy_lep",
@@ -141,10 +142,10 @@ def add_run3(ana: od.Analysis,
     # add datasets we need to study
     dataset_names_2022preEE = [
         #data
-        "data_e_C",
-        "data_e_D",
         "data_egamma_C",
         "data_egamma_D",
+        "data_muoneg_C",
+        "data_muoneg_D",
         "data_singlemu_C",
         "data_mu_C",
         "data_mu_D",
@@ -184,12 +185,12 @@ def add_run3(ana: od.Analysis,
 
     dataset_names_2022postEE = [
         #data
-        "data_e_E",
-        "data_e_F",
-        "data_e_G",
         "data_egamma_E",
         "data_egamma_F",
         "data_egamma_G",
+        "data_muoneg_E",
+        "data_muoneg_F",
+        "data_muoneg_G",
         "data_mu_E",
         "data_mu_F",
         "data_mu_G",
@@ -230,10 +231,10 @@ def add_run3(ana: od.Analysis,
     
     dataset_names_2023preBPix = [
         #data
-        "data_e_Cv123",
-        "data_e_Cv4",
         "data_egamma_Cv123",
         "data_egamma_Cv4",
+        "data_muoneg_Cv123",
+        "data_muoneg_Cv4",
         "data_mu_Cv123",
         "data_mu_Cv4",
         #Drell-Yan
@@ -270,8 +271,8 @@ def add_run3(ana: od.Analysis,
     
     dataset_names_2023postBPix = [
         #data
-        "data_e_D",
         "data_egamma_D",
+        "data_muoneg_D",
         "data_mu_D",
         #Drell-Yan
         "dy_lep_madgraph",

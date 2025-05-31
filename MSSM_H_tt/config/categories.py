@@ -145,3 +145,14 @@ def add_categories(config: od.Config,
     create_child_categories(config,
                         parent_categories=config.categories.names(),
                         child_category_map=child_category_map)
+
+    grand_child_category_map  = DotDict.wrap({
+
+        "dzl"    : {'selection' : ["D_zeta_cut_low"], 'label'     : f" \n $ -35 \leq D_{{\zeta}} < -10$",},
+        "dzm"    : {'selection' : ["D_zeta_cut_mid"], 'label'     : f" \n $ -10 \leq D_{{\zeta}} < 30 $",},
+        "dzh"    : {'selection' : ["D_zeta_cut_high"], 'label'     : f" \n $D_{{\zeta}}\geq 30$",},       
+        })
+    
+    create_child_categories(config,
+                        parent_categories=config.categories.names(),
+                        child_category_map=grand_child_category_map)

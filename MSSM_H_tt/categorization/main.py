@@ -202,5 +202,5 @@ def D_zeta_cut_mid(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Ar
 
 @categorizer(uses={'D_zeta'})
 def D_zeta_cut_high(self: Categorizer, events: ak.Array, **kwargs) -> tuple[ak.Array, ak.Array]:
-    mask = events.D_zeta >= 30
+    mask = (events.D_zeta >= 30)
     return events, mask

@@ -21,7 +21,7 @@ def example(self):
         "cat_emu_sr",
         config_category="cat_emu_sr",
         config_variable="emu_mt_tot",
-        config_data_datasets=["data_e_C","data_e_D","data_singlemu_C","data_mu_C","data_mu_D","data_singlemu_C"],
+        config_data_datasets=["data_egamma_E","data_egamma_F","data_egamma_G","data_mu_E","data_mu_F","data_mu_G"],
         mc_stats=True,
     )
 
@@ -38,12 +38,13 @@ def example(self):
     # processes and datasets
     # Setting for preEE
     process_vs_dataset_names = {
-        "data": ["data_e_C","data_e_D","data_singlemu_C","data_mu_C","data_mu_D","data_singlemu_C"],       
+        "data": ["data_egamma_E","data_egamma_F","data_egamma_G","data_mu_E","data_mu_F","data_mu_G"],       
     
         #Drell-Yan
-        "dy_z2ee": ["dy_lep_madgraph"],
-        "dy_z2mumu": ["dy_lep_madgraph"],
-        "dy_z2tautau": ["dy_lep_madgraph"],
+        "dy_lep": ["dy_lep_madgraph"],
+        # "dy_z2ee": ["dy_lep_madgraph"],
+        # "dy_z2mumu": ["dy_lep_madgraph"],
+        # "dy_z2tautau": ["dy_lep_madgraph"],
   
         "wj": ["wj_incl_madgraph"],
         #diboson

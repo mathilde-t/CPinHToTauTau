@@ -33,7 +33,7 @@ data_egamma_2023preBPix='data_egamma_Cv123,data_egamma_Cv4,'
 data_egamma_2023postBPix='data_egamma_D,'
 data_muoneg_2023preBPix='data_muoneg_Cv123,data_muoneg_Cv4,'
 data_muoneg_2023postBPix='data_muoneg_D,'
-#data_mu_2023preBPix='data_mu_Cv4,' #data_mu_Cv123
+data_mu_2023preBPix='data_mu_Cv4,data_mu_Cv123,'
 data_mu_2023postBPix='data_mu_D,'
 
 case $1 in
@@ -52,16 +52,16 @@ case $1 in
         config="run3_2022_preEE_emu_limited"	
         datasets='dy_lep_madgraph' #h_tt_100' 
         processes='dy_lep' #h_ggf_htt' #data,dy_lep,
-	    categories='cat_emu_sr'
-	    variables='emu_lep0_pt,emu_lep1_pt'
+	      categories='cat_emu_sr'
+	      variables='emu_lep0_pt,emu_lep1_pt'
         workflow='local'
     ;;
     "run3_2022preEE_mutau_lim")
         config="run3_2022_preEE_mutau_limited"	
         datasets='data_mu_C,dy_lep_madgraph'
         processes='dy_z2mumu,dy_z2ee,dy_z2tautau,data'
-	    categories='cat_mutau_sr'
-	    variables='N_b_jets'
+	      categories='cat_mutau_sr'
+	      variables='N_b_jets'
         workflow='local'
     ;;
 #########################
@@ -75,8 +75,8 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$data$bkg_ewk$bkg_top$bkg_ttbar
         processes='data,dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj'
-	    categories=$categories_etau
-	    variables=$variables_etau
+	      categories=$categories_etau
+	      variables=$variables_etau
         workflow='htcondor'
     ;;
     "run3_2022preEE_emu")
@@ -87,9 +87,9 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$data$bkg_ewk$bkg_top$bkg_ttbar$mssm_signal
         processes='dy_lep,vv,tt,st,wj,data,h_ggf_htt'
-	    categories='cat_emu_sr'
-	    variables=$variables_emu
-	    workflow='htcondor'
+	      categories='cat_emu_sr'
+	      variables=$variables_emu
+	      workflow='htcondor'
     ;;
     "run3_2022preEE_emu_st")
         config="run3_2022_preEE_emu"
@@ -107,8 +107,8 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	    categories=$categories_mutau
-	    variables=$variables_mutau
+	      categories=$categories_mutau
+	      variables=$variables_mutau
         workflow='htcondor'
      ;;
 ################################
@@ -118,24 +118,25 @@ case $1 in
         config="run3_2022_postEE_etau_limited"	
         datasets='data_egamma_E,dy_lep_madgraph'
         processes='data,dy_z2tautau,dy_z2mumu,dy_z2ee'
-	    categories='cat_etau_sr'
-	    variables='N_b_jets'
+	      categories='cat_etau_sr'
+	      variables='N_b_jets'
         workflow='local'
     ;;
     "run3_2022postEE_emu_lim")
         config="run3_2022_postEE_emu_limited"
         datasets='data_egamma_E,dy_lep_madgraph,h_tt_100'
         processes='data,dy_lep,h_ggf_htt'
-	    categories='cat_emu_sr'
-	    variables='D_zeta' #emu_mt_e,emu_mt_mu,emu_mt_tot,emu_mt_emu'
+	      categories='cat_emu_sr__nj0__dzh'
+        #cat_emu_sr__nj0__dzm,cat_emu_sr__nj0__dzh,cat_emu_sr__nj1__dzl,cat_emu_sr__nj1__dzm,cat_emu_sr__nj1__dzh,cat_emu_sr__nj2__dzl,cat_emu_sr__nj2__dzm,cat_emu_sr__nj2__dzh'
+	      variables='D_zeta' #emu_mt_e,emu_mt_mu,emu_mt_tot,emu_mt_emu'
         workflow='local'
     ;;
     "run3_2022postEE_mutau_lim")
         config="run3_2022_postEE_mutau_limited"	
         datasets='data_mu_E,dy_lep_madgraph'
         processes='dy_z2mumu,dy_z2ee,dy_z2tautau,data'
-	    categories='cat_mutau_sr'
-	    variables='N_b_jets'
+	      categories='cat_mutau_sr'
+	      variables='N_b_jets'
         workflow='local'
     ;;
 #########################
@@ -149,9 +150,9 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$data$bkg_ewk$bkg_top$bkg_ttbar
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	    categories=$categories_etau
-	    variables=$variables_etau
-	    workflow='htcondor'
+	      categories=$categories_etau
+	      variables=$variables_etau
+	      workflow='htcondor'
     ;;
     "run3_2022postEE_emu")
         config="run3_2022_postEE_emu"
@@ -161,9 +162,9 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$data$bkg_ewk$bkg_top$bkg_ttbar$mssm_signal
         processes='dy_lep,vv,tt,st,wj,data,h_ggf_htt'
-	    categories=$categories_emu
-	    variables=$variables_emu
-	    workflow='htcondor'
+	      categories='cat_emu_sr__nj0__dzh' #$categories_emu
+	      variables=$variables_emu
+	      workflow='htcondor'
     ;;
     "run3_2022postEE_emu_2D")
         config="run3_2022_postEE_emu"
@@ -173,17 +174,17 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
         datasets=$bkg_ewk$bkg_top$bkg_ttbar
         processes='dy_lep,vv,tt,st,wj'
-	    categories=$categories_emu
-	    variables='leading_jet_eta-leading_jet_phi'
-	    workflow='htcondor'
+	      categories=$categories_emu
+	      variables='leading_jet_eta-leading_jet_phi'
+	      workflow='htcondor'
     ;;
     "run3_2022postEE_emu_2D_dy")
         config="run3_2022_postEE_emu"
         datasets='dy_lep_madgraph'
         processes='dy_lep'
-	    categories='cat_emu_sr'
-	    variables='leading_jet_eta-leading_jet_phi'
-	    workflow='local'
+	      categories='cat_emu_sr'
+	      variables='leading_jet_eta-leading_jet_phi'
+	      workflow='local'
     ;;
     "run3_2022postEE_mutau")
         config="run3_2022_postEE_mutau"
@@ -193,9 +194,9 @@ case $1 in
         bkg_ttbar=$bkg_ttbar
       	datasets="$data$bkg_ewk$bkg_top$bkg_ttbar"
         processes='dy_z2tautau,dy_z2mumu,dy_z2ee,vv,tt,st,wj,data'
-	    categories=$categories_mutau
-	    variables=$variables_mutau
-	    workflow='htcondor'
+	      categories=$categories_mutau
+	      variables=$variables_mutau
+	      workflow='htcondor'
     ;;
 ###################################
 ####### 2023preBPix_limited #######

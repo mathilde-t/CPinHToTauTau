@@ -319,6 +319,7 @@ def electron_weight(self: Producer, events: ak.Array, do_syst: bool,  **kwargs) 
                     shaped_eff            = ak.unflatten(flat_eff, ak.num(electron.pt, axis=1))                    
                     MC_eff_values[the_shift] = MC_eff_values[the_shift] * ak.fill_none(ak.firsts(shaped_eff,axis=1), 0)
                     MC_eff_values[the_shift] =  ak.where(O_e, MC_eff_values[the_shift],0)
+    
     rename_systs = {"sf" : "nom",
                     "sfup"  : "up",
                     "sfdown": "down"
@@ -424,7 +425,7 @@ def trigger_sf(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     deff_MC_rel = deff_MC/eff_MC 
     
     delta_SF = SF_nom*np.sqrt(deff_MC_rel**2 + deff_data_rel**2)
-    
+
         # # up
     # eff_data_up  = Pass_mu_trig*muon_Data_eff_up + Pass_e_trig*electron_Data_eff_up - Pass_mu_trig*muon_Data_eff_up*Pass_e_trig*electron_Data_eff_up
     # eff_MC_up  = Pass_mu_trig*muon_MC_eff_up + Pass_e_trig*electron_MC_eff_up - Pass_mu_trig*muon_MC_eff_up*Pass_e_trig*electron_MC_eff_up

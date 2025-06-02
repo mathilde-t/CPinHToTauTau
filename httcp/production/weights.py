@@ -402,9 +402,9 @@ def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     names = ["_up", "", "_down"]
     for the_name in names:
         if  "TauSpinner" in list(events.fields):
-            if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0
-            elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p5
-            elif the_name == "":  the_weight =  (events.TauSpinner.weight_cp_0p5 + events.TauSpinner.weight_cp_0)/2.
+            if the_name == "_up": the_weight = events.TauSpinner.weight_cp_0p5 #cp-odd
+            elif the_name == "_down": the_weight = events.TauSpinner.weight_cp_0p25 #cp-odd
+            elif the_name == "":  the_weight =  events.TauSpinner.weight_cp_0 #cp-even 
             else:  raise NotImplementedError('CP hypothesis is not known to the tauspinner weight producer!')   
             buf = ak.to_numpy(the_weight)
             if any(np.isnan(buf)):

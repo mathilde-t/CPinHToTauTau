@@ -177,6 +177,7 @@ def add_categories(config: od.Config,
         
         "tau2pi"     : {'selection': ["pnet_dm0","tau_ip_cut"], 'label': r"$\mu \pi$",},
         "tau2rho"    : {'selection': ["pnet_dm1", "hps_dm1", "pion_E_split_cut"], 'label': r"$\mu \rho$",},
+        "tau2a1"     : {'selection': ["pnet_dm10", "hps_dm10"], 'label': r"$\mu a1$",},
 
         #"nj0"    : {'selection' : ["njets_eq0"], 'label'     : f" \n $n_{{jets}}= 0$",},
         #"nj1"    : {'selection' : ["njets_eq1"], 'label'     : f" \n $n_{{jets}}= 1$",},

@@ -18,12 +18,21 @@ def example(self):
     
 
     self.add_category(
-        "cat_mutau_sr",
-        config_category="cat_mutau_sr",
+        "cat_mutau_sr__tau2pi",
+        config_category="cat_mutau_sr__tau2pi",
         config_variable="phi_cp_mu_pi",
         config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
         mc_stats=True,
     )
+
+    self.add_category(
+        "cat_mutau_sr__tau2rho",
+        config_category="cat_mutau_sr__tau2rho",
+        config_variable="phi_cp_mu_rho",
+        config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
+        mc_stats=True,
+    )
+
 
     # TODO: think about defining a well motivated CR
     # self.add_category(
@@ -55,7 +64,7 @@ def example(self):
         #signal
         "h_ggf_htt": ["h_ggf_htt_filtered"], #SM Higgs signal
         "qcd": [""], 
-        "jet_fakes": [""], #QCD data-driven
+        #"jet_fakes": [""], # needs FF method
     }
  
     find_datasets = functools.partial(get_datasets_from_process, self.config_inst, strategy="all")

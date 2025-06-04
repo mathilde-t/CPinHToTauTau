@@ -399,7 +399,6 @@ def tauspinner_weight(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
     A simple function that sets tauspinner_weight according to the cp_hypothesis
     
     """
-    #print(self.dataset_inst.name, self.dataset_inst.processes, self.dataset_inst.processes.get_first().name) 
     if  "h_ggf_htt" in self.dataset_inst.name: 
         proc = self.dataset_inst.processes.get_first().name
         if proc == "h_ggf_htt_cpo":

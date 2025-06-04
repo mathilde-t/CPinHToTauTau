@@ -26,6 +26,14 @@ def example(self):
     )
 
     self.add_category(
+        "cat_mutau_sr",
+        config_category="cat_mutau_sr",
+        config_variable="phi_cp_incl",
+        config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
+        mc_stats=True,
+    )
+
+    self.add_category(
         "cat_mutau_sr__tau2rho",
         config_category="cat_mutau_sr__tau2rho",
         config_variable="phi_cp_mu_rho",
@@ -33,13 +41,6 @@ def example(self):
         mc_stats=True,
     )
 
-    self.add_category(
-        "cat_mutau_sr",
-        config_category="cat_mutau_sr",
-        config_variable="phi_cp_incl",
-        config_data_datasets=["data_singlemu_C", "data_mu_C", "data_mu_D"],
-        mc_stats=True,
-    )
 
     # TODO: think about defining a well motivated CR
     # self.add_category(

@@ -59,7 +59,7 @@ def configure_directories(config):
     else:
         PT_RANGE = (35, 100)
 
-    OUTPUT_DIR_BASE = f"/afs/cern.ch/user/o/oponcet/private/analysis/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{ERA}/{CORRECTION_TYPE}"
+    OUTPUT_DIR_BASE = f"/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{ERA}/{CORRECTION_TYPE}"
     ensure_directory(OUTPUT_DIR_BASE)
 
     # Handle all combinations of DM and n_jets
@@ -392,7 +392,7 @@ def main(args):
             combined_era = config["era"].split("_")[0]  #only keep the year
             CORRECTION_TYPE = config["correction_type"] 
 
-            OUTPUT_DIR_BASE = f"/afs/cern.ch/user/o/oponcet/private/analysis/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{combined_era}/{CORRECTION_TYPE}"
+            OUTPUT_DIR_BASE = f"/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{combined_era}/{CORRECTION_TYPE}"
             ensure_directory(OUTPUT_DIR_BASE)
 
             OUTPUT_DIR = os.path.join(OUTPUT_DIR_BASE, f"{dm}_{njet}")

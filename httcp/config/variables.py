@@ -338,14 +338,6 @@ def add_hcand_features(cfg: od.Config) -> None:
             x_title=f"hcand[{i+1}]" + " mass",
         )
         cfg.add_variable(
-            name=f"hcand_{i+1}_mass",
-            expression=f"hcand.mass[:,{i}]",
-            null_value=EMPTY_FLOAT,
-            binning=(30, 0., 3.0),
-            unit="GeV",
-            x_title=f"hcand[{i+1}]" + " mass",
-        )
-        cfg.add_variable(
             name=f"hcand_{i+1}_decayMode",
             expression=f"hcand.decayMode[:,{i}]",
             #null_value=EMPTY_INT,
@@ -512,38 +504,30 @@ def add_hcand_features(cfg: od.Config) -> None:
             unit="GeV",
             x_title=r"$m_H^{Gen}$",
     )
-    cfg.add_variable(
-            name=f"hcand_1_mass",
-            expression=f"hcand.mass[:,{0}]",
-            null_value=EMPTY_FLOAT,
-            binning=(100, 0.001, 0.25),
-            unit="GeV",
-            x_title=f"hcand[{1}]" + r" $m$",
-    )
-    cfg.add_variable(
-            name=f"hcand_2_mass",
-            expression=f"hcand.mass[:,{1}]",
-            null_value=EMPTY_FLOAT,
-            binning=(50, 0.01, 2.5),
-            unit="GeV",
-            x_title=f"hcand[{2}]" + r" $m$",
-    )
+    # cfg.add_variable(
+    #         name=f"hcand_1_mass",
+    #         expression=f"hcand.mass[:,{0}]",
+    #         null_value=EMPTY_FLOAT,
+    #         binning=(100, 0.001, 0.25),
+    #         unit="GeV",
+    #         x_title=f"hcand[{1}]" + r" $m$",
+    # )
+    # cfg.add_variable(
+    #         name=f"hcand_2_mass",
+    #         expression=f"hcand.mass[:,{1}]",
+    #         null_value=EMPTY_FLOAT,
+    #         binning=(50, 0.01, 2.5),
+    #         unit="GeV",
+    #         x_title=f"hcand[{2}]" + r" $m$",
+    # )
     cfg.add_variable(
         name="hcand_invm",
         expression="hcand_invm",
         null_value=EMPTY_FLOAT,
-        binning=(40, 0.0, 200.0),
+        #binning=(40, 0.0, 200.0),
         binning=(50, 0, 140),
         unit="GeV",
         x_title=r"$visible mass$",
-    )
-    cfg.add_variable(
-        name="hcand_invm_fastMTT",
-        expression="hcand_invm_fastMTT",
-        null_value=EMPTY_FLOAT,
-        binning=(75,  0, 250),
-        unit="GeV",
-        x_title=r"$m_{h1,h2}^{fastMTT W}$",
     )
     cfg.add_variable(
         name="hcand_invm_fastMTT",

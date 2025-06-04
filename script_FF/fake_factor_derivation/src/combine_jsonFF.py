@@ -8,7 +8,8 @@ import glob
 
 year = "2022_postEE"
 # Define the files and the structure
-input_files = glob.glob(f"/afs/cern.ch/user/o/oponcet/private/analysis/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{year}/fake_factors/*/*.json")  # Replace with the path to your files
+input_files = glob.glob(f"/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/{year}/fake_factors/*/*.json")  # Replace with the path to your files
+
 merged_structure = {
     "schema_version": 2,
     "description": "Fake factors for the httcp analysis",
@@ -78,7 +79,7 @@ merged_structure["corrections"][0]["data"]["content"] = [
 
 
 # Save the merged JSON
-output_file = f"/afs/cern.ch/user/o/oponcet/private/analysis/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/2022_postEE/fake_factors/json/fake_factor_{year}.json"
+output_file = f"/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/script_FF/fake_factor_derivation/outputs/2022_postEE/fake_factors/json/fake_factor_{year}.json"
 with open(output_file, "w") as f:
     json.dump(merged_structure, f, indent=4)
 

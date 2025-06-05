@@ -71,9 +71,9 @@ def example(self):
         "st": ["st_twchannel_t_sl", "st_twchannel_tbar_sl", "st_twchannel_tbar_dl", "st_tchannel_tbar", "st_tchannel_t", "st_schannel_t_lep", "st_schannel_tbar_lep"], #single top inclusive
         #signal
         #"h_ggf_htt": ["h_ggf_htt_filtered"], #SM Higgs signal SM 
-        "h_ggf_htt_cpo": ["h_ggf_htt_cpo_filtered"], #CP-odd Higgs signal
-        "h_ggf_htt_mm": ["h_ggf_htt_mm_filtered"], #CP-even Higgs signal with muon mass
-        "h_ggf_htt_sm": ["h_ggf_htt_sm_filtered"], #CP-even Higgs signal with SM mass
+        "h_ggf_htt_cpo": ["h_ggf_htt_cpo_filtered"], # CP-odd 
+        "h_ggf_htt_mm": ["h_ggf_htt_mm_filtered"], # Maximal Mixing
+        "h_ggf_htt_sm": ["h_ggf_htt_sm_filtered"], #CP-even 
         #data-driven backgrounds
         "qcd": [""], 
         #"jet_fakes": [""], # needs FF method

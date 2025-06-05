@@ -261,5 +261,4 @@ def phi_cp(
         events = set_ak_column_f32(events, f'alpha_{the_ch}', alpha_per_ch)
         events = set_ak_column_f32(events, "phi_cp_incl", phi_cp)
         events = set_ak_column_f32(events, f"phi_cp_{the_ch}",phi_cp)
-        events = set_ak_column_f32(events, f"phi_cp_{the_ch}",phi_cp)
     return events

@@ -1,0 +1,65 @@
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 120, in wrapper
+    return func(self, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/contrib/gfal/target.py", line 355, in filecopy
+    raise e
+law.contrib.gfal.target.GFALError_filecopy: Error on XrdCl::CopyProcess::Run(): [ERROR] Server responded with an error: [3021] Unable to get quota space - quota not defined or exhausted /eos/user/m/mawitt/share/OutputCP/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.9bf9774459d564026017a752c9f36ecaa2a1dce4.3.tgz; Disk quota exceeded (destination)
+ (GFALError_filecopy: unknown reason)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 126, in wrapper
+    e.reraise()
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 35, in reraise
+    return six.reraise(self.exc_type, self.exc_value, self.exc_traceback)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/venvs/cf_dev_9b04c75c/lib/python3.9/site-packages/six.py", line 719, in reraise
+    raise value
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/contrib/gfal/target.py", line 349, in filecopy
+    ctx.filecopy(params, src_uri, dst_uri)
+gfal2.GError: Error on XrdCl::CopyProcess::Run(): [ERROR] Server responded with an error: [3021] Unable to get quota space - quota not defined or exhausted /eos/user/m/mawitt/share/OutputCP/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.9bf9774459d564026017a752c9f36ecaa2a1dce4.3.tgz; Disk quota exceeded (destination)
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 281, in log
+    ret = fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 231, in wrapper
+    result = call(state)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 303, in call
+    return fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/framework/remote.py", line 72, in run
+    self.transfer(bundle)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/contrib/tasks/__init__.py", line 121, in transfer
+    replica.copy_from_local(src_path, cache=False)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/base.py", line 611, in copy_from_local
+    return self.copy_from(src, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/file.py", line 329, in copy_from
+    return self.fs.copy(get_path(src), self.path, perm=perm, dir_perm=dir_perm, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/base.py", line 500, in copy
+    return self._cached_copy(src, dst, perm=perm, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/base.py", line 405, in _cached_copy
+    return self._atomic_copy(src, dst, perm=perm, validate=validate, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/base.py", line 357, in _atomic_copy
+    src_uri, dst_uri = self.file_interface.filecopy(src, dst, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 142, in wrapper
+    six.reraise(e_type, e_type(msg, *e.args[1:]), traceback)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/venvs/cf_dev_9b04c75c/lib/python3.9/site-packages/six.py", line 718, in reraise
+    raise value.with_traceback(tb)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 126, in wrapper
+    e.reraise()
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/target/remote/interface.py", line 35, in reraise
+    return six.reraise(self.exc_type, self.exc_value, self.exc_traceback)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/venvs/cf_dev_9b04c75c/lib/python3.9/site-packages/six.py", line 719, in reraise
+    raise value
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/contrib/gfal/target.py", line 349, in filecopy
+    ctx.filecopy(params, src_uri, dst_uri)
+gfal2.GError: Error on XrdCl::CopyProcess::Run(): [ERROR] Server responded with an error: [3021] Unable to get quota space - quota not defined or exhausted /eos/user/m/mawitt/share/OutputCP/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.9bf9774459d564026017a752c9f36ecaa2a1dce4.3.tgz; Disk quota exceeded (destination)
+
+function: GFALFileInterface.filecopy
+attempts: 2
+args    : ('file:///tmp/mwitt/luigi-tmp-560410021.tgz', '/analysis_httcp/cf.BundleRepo/CPinHToTauTau.9bf9774459d564026017a752c9f36ecaa2a1dce4.3.tgz')
+kwargs  : {'base': 'root://eosuser.cern.ch/eos/user/m/mawitt/share/OutputCP/cf_store'}
+error   : GError: 'Error on XrdCl::CopyProcess::Run(): [ERROR] Server responded with an error: [3021] Unable to get quota space - quota not defined or exhausted /eos/user/m/mawitt/share/OutputCP/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.9bf9774459d564026017a752c9f36ecaa2a1dce4.3.tgz; Disk quota exceeded (destination)
+'

@@ -1,0 +1,21 @@
+2025-01-20:16:26:34,251 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_limited.yml
+2025-01-20:16:26:34,265 INFO     [cf_run.py:122] Execute  : cf.PlotVariables1D
+2025-01-20:16:26:34,265 INFO     [cf_run.py:123] Era      : 2022
+2025-01-20:16:26:34,265 INFO     [cf_run.py:124] Run      : 3
+2025-01-20:16:26:34,265 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-01-20:16:26:34,265 INFO     [cf_run.py:126] Limited? : True
+2025-01-20:16:26:34,266 INFO     [cf_run.py:127] nWorkers : 3
+2025-01-20:16:26:34,266 INFO     [cf_run.py:128] nTasks_per_job : None
+2025-01-20:16:26:34,266 INFO     [cf_run.py:131] Wrapper  : True
+2025-01-20:16:26:34,266 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14_limited
+2025-01-20:16:26:34,266 INFO     [cf_run.py:142] datasets : dy_lep_m50_madgraph,wj_incl_madgraph
+2025-01-20:16:26:34,266 INFO     [cf_run.py:145] processes: dy_m50toinf,w_lnu
+2025-01-20:16:26:34,266 INFO     [cf_run.py:149] shifts: 
+2025-01-20:16:26:34,266 INFO     [cf_run.py:152] worklflow: local
+2025-01-20:16:26:34,266 INFO     [cf_run.py:155] branch   : -1
+2025-01-20:16:26:34,266 INFO     [cf_run.py:160] version  : Run3_2022PreEE_limited_20250120_162633
+2025-01-20:16:26:34,266 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.PlotVariables1D --config run3_2022_preEE_nano_cp_tau_v14_limited --datasets dy_lep_m50_madgraph,wj_incl_madgraph --processes dy_m50toinf,w_lnu --workflow local --branch -1 --version Run3_2022PreEE_limited_20250120_162633 --categories mutau__lepD --variables npvs,process-settings "h_ggf_tautau,unstack,10" --workers 3 --pilot --log-file /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/cmdlogs/joblog_run3_2022PreEE_limited_PlotVariables1D_20250120_162633.log
+
+2025-01-20:16:26:34,266 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

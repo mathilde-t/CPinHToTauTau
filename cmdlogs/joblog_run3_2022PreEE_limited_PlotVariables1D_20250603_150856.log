@@ -1,0 +1,60 @@
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 281, in log
+    ret = fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 231, in wrapper
+    result = call(state)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 303, in call
+    return fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 522, in run
+    law.util.map_struct(fetch_file, self.config_inst.x.external_files)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1201, in map_struct
+    value = map_struct(func, value, map_dict=map_dict, map_list=map_list,
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1212, in map_struct
+    return func(struct)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 515, in fetch_file
+    shutil.copy2(src, dst)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 444, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 264, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/httcp/config/data/jsonpog-integration/POG/LUM/2022_Summer22/puWeights.json.gz'
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 281, in log
+    ret = fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 231, in wrapper
+    result = call(state)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 303, in call
+    return fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 522, in run
+    law.util.map_struct(fetch_file, self.config_inst.x.external_files)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1201, in map_struct
+    value = map_struct(func, value, map_dict=map_dict, map_list=map_list,
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1212, in map_struct
+    return func(struct)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 515, in fetch_file
+    shutil.copy2(src, dst)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 444, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 264, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/httcp/config/data/jsonpog-integration/POG/LUM/2022_Summer22/puWeights.json.gz'
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 281, in log
+    ret = fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 231, in wrapper
+    result = call(state)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/decorator.py", line 303, in call
+    return fn(task, *args, **kwargs)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 522, in run
+    law.util.map_struct(fetch_file, self.config_inst.x.external_files)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1201, in map_struct
+    value = map_struct(func, value, map_dict=map_dict, map_list=map_list,
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/modules/law/law/util.py", line 1212, in map_struct
+    return func(struct)
+  File "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/modules/columnflow/columnflow/tasks/external.py", line 515, in fetch_file
+    shutil.copy2(src, dst)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 444, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/eos/user/m/mwitt/CPinHToTauTauData/conda/lib/python3.9/shutil.py", line 264, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/httcp/config/data/jsonpog-integration/POG/LUM/2022_Summer22/puWeights.json.gz'

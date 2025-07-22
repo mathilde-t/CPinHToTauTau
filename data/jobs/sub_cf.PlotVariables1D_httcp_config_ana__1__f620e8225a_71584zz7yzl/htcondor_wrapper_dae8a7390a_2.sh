@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+# Wrapper script that is to be configured as htcondor's main executable file
+
+htcondor_wrapper() {
+    # helper to select the correct python executable
+    _law_python() {
+        command -v python &> /dev/null && python "$@" || python3 "$@"
+    }
+
+    #
+    # detect variables
+    #
+
+    local shell_is_zsh="$( [ -z "${ZSH_VERSION}" ] && echo "false" || echo "true" )"
+    local this_file="$( ${shell_is_zsh} && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
+    local this_file_base="$( basename "${this_file}" )"
+
+    # get the job number
+    export LAW_HTCONDOR_JOB_NUMBER="${LAW_HTCONDOR_JOB_PROCESS}"
+    if [ -z "${LAW_HTCONDOR_JOB_NUMBER}" ]; then
+        >&2 echo "could not determine htcondor job number"
+        return "1"
+    fi
+    # htcondor process numbers start at 0, law job numbers at 1, so increment
+    ((LAW_HTCONDOR_JOB_NUMBER++))
+    echo "running ${this_file_base} for job number ${LAW_HTCONDOR_JOB_NUMBER}"
+
+
+    #
+    # job argument definitons, depending on LAW_HTCONDOR_JOB_NUMBER
+    #
+
+    # definition
+    local htcondor_job_arguments_map
+    declare -A htcondor_job_arguments_map
+    htcondor_job_arguments_map=(
+        ['1']="columnflow.tasks.plotting PlotVariables1D LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1mZl9leHBfYW5kX3AyX3RhdV9ldGEycDNfdGVzdF9NVFRfNSAtLWNvbmZpZz1ydW4zXzIwMjJfcHJlRUVfbXV0YXVfbGltaXRlZCAtLXNoaWZ0PW5vbWluYWwgLS1jYWxpYnJhdG9ycz1tYWluIC0tc2VsZWN0b3I9bWFpbiAtLXNlbGVjdG9yLXN0ZXBzPScnIC0tcHJvZHVjZXJzPW1haW4gLS1tbC1tb2RlbHM9JycgLS1jYXRlZ29yaWVzPWNhdF9tdXRhdV9zcixjYXRfbXV0YXVfc3JfX3RhdTJhMSAtLXZhcmlhYmxlcz1tdXRhdV9sZXAxX3B0LGhjYW5kX211dGF1X2Zhc3RNVFRfbGVwMF9wdCAtLWRhdGFzZXRzPXdqX2luY2xfbWFkZ3JhcGgsaF9nZ2ZfaHR0X2Nwb19maWx0ZXJlZCAtLXByb2Nlc3Nlcz13aixoX2dnZl9odHRfY3BvIC0td2VpZ2h0LXByb2R1Y2VyPW1haW4gLS1oaXN0LWhvb2tzPScnIC0tcGxvdC1mdW5jdGlvbj1jb2x1bW5mbG93LnBsb3R0aW5nLnBsb3RfZnVuY3Rpb25zXzFkLnBsb3RfdmFyaWFibGVfcGVyX3Byb2Nlc3MgLS1maWxlLXR5cGVzPXBkZiAtLXBsb3Qtc3VmZml4PU5PX1NUUiAtLXZpZXctY21kPU5PX1NUUiAtLWdlbmVyYWwtc2V0dGluZ3M9Y21zLWxhYmVsPXB3IC0tY3VzdG9tLXN0eWxlLWNvbmZpZz1ERUZBVUxUIC0tY21zLWxhYmVsPU5PX1NUUiAtLWJsaW5kaW5nLXRocmVzaG9sZD0tMS4wIC0teXNjYWxlPU5PX1NUUiAtLXByb2Nlc3Mtc2V0dGluZ3M9JycgLS12YXJpYWJsZS1zZXR0aW5ncz0nJyAtLWNmLkNhbGlicmF0ZUV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLlNlbGVjdEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlU2VsZWN0aW9uU3RhdHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5Qcm92aWRlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWxvY2FsLXNjaGVkdWxlcj1UcnVl MA== 1 no LQ=="
+        ['2']="columnflow.tasks.plotting PlotVariables1D LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1mZl9leHBfYW5kX3AyX3RhdV9ldGEycDNfdGVzdF9NVFRfNSAtLWNvbmZpZz1ydW4zXzIwMjJfcHJlRUVfbXV0YXVfbGltaXRlZCAtLXNoaWZ0PW5vbWluYWwgLS1jYWxpYnJhdG9ycz1tYWluIC0tc2VsZWN0b3I9bWFpbiAtLXNlbGVjdG9yLXN0ZXBzPScnIC0tcHJvZHVjZXJzPW1haW4gLS1tbC1tb2RlbHM9JycgLS1jYXRlZ29yaWVzPWNhdF9tdXRhdV9zcixjYXRfbXV0YXVfc3JfX3RhdTJhMSAtLXZhcmlhYmxlcz1tdXRhdV9sZXAxX3B0LGhjYW5kX211dGF1X2Zhc3RNVFRfbGVwMF9wdCAtLWRhdGFzZXRzPXdqX2luY2xfbWFkZ3JhcGgsaF9nZ2ZfaHR0X2Nwb19maWx0ZXJlZCAtLXByb2Nlc3Nlcz13aixoX2dnZl9odHRfY3BvIC0td2VpZ2h0LXByb2R1Y2VyPW1haW4gLS1oaXN0LWhvb2tzPScnIC0tcGxvdC1mdW5jdGlvbj1jb2x1bW5mbG93LnBsb3R0aW5nLnBsb3RfZnVuY3Rpb25zXzFkLnBsb3RfdmFyaWFibGVfcGVyX3Byb2Nlc3MgLS1maWxlLXR5cGVzPXBkZiAtLXBsb3Qtc3VmZml4PU5PX1NUUiAtLXZpZXctY21kPU5PX1NUUiAtLWdlbmVyYWwtc2V0dGluZ3M9Y21zLWxhYmVsPXB3IC0tY3VzdG9tLXN0eWxlLWNvbmZpZz1ERUZBVUxUIC0tY21zLWxhYmVsPU5PX1NUUiAtLWJsaW5kaW5nLXRocmVzaG9sZD0tMS4wIC0teXNjYWxlPU5PX1NUUiAtLXByb2Nlc3Mtc2V0dGluZ3M9JycgLS12YXJpYWJsZS1zZXR0aW5ncz0nJyAtLWNmLkNhbGlicmF0ZUV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLlNlbGVjdEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlU2VsZWN0aW9uU3RhdHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5Qcm92aWRlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWxvY2FsLXNjaGVkdWxlcj1UcnVl MQ== 1 no LQ=="
+        ['3']="columnflow.tasks.plotting PlotVariables1D LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1mZl9leHBfYW5kX3AyX3RhdV9ldGEycDNfdGVzdF9NVFRfNSAtLWNvbmZpZz1ydW4zXzIwMjJfcHJlRUVfbXV0YXVfbGltaXRlZCAtLXNoaWZ0PW5vbWluYWwgLS1jYWxpYnJhdG9ycz1tYWluIC0tc2VsZWN0b3I9bWFpbiAtLXNlbGVjdG9yLXN0ZXBzPScnIC0tcHJvZHVjZXJzPW1haW4gLS1tbC1tb2RlbHM9JycgLS1jYXRlZ29yaWVzPWNhdF9tdXRhdV9zcixjYXRfbXV0YXVfc3JfX3RhdTJhMSAtLXZhcmlhYmxlcz1tdXRhdV9sZXAxX3B0LGhjYW5kX211dGF1X2Zhc3RNVFRfbGVwMF9wdCAtLWRhdGFzZXRzPXdqX2luY2xfbWFkZ3JhcGgsaF9nZ2ZfaHR0X2Nwb19maWx0ZXJlZCAtLXByb2Nlc3Nlcz13aixoX2dnZl9odHRfY3BvIC0td2VpZ2h0LXByb2R1Y2VyPW1haW4gLS1oaXN0LWhvb2tzPScnIC0tcGxvdC1mdW5jdGlvbj1jb2x1bW5mbG93LnBsb3R0aW5nLnBsb3RfZnVuY3Rpb25zXzFkLnBsb3RfdmFyaWFibGVfcGVyX3Byb2Nlc3MgLS1maWxlLXR5cGVzPXBkZiAtLXBsb3Qtc3VmZml4PU5PX1NUUiAtLXZpZXctY21kPU5PX1NUUiAtLWdlbmVyYWwtc2V0dGluZ3M9Y21zLWxhYmVsPXB3IC0tY3VzdG9tLXN0eWxlLWNvbmZpZz1ERUZBVUxUIC0tY21zLWxhYmVsPU5PX1NUUiAtLWJsaW5kaW5nLXRocmVzaG9sZD0tMS4wIC0teXNjYWxlPU5PX1NUUiAtLXByb2Nlc3Mtc2V0dGluZ3M9JycgLS12YXJpYWJsZS1zZXR0aW5ncz0nJyAtLWNmLkNhbGlicmF0ZUV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLlNlbGVjdEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlU2VsZWN0aW9uU3RhdHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5Qcm92aWRlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWxvY2FsLXNjaGVkdWxlcj1UcnVl Mg== 1 no LQ=="
+        ['4']="columnflow.tasks.plotting PlotVariables1D LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1mZl9leHBfYW5kX3AyX3RhdV9ldGEycDNfdGVzdF9NVFRfNSAtLWNvbmZpZz1ydW4zXzIwMjJfcHJlRUVfbXV0YXVfbGltaXRlZCAtLXNoaWZ0PW5vbWluYWwgLS1jYWxpYnJhdG9ycz1tYWluIC0tc2VsZWN0b3I9bWFpbiAtLXNlbGVjdG9yLXN0ZXBzPScnIC0tcHJvZHVjZXJzPW1haW4gLS1tbC1tb2RlbHM9JycgLS1jYXRlZ29yaWVzPWNhdF9tdXRhdV9zcixjYXRfbXV0YXVfc3JfX3RhdTJhMSAtLXZhcmlhYmxlcz1tdXRhdV9sZXAxX3B0LGhjYW5kX211dGF1X2Zhc3RNVFRfbGVwMF9wdCAtLWRhdGFzZXRzPXdqX2luY2xfbWFkZ3JhcGgsaF9nZ2ZfaHR0X2Nwb19maWx0ZXJlZCAtLXByb2Nlc3Nlcz13aixoX2dnZl9odHRfY3BvIC0td2VpZ2h0LXByb2R1Y2VyPW1haW4gLS1oaXN0LWhvb2tzPScnIC0tcGxvdC1mdW5jdGlvbj1jb2x1bW5mbG93LnBsb3R0aW5nLnBsb3RfZnVuY3Rpb25zXzFkLnBsb3RfdmFyaWFibGVfcGVyX3Byb2Nlc3MgLS1maWxlLXR5cGVzPXBkZiAtLXBsb3Qtc3VmZml4PU5PX1NUUiAtLXZpZXctY21kPU5PX1NUUiAtLWdlbmVyYWwtc2V0dGluZ3M9Y21zLWxhYmVsPXB3IC0tY3VzdG9tLXN0eWxlLWNvbmZpZz1ERUZBVUxUIC0tY21zLWxhYmVsPU5PX1NUUiAtLWJsaW5kaW5nLXRocmVzaG9sZD0tMS4wIC0teXNjYWxlPU5PX1NUUiAtLXByb2Nlc3Mtc2V0dGluZ3M9JycgLS12YXJpYWJsZS1zZXR0aW5ncz0nJyAtLWNmLkNhbGlicmF0ZUV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLlNlbGVjdEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWNmLk1lcmdlU2VsZWN0aW9uU3RhdHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5Qcm92aWRlUmVkdWNlZEV2ZW50cy12ZXJzaW9uPWpldF92ZXRvX2ZpeCAtLWxvY2FsLXNjaGVkdWxlcj1UcnVl Mw== 1 no LQ=="
+    )
+
+    # pick
+    local htcondor_job_arguments="${htcondor_job_arguments_map[${LAW_HTCONDOR_JOB_NUMBER}]}"
+    if [ -z "${htcondor_job_arguments}" ]; then
+        >&2 echo "empty htcondor job arguments for LAW_HTCONDOR_JOB_NUMBER ${LAW_HTCONDOR_JOB_NUMBER}"
+        return "3"
+    fi
+
+
+    #
+    # variable rendering
+    #
+
+    # check variables
+    local render_variables="eyJsYXdfY29uZmlnX2ZpbGUiOiAiJENGX1JFUE9fQkFTRS9sYXcuY2ZnIiwgImNmX3JlcG9fdXJpcyI6ICJyb290Oi8vZW9zdXNlci5jZXJuLmNoLy9lb3MvcHJvamVjdC9pL2lwaGN0YXUvcHVibGljL213aXR0L0NQaW5IVG9UYXVUYXVPdXRwdXQvaGFtYm91cmcvY2Zfc3RvcmUvYW5hbHlzaXNfaHR0Y3AvY2YuQnVuZGxlUmVwbyIsICJjZl9yZXBvX3BhdHRlcm4iOiAiQ1BpbkhUb1RhdVRhdS43NTEyZTdiYjdkNWI5MzYxYmE3YmExNDliN2FiMWEwODNiNTg5ZTc3LlteXFwuXSsudGd6IiwgImNmX3NvZnR3YXJlX3VyaXMiOiAicm9vdDovL2Vvc3VzZXIuY2Vybi5jaC8vZW9zL3Byb2plY3QvaS9pcGhjdGF1L3B1YmxpYy9td2l0dC9DUGluSFRvVGF1VGF1T3V0cHV0L2hhbWJvdXJnL2NmX3N0b3JlL2FuYWx5c2lzX2h0dGNwL2NmLkJ1bmRsZVNvZnR3YXJlIiwgImNmX3NvZnR3YXJlX3BhdHRlcm4iOiAic29mdHdhcmUuW15cXC5dKy50Z3oiLCAiY2ZfYmFzaF9zYW5kYm94X3VyaXMiOiAiXCJyb290Oi8vZW9zdXNlci5jZXJuLmNoLy9lb3MvcHJvamVjdC9pL2lwaGN0YXUvcHVibGljL213aXR0L0NQaW5IVG9UYXVUYXVPdXRwdXQvaGFtYm91cmcvY2Zfc3RvcmUvYW5hbHlzaXNfaHR0Y3AvY2YuQnVuZGxlQmFzaFNhbmRib3hcIiBcInJvb3Q6Ly9lb3N1c2VyLmNlcm4uY2gvL2Vvcy9wcm9qZWN0L2kvaXBoY3RhdS9wdWJsaWMvbXdpdHQvQ1BpbkhUb1RhdVRhdU91dHB1dC9oYW1ib3VyZy9jZl9zdG9yZS9hbmFseXNpc19odHRjcC9jZi5CdW5kbGVCYXNoU2FuZGJveFwiIiwgImNmX2Jhc2hfc2FuZGJveF9wYXR0ZXJucyI6ICJcImNmXzVkZTcyMTNjLmM3YjZiMjgyZTIuW15cXC5dKy50Z3pcIiBcInZlbnZfY29sdW1uYXJfNGVmNDU2NzQuMmJhZTgxZTEwMy5bXlxcLl0rLnRnelwiIiwgImNmX2Jhc2hfc2FuZGJveF9uYW1lcyI6ICJcImNmXCIgXCJ2ZW52X2NvbHVtbmFyXCIiLCAiY2ZfY21zc3dfc2FuZGJveF91cmlzIjogIlwicm9vdDovL2Vvc3VzZXIuY2Vybi5jaC8vZW9zL3Byb2plY3QvaS9pcGhjdGF1L3B1YmxpYy9td2l0dC9DUGluSFRvVGF1VGF1T3V0cHV0L2hhbWJvdXJnL2NmX3N0b3JlL2FuYWx5c2lzX2h0dGNwL2NmLkJ1bmRsZUNNU1NXU2FuZGJveFwiIiwgImNmX2Ntc3N3X3NhbmRib3hfcGF0dGVybnMiOiAiXCJjbXNzd19kZWZhdWx0Xzc1MGY2MWQ1X0NNU1NXXzE0XzFfMF9wcmU0LmRhMzlhM2VlNWU2YjRiMGQzMjU1YmZlZjk1NjAxODkwYWZkODA3MDkuW15cXC5dKy50Z3pcIiIsICJjZl9jbXNzd19zYW5kYm94X25hbWVzIjogIlwiY21zc3dfZGVmYXVsdFwiIiwgImNmX2Jvb3RzdHJhcF9uYW1lIjogImh0Y29uZG9yX3N0YW5kYWxvbmUiLCAiY2ZfaHRjb25kb3JfZmxhdm9yIjogImNlcm4iLCAiY2ZfcHJlX3NldHVwX2NvbW1hbmQiOiAiIiwgImNmX3Bvc3Rfc2V0dXBfY29tbWFuZCI6ICIiLCAiY2ZfcmVtb3RlX2xjZ19zZXR1cCI6ICIvY3ZtZnMvZ3JpZC5jZXJuLmNoL2FsbWE5LXVpLXRlc3QvZXRjL3Byb2ZpbGUuZC9zZXR1cC1hbG1hOS10ZXN0LnNoIiwgImNmX3JlbW90ZV9sY2dfc2V0dXBfZm9yY2UiOiAiIiwgImNmX2Jhc2UiOiAiL2Fmcy9jZXJuLmNoL3VzZXIvbS9td2l0dC9wdWJsaWMvQ1BpbkhUb1RhdVRhdS9tb2R1bGVzL2NvbHVtbmZsb3ciLCAiY2ZfcmVwb19iYXNlIjogIi9hZnMvY2Vybi5jaC91c2VyL20vbXdpdHQvcHVibGljL0NQaW5IVG9UYXVUYXUiLCAiY2ZfY2Vybl91c2VyIjogIm13aXR0IiwgImNmX3N0b3JlX25hbWUiOiAiY2Zfc3RvcmUiLCAiY2Zfc3RvcmVfbG9jYWwiOiAiL2Fmcy9jZXJuLmNoL3VzZXIvbS9td2l0dC9wdWJsaWMvQ1BpbkhUb1RhdVRhdS9kYXRhL2NmX3N0b3JlIiwgImNmX2xvY2FsX3NjaGVkdWxlciI6ICJ0cnVlIiwgImpvYl9maWxlIjogImxhd19qb2JfZDA4NTk5YmMwOC5zaCIsICJleGVjdXRhYmxlX2ZpbGUiOiAiaHRjb25kb3Jfd3JhcHBlcl9kYWU4YTczOTBhXzIuc2giLCAiYm9vdHN0cmFwX2ZpbGUiOiAicmVtb3RlX2Jvb3RzdHJhcF9kMDdlNTBiYTk1LnNoIiwgInZvbXNwcm94eV9maWxlIjogIng1MDl1cF91MTUxNzkwX2E4ZjEyZmQxZjUiLCAid2xjZ190b29scyI6ICJsYXdfd2xjZ190b29sc180MDFkOWI5MDU3LnNoIiwgImlucHV0X2ZpbGVzIjogImxhd19qb2JfZDA4NTk5YmMwOC5zaCBodGNvbmRvcl93cmFwcGVyX2RhZThhNzM5MGFfMi5zaCByZW1vdGVfYm9vdHN0cmFwX2QwN2U1MGJhOTUuc2ggeDUwOXVwX3UxNTE3OTBfYThmMTJmZDFmNSBsYXdfd2xjZ190b29sc180MDFkOWI5MDU3LnNoIiwgImlucHV0X2ZpbGVzX3JlbmRlciI6ICJsYXdfam9iX2QwODU5OWJjMDguc2ggcmVtb3RlX2Jvb3RzdHJhcF9kMDdlNTBiYTk1LnNoIiwgImxvZ19maWxlIjogInN0ZGFsbCQobGF3X2pvYl9wb3N0Zml4KS50eHQiLCAiaHRjb25kb3Jfam9iX2FyZ3VtZW50c19tYXAiOiAiWycxJ109XCJjb2x1bW5mbG93LnRhc2tzLnBsb3R0aW5nIFBsb3RWYXJpYWJsZXMxRCBMUzFzYjJjdFptbHNaVDFPVDE5VFZGSWdMUzFqYkdWaGNpMXNiMmR6UFVaaGJITmxJQzB0WVc1aGJIbHphWE05YUhSMFkzQXVZMjl1Wm1sbkxtRnVZV3g1YzJselgyaDBkR053TG1GdVlXeDVjMmx6WDJoMGRHTndJQzB0ZG1WeWMybHZiajFtWmw5bGVIQmZZVzVrWDNBeVgzUmhkVjlsZEdFeWNETmZkR1Z6ZEY5TlZGUmZOU0F0TFdOdmJtWnBaejF5ZFc0elh6SXdNakpmY0hKbFJVVmZiWFYwWVhWZmJHbHRhWFJsWkNBdExYTm9hV1owUFc1dmJXbHVZV3dnTFMxallXeHBZbkpoZEc5eWN6MXRZV2x1SUMwdGMyVnNaV04wYjNJOWJXRnBiaUF0TFhObGJHVmpkRzl5TFhOMFpYQnpQU2NuSUMwdGNISnZaSFZqWlhKelBXMWhhVzRnTFMxdGJDMXRiMlJsYkhNOUp5Y2dMUzFqWVhSbFoyOXlhV1Z6UFdOaGRGOXRkWFJoZFY5emNpeGpZWFJmYlhWMFlYVmZjM0pmWDNSaGRUSmhNU0F0TFhaaGNtbGhZbXhsY3oxdGRYUmhkVjlzWlhBeFgzQjBMR2hqWVc1a1gyMTFkR0YxWDJaaGMzUk5WRlJmYkdWd01GOXdkQ0F0TFdSaGRHRnpaWFJ6UFhkcVgybHVZMnhmYldGa1ozSmhjR2dzYUY5bloyWmZhSFIwWDJOd2IxOW1hV3gwWlhKbFpDQXRMWEJ5YjJObGMzTmxjejEzYWl4b1gyZG5abDlvZEhSZlkzQnZJQzB0ZDJWcFoyaDBMWEJ5YjJSMVkyVnlQVzFoYVc0Z0xTMW9hWE4wTFdodmIydHpQU2NuSUMwdGNHeHZkQzFtZFc1amRHbHZiajFqYjJ4MWJXNW1iRzkzTG5Cc2IzUjBhVzVuTG5Cc2IzUmZablZ1WTNScGIyNXpYekZrTG5Cc2IzUmZkbUZ5YVdGaWJHVmZjR1Z5WDNCeWIyTmxjM01nTFMxbWFXeGxMWFI1Y0dWelBYQmtaaUF0TFhCc2IzUXRjM1ZtWm1sNFBVNVBYMU5VVWlBdExYWnBaWGN0WTIxa1BVNVBYMU5VVWlBdExXZGxibVZ5WVd3dGMyVjBkR2x1WjNNOVkyMXpMV3hoWW1Wc1BYQjNJQzB0WTNWemRHOXRMWE4wZVd4bExXTnZibVpwWnoxRVJVWkJWVXhVSUMwdFkyMXpMV3hoWW1Wc1BVNVBYMU5VVWlBdExXSnNhVzVrYVc1bkxYUm9jbVZ6YUc5c1pEMHRNUzR3SUMwdGVYTmpZV3hsUFU1UFgxTlVVaUF0TFhCeWIyTmxjM010YzJWMGRHbHVaM005SnljZ0xTMTJZWEpwWVdKc1pTMXpaWFIwYVc1bmN6MG5KeUF0TFdObUxrTmhiR2xpY21GMFpVVjJaVzUwY3kxMlpYSnphVzl1UFdwbGRGOTJaWFJ2WDJacGVDQXRMV05tTGxObGJHVmpkRVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFdObUxrMWxjbWRsVW1Wa2RXTmxaRVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFdObUxrMWxjbWRsVTJWc1pXTjBhVzl1VTNSaGRITXRkbVZ5YzJsdmJqMXFaWFJmZG1WMGIxOW1hWGdnTFMxalppNVFjbTkyYVdSbFVtVmtkV05sWkVWMlpXNTBjeTEyWlhKemFXOXVQV3BsZEY5MlpYUnZYMlpwZUNBdExXeHZZMkZzTFhOamFHVmtkV3hsY2oxVWNuVmwgTUE9PSAxIG5vIExRPT1cIlxuICAgICAgICBbJzInXT1cImNvbHVtbmZsb3cudGFza3MucGxvdHRpbmcgUGxvdFZhcmlhYmxlczFEIExTMXNiMmN0Wm1sc1pUMU9UMTlUVkZJZ0xTMWpiR1ZoY2kxc2IyZHpQVVpoYkhObElDMHRZVzVoYkhsemFYTTlhSFIwWTNBdVkyOXVabWxuTG1GdVlXeDVjMmx6WDJoMGRHTndMbUZ1WVd4NWMybHpYMmgwZEdOd0lDMHRkbVZ5YzJsdmJqMW1abDlsZUhCZllXNWtYM0F5WDNSaGRWOWxkR0V5Y0ROZmRHVnpkRjlOVkZSZk5TQXRMV052Ym1acFp6MXlkVzR6WHpJd01qSmZjSEpsUlVWZmJYVjBZWFZmYkdsdGFYUmxaQ0F0TFhOb2FXWjBQVzV2YldsdVlXd2dMUzFqWVd4cFluSmhkRzl5Y3oxdFlXbHVJQzB0YzJWc1pXTjBiM0k5YldGcGJpQXRMWE5sYkdWamRHOXlMWE4wWlhCelBTY25JQzB0Y0hKdlpIVmpaWEp6UFcxaGFXNGdMUzF0YkMxdGIyUmxiSE05SnljZ0xTMWpZWFJsWjI5eWFXVnpQV05oZEY5dGRYUmhkVjl6Y2l4allYUmZiWFYwWVhWZmMzSmZYM1JoZFRKaE1TQXRMWFpoY21saFlteGxjejF0ZFhSaGRWOXNaWEF4WDNCMExHaGpZVzVrWDIxMWRHRjFYMlpoYzNSTlZGUmZiR1Z3TUY5d2RDQXRMV1JoZEdGelpYUnpQWGRxWDJsdVkyeGZiV0ZrWjNKaGNHZ3NhRjluWjJaZmFIUjBYMk53YjE5bWFXeDBaWEpsWkNBdExYQnliMk5sYzNObGN6MTNhaXhvWDJkblpsOW9kSFJmWTNCdklDMHRkMlZwWjJoMExYQnliMlIxWTJWeVBXMWhhVzRnTFMxb2FYTjBMV2h2YjJ0elBTY25JQzB0Y0d4dmRDMW1kVzVqZEdsdmJqMWpiMngxYlc1bWJHOTNMbkJzYjNSMGFXNW5MbkJzYjNSZlpuVnVZM1JwYjI1elh6RmtMbkJzYjNSZmRtRnlhV0ZpYkdWZmNHVnlYM0J5YjJObGMzTWdMUzFtYVd4bExYUjVjR1Z6UFhCa1ppQXRMWEJzYjNRdGMzVm1abWw0UFU1UFgxTlVVaUF0TFhacFpYY3RZMjFrUFU1UFgxTlVVaUF0TFdkbGJtVnlZV3d0YzJWMGRHbHVaM005WTIxekxXeGhZbVZzUFhCM0lDMHRZM1Z6ZEc5dExYTjBlV3hsTFdOdmJtWnBaejFFUlVaQlZVeFVJQzB0WTIxekxXeGhZbVZzUFU1UFgxTlVVaUF0TFdKc2FXNWthVzVuTFhSb2NtVnphRzlzWkQwdE1TNHdJQzB0ZVhOallXeGxQVTVQWDFOVVVpQXRMWEJ5YjJObGMzTXRjMlYwZEdsdVozTTlKeWNnTFMxMllYSnBZV0pzWlMxelpYUjBhVzVuY3owbkp5QXRMV05tTGtOaGJHbGljbUYwWlVWMlpXNTBjeTEyWlhKemFXOXVQV3BsZEY5MlpYUnZYMlpwZUNBdExXTm1MbE5sYkdWamRFVjJaVzUwY3kxMlpYSnphVzl1UFdwbGRGOTJaWFJ2WDJacGVDQXRMV05tTGsxbGNtZGxVbVZrZFdObFpFVjJaVzUwY3kxMlpYSnphVzl1UFdwbGRGOTJaWFJ2WDJacGVDQXRMV05tTGsxbGNtZGxVMlZzWldOMGFXOXVVM1JoZEhNdGRtVnljMmx2YmoxcVpYUmZkbVYwYjE5bWFYZ2dMUzFqWmk1UWNtOTJhV1JsVW1Wa2RXTmxaRVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFd4dlkyRnNMWE5qYUdWa2RXeGxjajFVY25WbCBNUT09IDEgbm8gTFE9PVwiXG4gICAgICAgIFsnMyddPVwiY29sdW1uZmxvdy50YXNrcy5wbG90dGluZyBQbG90VmFyaWFibGVzMUQgTFMxc2IyY3RabWxzWlQxT1QxOVRWRklnTFMxamJHVmhjaTFzYjJkelBVWmhiSE5sSUMwdFlXNWhiSGx6YVhNOWFIUjBZM0F1WTI5dVptbG5MbUZ1WVd4NWMybHpYMmgwZEdOd0xtRnVZV3g1YzJselgyaDBkR053SUMwdGRtVnljMmx2YmoxbVpsOWxlSEJmWVc1a1gzQXlYM1JoZFY5bGRHRXljRE5mZEdWemRGOU5WRlJmTlNBdExXTnZibVpwWnoxeWRXNHpYekl3TWpKZmNISmxSVVZmYlhWMFlYVmZiR2x0YVhSbFpDQXRMWE5vYVdaMFBXNXZiV2x1WVd3Z0xTMWpZV3hwWW5KaGRHOXljejF0WVdsdUlDMHRjMlZzWldOMGIzSTliV0ZwYmlBdExYTmxiR1ZqZEc5eUxYTjBaWEJ6UFNjbklDMHRjSEp2WkhWalpYSnpQVzFoYVc0Z0xTMXRiQzF0YjJSbGJITTlKeWNnTFMxallYUmxaMjl5YVdWelBXTmhkRjl0ZFhSaGRWOXpjaXhqWVhSZmJYVjBZWFZmYzNKZlgzUmhkVEpoTVNBdExYWmhjbWxoWW14bGN6MXRkWFJoZFY5c1pYQXhYM0IwTEdoallXNWtYMjExZEdGMVgyWmhjM1JOVkZSZmJHVndNRjl3ZENBdExXUmhkR0Z6WlhSelBYZHFYMmx1WTJ4ZmJXRmtaM0poY0dnc2FGOW5aMlpmYUhSMFgyTndiMTltYVd4MFpYSmxaQ0F0TFhCeWIyTmxjM05sY3oxM2FpeG9YMmRuWmw5b2RIUmZZM0J2SUMwdGQyVnBaMmgwTFhCeWIyUjFZMlZ5UFcxaGFXNGdMUzFvYVhOMExXaHZiMnR6UFNjbklDMHRjR3h2ZEMxbWRXNWpkR2x2YmoxamIyeDFiVzVtYkc5M0xuQnNiM1IwYVc1bkxuQnNiM1JmWm5WdVkzUnBiMjV6WHpGa0xuQnNiM1JmZG1GeWFXRmliR1ZmY0dWeVgzQnliMk5sYzNNZ0xTMW1hV3hsTFhSNWNHVnpQWEJrWmlBdExYQnNiM1F0YzNWbVptbDRQVTVQWDFOVVVpQXRMWFpwWlhjdFkyMWtQVTVQWDFOVVVpQXRMV2RsYm1WeVlXd3RjMlYwZEdsdVozTTlZMjF6TFd4aFltVnNQWEIzSUMwdFkzVnpkRzl0TFhOMGVXeGxMV052Ym1acFp6MUVSVVpCVlV4VUlDMHRZMjF6TFd4aFltVnNQVTVQWDFOVVVpQXRMV0pzYVc1a2FXNW5MWFJvY21WemFHOXNaRDB0TVM0d0lDMHRlWE5qWVd4bFBVNVBYMU5VVWlBdExYQnliMk5sYzNNdGMyVjBkR2x1WjNNOUp5Y2dMUzEyWVhKcFlXSnNaUzF6WlhSMGFXNW5jejBuSnlBdExXTm1Ma05oYkdsaWNtRjBaVVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFdObUxsTmxiR1ZqZEVWMlpXNTBjeTEyWlhKemFXOXVQV3BsZEY5MlpYUnZYMlpwZUNBdExXTm1MazFsY21kbFVtVmtkV05sWkVWMlpXNTBjeTEyWlhKemFXOXVQV3BsZEY5MlpYUnZYMlpwZUNBdExXTm1MazFsY21kbFUyVnNaV04wYVc5dVUzUmhkSE10ZG1WeWMybHZiajFxWlhSZmRtVjBiMTltYVhnZ0xTMWpaaTVRY205MmFXUmxVbVZrZFdObFpFVjJaVzUwY3kxMlpYSnphVzl1UFdwbGRGOTJaWFJ2WDJacGVDQXRMV3h2WTJGc0xYTmphR1ZrZFd4bGNqMVVjblZsIE1nPT0gMSBubyBMUT09XCJcbiAgICAgICAgWyc0J109XCJjb2x1bW5mbG93LnRhc2tzLnBsb3R0aW5nIFBsb3RWYXJpYWJsZXMxRCBMUzFzYjJjdFptbHNaVDFPVDE5VFZGSWdMUzFqYkdWaGNpMXNiMmR6UFVaaGJITmxJQzB0WVc1aGJIbHphWE05YUhSMFkzQXVZMjl1Wm1sbkxtRnVZV3g1YzJselgyaDBkR053TG1GdVlXeDVjMmx6WDJoMGRHTndJQzB0ZG1WeWMybHZiajFtWmw5bGVIQmZZVzVrWDNBeVgzUmhkVjlsZEdFeWNETmZkR1Z6ZEY5TlZGUmZOU0F0TFdOdmJtWnBaejF5ZFc0elh6SXdNakpmY0hKbFJVVmZiWFYwWVhWZmJHbHRhWFJsWkNBdExYTm9hV1owUFc1dmJXbHVZV3dnTFMxallXeHBZbkpoZEc5eWN6MXRZV2x1SUMwdGMyVnNaV04wYjNJOWJXRnBiaUF0TFhObGJHVmpkRzl5TFhOMFpYQnpQU2NuSUMwdGNISnZaSFZqWlhKelBXMWhhVzRnTFMxdGJDMXRiMlJsYkhNOUp5Y2dMUzFqWVhSbFoyOXlhV1Z6UFdOaGRGOXRkWFJoZFY5emNpeGpZWFJmYlhWMFlYVmZjM0pmWDNSaGRUSmhNU0F0TFhaaGNtbGhZbXhsY3oxdGRYUmhkVjlzWlhBeFgzQjBMR2hqWVc1a1gyMTFkR0YxWDJaaGMzUk5WRlJmYkdWd01GOXdkQ0F0TFdSaGRHRnpaWFJ6UFhkcVgybHVZMnhmYldGa1ozSmhjR2dzYUY5bloyWmZhSFIwWDJOd2IxOW1hV3gwWlhKbFpDQXRMWEJ5YjJObGMzTmxjejEzYWl4b1gyZG5abDlvZEhSZlkzQnZJQzB0ZDJWcFoyaDBMWEJ5YjJSMVkyVnlQVzFoYVc0Z0xTMW9hWE4wTFdodmIydHpQU2NuSUMwdGNHeHZkQzFtZFc1amRHbHZiajFqYjJ4MWJXNW1iRzkzTG5Cc2IzUjBhVzVuTG5Cc2IzUmZablZ1WTNScGIyNXpYekZrTG5Cc2IzUmZkbUZ5YVdGaWJHVmZjR1Z5WDNCeWIyTmxjM01nTFMxbWFXeGxMWFI1Y0dWelBYQmtaaUF0TFhCc2IzUXRjM1ZtWm1sNFBVNVBYMU5VVWlBdExYWnBaWGN0WTIxa1BVNVBYMU5VVWlBdExXZGxibVZ5WVd3dGMyVjBkR2x1WjNNOVkyMXpMV3hoWW1Wc1BYQjNJQzB0WTNWemRHOXRMWE4wZVd4bExXTnZibVpwWnoxRVJVWkJWVXhVSUMwdFkyMXpMV3hoWW1Wc1BVNVBYMU5VVWlBdExXSnNhVzVrYVc1bkxYUm9jbVZ6YUc5c1pEMHRNUzR3SUMwdGVYTmpZV3hsUFU1UFgxTlVVaUF0TFhCeWIyTmxjM010YzJWMGRHbHVaM005SnljZ0xTMTJZWEpwWVdKc1pTMXpaWFIwYVc1bmN6MG5KeUF0TFdObUxrTmhiR2xpY21GMFpVVjJaVzUwY3kxMlpYSnphVzl1UFdwbGRGOTJaWFJ2WDJacGVDQXRMV05tTGxObGJHVmpkRVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFdObUxrMWxjbWRsVW1Wa2RXTmxaRVYyWlc1MGN5MTJaWEp6YVc5dVBXcGxkRjkyWlhSdlgyWnBlQ0F0TFdObUxrMWxjbWRsVTJWc1pXTjBhVzl1VTNSaGRITXRkbVZ5YzJsdmJqMXFaWFJmZG1WMGIxOW1hWGdnTFMxalppNVFjbTkyYVdSbFVtVmtkV05sWkVWMlpXNTBjeTEyWlhKemFXOXVQV3BsZEY5MlpYUnZYMlpwZUNBdExXeHZZMkZzTFhOamFHVmtkV3hsY2oxVWNuVmwgTXc9PSAxIG5vIExRPT1cIiJ9"
+    if [ -z "${render_variables}" ]; then
+        >&2 echo "empty render variables"
+        return "4"
+    fi
+
+    # decode
+    render_variables="$( echo "${render_variables}" | base64 --decode )"
+
+    # check files to render
+    local input_files_render=( law_job_d08599bc08.sh remote_bootstrap_d07e50ba95.sh )
+    if [ "${#input_files_render[@]}" == "0" ]; then
+        >&2 echo "received empty input files for rendering for LAW_HTCONDOR_JOB_NUMBER ${LAW_HTCONDOR_JOB_NUMBER}"
+        return "5"
+    fi
+
+    # render files
+    local input_file_render
+    for input_file_render in ${input_files_render[@]}; do
+        # skip if the file refers to _this_ one
+        local input_file_render_base="$( basename "${input_file_render}" )"
+        [ "${input_file_render_base}" = "${this_file_base}" ] && continue
+        # render
+        echo "render ${input_file_render}"
+        cat > _render.py << EOT
+import re
+repl = ${render_variables}
+repl['input_files_render'] = ''
+repl['file_postfix'] = '${file_postfix}' or repl.get('file_postfix', '')
+repl['log_file'] = ''
+content = open('${input_file_render}', 'r').read()
+content = re.sub(r'\{\{(\w+)\}\}', lambda m: repl.get(m.group(1), ''), content)
+open('${input_file_render_base}', 'w').write(content)
+EOT
+        _law_python _render.py
+        local render_ret="$?"
+        rm -f _render.py
+        # handle rendering errors
+        if [ "${render_ret}" != "0" ]; then
+            >&2 echo "input file rendering failed with code ${render_ret}"
+            return "6"
+        fi
+    done
+
+
+    #
+    # run the actual job file
+    #
+
+    # check the job file
+    local job_file="law_job_d08599bc08.sh"
+    if [ ! -f "${job_file}" ]; then
+        >&2 echo "job file '${job_file}' does not exist"
+        return "7"
+    fi
+
+    # helper to print a banner
+    banner() {
+        local msg="$1"
+
+        echo
+        echo "================================================================================"
+        echo "=== ${msg}"
+        echo "================================================================================"
+        echo
+    }
+
+    # debugging: print its contents
+    # echo "=== content of job file '${job_file}'"
+    # echo
+    # cat "${job_file}"
+    # echo
+    # echo "=== end of job file content"
+
+    # run it
+    banner "Start of law job"
+
+    local job_ret
+    bash "${job_file}" ${htcondor_job_arguments}
+    job_ret="$?"
+
+    banner "End of law job"
+
+    return "${job_ret}"
+}
+
+action() {
+    # arguments: file_postfix, log_file
+    local file_postfix="$1"
+    local log_file="$2"
+
+    # create log directory
+    if [ ! -z "${log_file}" ]; then
+        local log_dir="$( dirname "${log_file}" )"
+        [ ! -d "${log_dir}" ] && mkdir -p "${log_dir}"
+    fi
+
+    # run the wrapper function
+    if [ -z "${log_file}" ]; then
+        htcondor_wrapper "$@"
+    elif command -v tee &> /dev/null; then
+        set -o pipefail
+        echo "---" >> "${log_file}"
+        htcondor_wrapper "$@" 2>&1 | tee -a "${log_file}"
+    else
+        echo "---" >> "${log_file}"
+        htcondor_wrapper "$@" &>> "${log_file}"
+    fi
+}
+
+action "$@"

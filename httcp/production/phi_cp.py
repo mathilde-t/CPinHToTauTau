@@ -37,7 +37,8 @@ def apply_evt_mask(array: ak.Array, mask: ak.Array) -> ak.Array:
 
 
 def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
-    tau     = events.hcand_mutau.lep1 
+    tau     = events.hcand_mutau.lep1
+    tau_MTT     = events.hcand_mutau.fastMTT.lep1 #used only in mu_a1_pv
     tauprod = events.tau_decay_prods_mutau_lep1
     muon    = events.hcand_mutau.lep0
     mask = ak.ones_like(tau.pt, dtype=np.bool_)
@@ -56,9 +57,10 @@ def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
         mask = mask & (tau.ip_sig >= 1)
     elif (pair_decay_ch == "mu_a1") or (pair_decay_ch == "mu_a1_pv"):
         mask = mask & (tau.decayModePNet == 10)
-        mask = mask & (ak.sum(pion_mask(tauprod), axis=1) == 3) # Require only one charged pion
+        mask = mask & (ak.sum(pion_mask(tauprod), axis=1) == 3) # Require three charged pion
         mask = mask & (tau.ip_sig >= 1)
     sel_tau = apply_evt_mask(tau, ak.fill_none(ak.firsts(mask),False))
+    sel_tau_MTT = apply_evt_mask(tau_MTT, ak.fill_none(ak.firsts(mask),False))
     sel_tauprod = apply_evt_mask(tauprod, ak.fill_none(ak.firsts(mask),False))
     sel_muon = apply_evt_mask(muon, ak.fill_none(ak.firsts(mask),False))
     
@@ -126,7 +128,7 @@ def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
         lf_vars['os_pi'] = os_pion
         lf_vars['ss_pi1'] = ss_pions[:, :1]
         lf_vars['ss_pi2'] = ss_pions[:, 1:2]
-        lf_vars['tau'] = sel_tau
+        lf_vars['tau'] = sel_tau_MTT
         
         tau_p4 = get_lep_p4(sel_tau)
         boostvec_ = p1.add(tau_p4)

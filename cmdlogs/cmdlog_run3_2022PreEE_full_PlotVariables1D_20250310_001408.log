@@ -1,0 +1,21 @@
+2025-03-10:00:14:09,169 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2025-03-10:00:14:09,169 INFO     [cf_run.py:122] Execute  : cf.PlotVariables1D
+2025-03-10:00:14:09,169 INFO     [cf_run.py:123] Era      : 2022
+2025-03-10:00:14:09,170 INFO     [cf_run.py:124] Run      : 3
+2025-03-10:00:14:09,170 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-03-10:00:14:09,170 INFO     [cf_run.py:126] Limited? : False
+2025-03-10:00:14:09,170 INFO     [cf_run.py:127] nWorkers : 9
+2025-03-10:00:14:09,170 INFO     [cf_run.py:128] nTasks_per_job : 3
+2025-03-10:00:14:09,170 INFO     [cf_run.py:131] Wrapper  : True
+2025-03-10:00:14:09,170 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2025-03-10:00:14:09,170 INFO     [cf_run.py:142] datasets : h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+2025-03-10:00:14:09,170 INFO     [cf_run.py:145] processes: h_ggf_htt
+2025-03-10:00:14:09,170 INFO     [cf_run.py:149] shifts: tauspinner
+2025-03-10:00:14:09,170 INFO     [cf_run.py:152] worklflow: htcondor
+2025-03-10:00:14:09,170 INFO     [cf_run.py:155] branch   : -1
+2025-03-10:00:14:09,170 INFO     [cf_run.py:160] version  : Run3_preEE_2022_full_fastMTT_0p01mH_8_mars
+2025-03-10:00:14:09,170 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.PlotVariables1D --config run3_2022_preEE_nano_cp_tau_v14 --datasets h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay --processes h_ggf_htt --workflow htcondor --branch -1 --version Run3_preEE_2022_full_fastMTT_0p01mH_8_mars --categories mutau__lepD,mutau__lepD__a1dm10_2 --variables PhiCP_IPIP,PhiCP_DPDP,PhiCP_PVPV,PhiCP_IPPV,PhiCP_IPDP --workers 9 --pilot --log-file /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/cmdlogs/joblog_run3_2022PreEE_full_PlotVariables1D_20250310_001408.log --process-settings "h_ggf_htt,unstack,300:zh_htt,unstack,300:wh_htt,unstack,300"
+
+2025-03-10:00:14:09,170 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

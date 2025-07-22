@@ -1,0 +1,21 @@
+2025-01-07:13:18:50,910 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2025-01-07:13:18:50,910 INFO     [cf_run.py:122] Execute  : cf.CreateHistograms
+2025-01-07:13:18:50,910 INFO     [cf_run.py:123] Era      : 2022
+2025-01-07:13:18:50,910 INFO     [cf_run.py:124] Run      : 3
+2025-01-07:13:18:50,910 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-01-07:13:18:50,910 INFO     [cf_run.py:126] Limited? : False
+2025-01-07:13:18:50,910 INFO     [cf_run.py:127] nWorkers : 8
+2025-01-07:13:18:50,910 INFO     [cf_run.py:128] nTasks_per_job : 5
+2025-01-07:13:18:50,910 INFO     [cf_run.py:131] Wrapper  : True
+2025-01-07:13:18:50,910 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2025-01-07:13:18:50,910 INFO     [cf_run.py:142] datasets : wj_1j_madgraph,wj_2j_madgraph,wj_3j_madgraph,wj_4j_madgraph,dy_lep_m50_1j_madgraph,dy_lep_m50_2j_madgraph,dy_lep_m50_3j_madgraph,dy_lep_m50_4j_madgraph,tt_dl,tt_sl,tt_fh,st_tw_t_sl,st_tw_t_dl,st_tw_t_fh,ww,wz,zz,www,wwz,wzz,zzz
+2025-01-07:13:18:50,910 INFO     [cf_run.py:145] processes: w_lnu,dy,tt,st_tchannel,vv,vvv
+2025-01-07:13:18:50,910 INFO     [cf_run.py:149] shifts: 
+2025-01-07:13:18:50,910 INFO     [cf_run.py:152] worklflow: htcondor
+2025-01-07:13:18:50,910 INFO     [cf_run.py:155] branch   : -1
+2025-01-07:13:18:50,910 INFO     [cf_run.py:160] version  : Run3_2022PreEE_full_20250107_131850
+2025-01-07:13:18:50,911 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.CreateHistogramsWrapper --config run3_2022_preEE_nano_cp_tau_v14 --datasets wj_1j_madgraph,wj_2j_madgraph,wj_3j_madgraph,wj_4j_madgraph,dy_lep_m50_1j_madgraph,dy_lep_m50_2j_madgraph,dy_lep_m50_3j_madgraph,dy_lep_m50_4j_madgraph,tt_dl,tt_sl,tt_fh,st_tw_t_sl,st_tw_t_dl,st_tw_t_fh,ww,wz,zz,www,wwz,wzz,zzz --shifts nominal --cf.CreateHistograms-workflow htcondor --cf.CreateHistograms-tasks-per-job 5 --cf.CreateHistograms-pilot --version Run3_2022PreEE_full_20250107_131850 --workers 8 --cf.CreateHistograms-variables pu_weight
+
+2025-01-07:13:18:50,911 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

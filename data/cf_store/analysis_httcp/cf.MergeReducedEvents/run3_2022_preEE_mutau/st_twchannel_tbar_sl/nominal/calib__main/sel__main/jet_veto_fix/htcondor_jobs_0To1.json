@@ -1,0 +1,20 @@
+{
+    "jobs": {
+        "1": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                0
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/data/cf_store/analysis_httcp/cf.MergeReducedEvents/run3_2022_preEE_mutau/st_twchannel_tbar_sl/nominal/calib__main/sel__main/jet_veto_fix/stdall_0To1.txt"
+            }
+        }
+    },
+    "unsubmitted_jobs": {},
+    "attempts": {},
+    "tasks_per_job": 1,
+    "dashboard_config": {}
+}

@@ -1,0 +1,21 @@
+2025-01-09:10:59:56,249 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2025-01-09:10:59:56,249 INFO     [cf_run.py:122] Execute  : cf.ReduceEvents
+2025-01-09:10:59:56,249 INFO     [cf_run.py:123] Era      : 2022
+2025-01-09:10:59:56,249 INFO     [cf_run.py:124] Run      : 3
+2025-01-09:10:59:56,249 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-01-09:10:59:56,249 INFO     [cf_run.py:126] Limited? : False
+2025-01-09:10:59:56,249 INFO     [cf_run.py:127] nWorkers : 9
+2025-01-09:10:59:56,249 INFO     [cf_run.py:128] nTasks_per_job : 3
+2025-01-09:10:59:56,250 INFO     [cf_run.py:131] Wrapper  : True
+2025-01-09:10:59:56,250 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2025-01-09:10:59:56,250 INFO     [cf_run.py:142] datasets : data_tau_C,data_tau_D,data_mu_C,data_mu_D,data_single_mu_C,data_e_C,data_e_D,wj_incl_madgraph,dy_lep_m10to50_madgraph,dy_lep_m50_madgraph,tt_dl,tt_sl,tt_fh,st_tchannel_tbar,st_tw_t_sl,st_tchannel_t,st_tw_t_dl,st_tw_t_fh,st_tw_tb_sl,st_tw_tb_dl,st_tw_tb_fh,st_schannel_t,st_schannel_tbar,ww,wz,zz,www,wwz,wzz,zzz,h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+2025-01-09:10:59:56,250 INFO     [cf_run.py:145] processes: data,w_lnu,dy,tt,st,vv,vvv,h_ggf_htt
+2025-01-09:10:59:56,250 INFO     [cf_run.py:149] shifts: 
+2025-01-09:10:59:56,250 INFO     [cf_run.py:152] worklflow: htcondor
+2025-01-09:10:59:56,250 INFO     [cf_run.py:155] branch   : -1
+2025-01-09:10:59:56,250 INFO     [cf_run.py:160] version  : Run3_2022PreEE_full_9jan_preipsigcut
+2025-01-09:10:59:56,250 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.ReduceEventsWrapper --config run3_2022_preEE_nano_cp_tau_v14 --datasets data_tau_C,data_tau_D,data_mu_C,data_mu_D,data_single_mu_C,data_e_C,data_e_D,wj_incl_madgraph,dy_lep_m10to50_madgraph,dy_lep_m50_madgraph,tt_dl,tt_sl,tt_fh,st_tchannel_tbar,st_tw_t_sl,st_tchannel_t,st_tw_t_dl,st_tw_t_fh,st_tw_tb_sl,st_tw_tb_dl,st_tw_tb_fh,st_schannel_t,st_schannel_tbar,ww,wz,zz,www,wwz,wzz,zzz,h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay --shifts nominal --cf.ReduceEvents-workflow htcondor --cf.ReduceEvents-tasks-per-job 3 --cf.ReduceEvents-pilot --version Run3_2022PreEE_full_9jan_preipsigcut --workers 9
+
+2025-01-09:10:59:56,250 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

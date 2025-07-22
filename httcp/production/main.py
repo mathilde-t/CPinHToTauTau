@@ -24,6 +24,10 @@ from httcp.production.generatorZ import genZ
 from httcp.production.met_recoil import gen_boson, met_recoil
 from httcp.production.dilepton_features import hcand_fields,hcand_mt
 
+from httcp.production.apply_fastMTT import apply_fastMTT
+#from httcp.production.produce_px_py_pz import produce_px_py_pz
+#from httcp.production.produce_px_py_pz import calculate_higgs_mass_genlevel
+
 from httcp.production.phi_cp import phi_cp
 from httcp.production.aux_columns import jet_pt_def,jets_taggable, number_b_jet, pion_energy_split
 from httcp.production.top_pt_weight import top_pt_weight, gen_parton_top
@@ -56,6 +60,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
+        apply_fastMTT,
         phi_cp,
         category_ids,
         gen_parton_top,
@@ -84,6 +89,7 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
         hcand_fields,
         hcand_mt,
         tauspinner_weight,
+        apply_fastMTT,
         phi_cp,
         category_ids,
         gen_parton_top,
@@ -152,6 +158,12 @@ def main(self: Producer, events: ak.Array, **kwargs) -> ak.Array:
         if (dataset_inst := getattr(self, "dataset_inst", None)) and dataset_inst.has_tag("ttbar"):
             print("Producing Top pT weights...")
             events = self[top_pt_weight](events, **kwargs)
+        print("Producing fastMTT...")
+        events = self[apply_fastMTT](events, **kwargs)
+        #print("Producing produce .px, .py, .pz's")
+        #events = self[produce_px_py_pz](events, **kwargs)
+        #print("Producing Higgs mass at gen level")
+        #events = self[calculate_higgs_mass_genlevel](events, **kwargs)
     print("Producing Fake Factor weights...")
     events = self[fake_factors](events, **kwargs)
     print("Producing phi_cp...")

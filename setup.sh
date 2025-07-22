@@ -85,6 +85,9 @@ setup_httcp() {
     fi
 
     # continue the fixed setup
+    # export CF_CONDA_BASE="${CF_SOFTWARE_BASE}/conda"
+    # export CF_VENV_BASE="${CF_SOFTWARE_BASE}/venvs"
+    # export CF_CMSSW_BASE="${CF_SOFTWARE_BASE}/cmssw"
     export CF_CONDA_BASE="${CF_CONDA_BASE:-${CF_SOFTWARE_BASE}/conda}"
     export CF_VENV_BASE="${CF_VENV_BASE:-${CF_SOFTWARE_BASE}/venvs}"
     export CF_CMSSW_BASE="${CF_CMSSW_BASE:-${CF_SOFTWARE_BASE}/cmssw}"

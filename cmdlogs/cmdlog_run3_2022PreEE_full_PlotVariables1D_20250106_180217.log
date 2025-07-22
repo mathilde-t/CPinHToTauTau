@@ -1,0 +1,21 @@
+2025-01-06:18:02:18,134 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2025-01-06:18:02:18,135 INFO     [cf_run.py:122] Execute  : cf.PlotVariables1D
+2025-01-06:18:02:18,135 INFO     [cf_run.py:123] Era      : 2022
+2025-01-06:18:02:18,135 INFO     [cf_run.py:124] Run      : 3
+2025-01-06:18:02:18,135 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-01-06:18:02:18,135 INFO     [cf_run.py:126] Limited? : False
+2025-01-06:18:02:18,135 INFO     [cf_run.py:127] nWorkers : 8
+2025-01-06:18:02:18,135 INFO     [cf_run.py:128] nTasks_per_job : 5
+2025-01-06:18:02:18,135 INFO     [cf_run.py:131] Wrapper  : True
+2025-01-06:18:02:18,136 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2025-01-06:18:02:18,136 INFO     [cf_run.py:142] datasets : wj_1j_madgraph,wj_2j_madgraph,wj_3j_madgraph,wj_4j_madgraph,dy_lep_m50_1j_madgraph,dy_lep_m50_2j_madgraph,dy_lep_m50_3j_madgraph,dy_lep_m50_4j_madgraph,tt_dl,tt_sl,tt_fh,st_tw_t_sl,st_tw_t_dl,st_tw_t_fh,ww,wz,zz,www,wwz,wzz,zzz
+2025-01-06:18:02:18,136 INFO     [cf_run.py:145] processes: h_ggf_htt
+2025-01-06:18:02:18,136 INFO     [cf_run.py:149] shifts: 
+2025-01-06:18:02:18,136 INFO     [cf_run.py:152] worklflow: htcondor
+2025-01-06:18:02:18,136 INFO     [cf_run.py:155] branch   : -1
+2025-01-06:18:02:18,136 INFO     [cf_run.py:160] version  : Run3_2022PreEE_full_20250106_180217
+2025-01-06:18:02:18,136 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.PlotVariables1D --config run3_2022_preEE_nano_cp_tau_v14 --datasets wj_1j_madgraph,wj_2j_madgraph,wj_3j_madgraph,wj_4j_madgraph,dy_lep_m50_1j_madgraph,dy_lep_m50_2j_madgraph,dy_lep_m50_3j_madgraph,dy_lep_m50_4j_madgraph,tt_dl,tt_sl,tt_fh,st_tw_t_sl,st_tw_t_dl,st_tw_t_fh,ww,wz,zz,www,wwz,wzz,zzz --processes h_ggf_htt --workflow htcondor --branch -1 --version Run3_2022PreEE_full_20250106_180217 --categories mutau__* --variables hcand_1_decayMode,hcand_2_decayMode --workers 8 --pilot --log-file /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/cmdlogs/joblog_run3_2022PreEE_full_PlotVariables1D_20250106_180217.log --process-settings "h_ggf_htt,unstack,300"
+
+2025-01-06:18:02:18,136 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

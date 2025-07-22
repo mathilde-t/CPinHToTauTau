@@ -1,0 +1,21 @@
+2025-05-28:10:14:01,011 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_limited.yml
+2025-05-28:10:14:01,011 INFO     [cf_run.py:122] Execute  : cf.PlotVariables1D
+2025-05-28:10:14:01,011 INFO     [cf_run.py:123] Era      : 2022
+2025-05-28:10:14:01,011 INFO     [cf_run.py:124] Run      : 3
+2025-05-28:10:14:01,012 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-05-28:10:14:01,012 INFO     [cf_run.py:126] Limited? : True
+2025-05-28:10:14:01,012 INFO     [cf_run.py:127] nWorkers : 6
+2025-05-28:10:14:01,012 INFO     [cf_run.py:128] nTasks_per_job : None
+2025-05-28:10:14:01,012 INFO     [cf_run.py:131] Wrapper  : True
+2025-05-28:10:14:01,012 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14_limited
+2025-05-28:10:14:01,012 INFO     [cf_run.py:142] datasets : h_vbf_tautau_UncorrelatedDecay_Filtered
+2025-05-28:10:14:01,012 INFO     [cf_run.py:145] processes: h_vbf_htt
+2025-05-28:10:14:01,012 INFO     [cf_run.py:149] shifts: 
+2025-05-28:10:14:01,012 INFO     [cf_run.py:152] worklflow: local
+2025-05-28:10:14:01,012 INFO     [cf_run.py:155] branch   : 1
+2025-05-28:10:14:01,012 INFO     [cf_run.py:160] version  : testGenMass
+2025-05-28:10:14:01,012 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.PlotVariables1D --config run3_2022_preEE_nano_cp_tau_v14_limited --datasets h_vbf_tautau_UncorrelatedDecay_Filtered --processes h_vbf_htt --workflow local --branch 1 --version testGenMass --categories mutau__lepD,mutau__lepD__a1dm10_2 --variables hcand_invm_fastMTT,GenHiggs_mass,hcand_1_pt_fastMTT,hcand_1_eta_fastMTT,hcand_1_phi_fastMTT,hcand_1_mass_fastMTT,hcand_2_pt_fastMTT,hcand_2_eta_fastMTT,hcand_2_phi_fastMTT,hcand_2_mass_fastMTT --workers 6 --pilot --log-file /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/cmdlogs/joblog_run3_2022PreEE_limited_PlotVariables1D_20250528_101400.log --process-settings "h_ggf_tautau,unstack,10:h_vbf_tautau,unstack,10"
+
+2025-05-28:10:14:01,012 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

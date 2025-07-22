@@ -1,0 +1,21 @@
+2025-01-14:12:13:38,915 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2025-01-14:12:13:38,915 INFO     [cf_run.py:122] Execute  : cf.PlotVariables1D
+2025-01-14:12:13:38,915 INFO     [cf_run.py:123] Era      : 2022
+2025-01-14:12:13:38,915 INFO     [cf_run.py:124] Run      : 3
+2025-01-14:12:13:38,915 INFO     [cf_run.py:125] Postfix  : PreEE
+2025-01-14:12:13:38,916 INFO     [cf_run.py:126] Limited? : False
+2025-01-14:12:13:38,916 INFO     [cf_run.py:127] nWorkers : 9
+2025-01-14:12:13:38,916 INFO     [cf_run.py:128] nTasks_per_job : 3
+2025-01-14:12:13:38,916 INFO     [cf_run.py:131] Wrapper  : True
+2025-01-14:12:13:38,916 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2025-01-14:12:13:38,916 INFO     [cf_run.py:142] datasets : h_ggf_tautau_uncorrelated_filter
+2025-01-14:12:13:38,916 INFO     [cf_run.py:145] processes: h_ggf_htt
+2025-01-14:12:13:38,916 INFO     [cf_run.py:149] shifts: 
+2025-01-14:12:13:38,916 INFO     [cf_run.py:152] worklflow: htcondor
+2025-01-14:12:13:38,916 INFO     [cf_run.py:155] branch   : -1
+2025-01-14:12:13:38,916 INFO     [cf_run.py:160] version  : PhiCPtt+mt_12jan25
+2025-01-14:12:13:38,916 INFO     [cf_run.py:219] CMD      : 
+
+law run cf.PlotVariables1D --config run3_2022_preEE_nano_cp_tau_v14 --datasets h_ggf_tautau_uncorrelated_filter --processes h_ggf_htt --workflow htcondor --branch -1 --version PhiCPtt+mt_12jan25 --categories mutau__lepD,mutau__lepD__a1dm10_2,mutau__lepD__a1dm2_2,mutau__lepD__a1dm11_2,mutau__lepD__pi_2,mutau__lepD__rho_2,tautau__hadD__pi_a1dm10,tautau__hadD__pi_rho,tautau__hadD__pi_pi,tautau__hadD__pi_a1dm2,tautau__hadD__pi_a1dm11 --variables PhiCP_IPIP,PhiCP_IPPV,PhiCP_IPDP,PhiCPGen_IPIP,PhiCPGen_IPDP,PhiCPGen_IPPV --workers 9 --pilot --log-file /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/cmdlogs/joblog_run3_2022PreEE_full_PlotVariables1D_20250114_121338.log --process-settings "h_ggf_htt,unstack,300:zh_htt,unstack,300:wh_htt,unstack,300"
+
+2025-01-14:12:13:38,916 INFO     [cf_run.py:220] Copy this line above, paste it and hit enter : BABUSHCHA !

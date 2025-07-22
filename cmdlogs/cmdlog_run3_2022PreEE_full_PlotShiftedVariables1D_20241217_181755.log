@@ -1,0 +1,16 @@
+2024-12-17:18:17:57,151 INFO     [cf_run.py:121] Yaml     : yamls/2022PreEE_full.yml
+2024-12-17:18:17:57,152 INFO     [cf_run.py:122] Execute  : cf.PlotShiftedVariables1D
+2024-12-17:18:17:57,152 INFO     [cf_run.py:123] Era      : 2022
+2024-12-17:18:17:57,152 INFO     [cf_run.py:124] Run      : 3
+2024-12-17:18:17:57,152 INFO     [cf_run.py:125] Postfix  : PreEE
+2024-12-17:18:17:57,152 INFO     [cf_run.py:126] Limited? : False
+2024-12-17:18:17:57,152 INFO     [cf_run.py:127] nWorkers : 8
+2024-12-17:18:17:57,152 INFO     [cf_run.py:128] nTasks_per_job : 5
+2024-12-17:18:17:57,153 INFO     [cf_run.py:131] Wrapper  : True
+2024-12-17:18:17:57,153 INFO     [cf_run.py:135] Config   : run3_2022_preEE_nano_cp_tau_v14
+2024-12-17:18:17:57,153 INFO     [cf_run.py:142] datasets : h_ggf_tautau_uncorrelatedDecay_CPodd_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_MM_Filtered_ProdAndDecay,h_ggf_tautau_uncorrelatedDecay_SM_Filtered_ProdAndDecay
+2024-12-17:18:17:57,153 INFO     [cf_run.py:145] processes: h_ggf_htt
+2024-12-17:18:17:57,153 INFO     [cf_run.py:149] shifts: 
+2024-12-17:18:17:57,153 INFO     [cf_run.py:152] worklflow: htcondor
+2024-12-17:18:17:57,153 INFO     [cf_run.py:155] branch   : -1
+2024-12-17:18:17:57,153 INFO     [cf_run.py:160] version  : Run3_2022PreEE_full_20241216_180641

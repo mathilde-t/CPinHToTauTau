@@ -1,0 +1,339 @@
+---
+running htcondor_wrapper_dae8a7390a.sh for job number 294
+render law_job_d08599bc08.sh
+render remote_bootstrap_d07e50ba95.sh
+
+================================================================================
+=== Start of law job
+================================================================================
+
+law remote job script
+=====================
+04/07/2025 00:06:17.336719073 (CEST)
+
+-- environment -------------------------------------------------------------------------------------
+
+-- host infos
+> uname -a
+Linux b9g03p6806.cern.ch 5.14.0-570.23.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Jun 14 13:10:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+> hostnamectl status
+ Static hostname: b9g03p6806.cern.ch
+       Icon name: computer-server
+         Chassis: server 🖳
+      Machine ID: e02428dcf6444fe6b06d93d76f8834e6
+         Boot ID: 7a27ace57d6a49ff96d2f63ce6e8c5b5
+Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+     CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+          Kernel: Linux 5.14.0-570.23.1.el9_6.x86_64
+    Architecture: x86-64
+ Hardware Vendor: Intel Corporation
+  Hardware Model: S2600BPB
+Firmware Version: SE5C620.86B.02.01.0012.070720200218
+
+-- job infos
+shell    : /bin/bash
+hostname : b9g03p6806.cern.ch
+python   : missing
+python3  : Python 3.9.21 from /usr/bin/python3
+init dir : /pool/condor/dir_1152273
+job home : /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd
+tmp dir  : /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/tmp
+user home: /afs/cern.ch/user/m/mwitt
+pwd      : /pool/condor/dir_1152273
+script   : law_job_d08599bc08.sh
+args     : columnflow.tasks.calibration CalibrateEvents LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1qZXRfdmV0b19maXggLS1jb25maWc9cnVuM18yMDIyX3ByZUVFX211dGF1IC0tc2hpZnQ9bm9taW5hbCAtLWRhdGFzZXQ9dHRfc2wgLS1jYWxpYnJhdG9yPW1haW4gLS1jaGVjay1maW5pdGUtb3V0cHV0PVRydWUgLS1jaGVjay1vdmVybGFwcGluZy1pbnB1dHM9RmFsc2UgLS1jZi5TZWxlY3RFdmVudHMtd29ya2Zsb3c9aHRjb25kb3IgLS1jZi5TZWxlY3RFdmVudHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5NZXJnZVJlZHVjZWRFdmVudHMtd29ya2Zsb3c9aHRjb25kb3IgLS1jZi5NZXJnZVJlZHVjZWRFdmVudHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1jZi5NZXJnZVNlbGVjdGlvblN0YXRzLXZlcnNpb249amV0X3ZldG9fZml4IC0tY2YuUHJvdmlkZVJlZHVjZWRFdmVudHMtdmVyc2lvbj1qZXRfdmV0b19maXggLS1sb2NhbC1zY2hlZHVsZXI9VHJ1ZQ== Mjkz 1 no LQ==
+
+-- task infos
+task module   : columnflow.tasks.calibration
+task family   : CalibrateEvents
+task params   : --log-file=NO_STR --clear-logs=False --analysis=httcp.config.analysis_httcp.analysis_httcp --version=jet_veto_fix --config=run3_2022_preEE_mutau --shift=nominal --dataset=tt_sl --calibrator=main --check-finite-output=True --check-overlapping-inputs=False --cf.SelectEvents-workflow=htcondor --cf.SelectEvents-version=jet_veto_fix --cf.MergeReducedEvents-workflow=htcondor --cf.MergeReducedEvents-version=jet_veto_fix --cf.MergeSelectionStats-version=jet_veto_fix --cf.ProvideReducedEvents-version=jet_veto_fix --local-scheduler=True
+branches      : 293
+job workers   : 1
+auto retry    : no
+dashboard data: -
+
+-- files in LAW_JOB_INIT_DIR
+> pwd
+/pool/condor/dir_1152273
+> ls -la
+total 712
+drwx------.  6 mwitt  zh       4096 Jul  4 00:06 .
+drwxr-xr-x. 32 condor condor   4096 Jul  4 00:06 ..
+-rwx------.  1 mwitt  zh         48 Jul  4 00:06 .chirp.config
+-rwxr-xr-x.  1 mwitt  zh     625391 Jul  4 00:06 htcondor_wrapper_dae8a7390a.sh
+-rw-r--r--.  1 condor condor   7147 Jul  4 00:06 .job.ad
+drwx------.  3 mwitt  zh         25 Jul  4 00:06 job_Wnt3ZvHwS2Qd
+-rwxr-xr-x.  1 mwitt  zh      20226 Jul  4 00:06 law_job_d08599bc08.sh
+-rw-r--r--.  1 mwitt  zh      10667 Jul  4 00:06 law_wlcg_tools_401d9b9057.sh
+-rw-r--r--.  1 condor condor   8079 Jul  4 00:06 .machine.ad
+-rw-------.  1 mwitt  zh       3045 Jul  4 00:06 mwitt.cc
+-rwxr-xr-x.  1 mwitt  zh      12079 Jul  4 00:06 remote_bootstrap_d07e50ba95.sh
+drwx------.  2 mwitt  zh          6 Jul  4 00:06 srv
+-rw-r--r--.  1 mwitt  zh       3146 Jul  4 00:06 stdall_293To294.txt
+drwx------.  2 mwitt  zh          6 Jul  4 00:06 tmp
+-rw-r--r--.  1 mwitt  zh       7998 Jul  4 00:06 .update.ad
+drwx------.  3 mwitt  zh         25 Jul  4 00:06 var
+-rw-------.  1 mwitt  zh      10405 Jul  4 00:06 x509up_u151790_a8f12fd1f5
+
+-- link input files
+link /pool/condor/dir_1152273/htcondor_wrapper_dae8a7390a.sh
+link /pool/condor/dir_1152273/remote_bootstrap_d07e50ba95.sh
+link /pool/condor/dir_1152273/x509up_u151790_a8f12fd1f5
+link /pool/condor/dir_1152273/law_wlcg_tools_401d9b9057.sh
+
+-- files in LAW_JOB_HOME
+> pwd
+/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd
+> ls -la
+total 4
+drwx------. 3 mwitt zh  186 Jul  4 00:06 .
+drwx------. 6 mwitt zh 4096 Jul  4 00:06 ..
+lrwxrwxrwx. 1 mwitt zh   55 Jul  4 00:06 htcondor_wrapper_dae8a7390a.sh -> /pool/condor/dir_1152273/htcondor_wrapper_dae8a7390a.sh
+lrwxrwxrwx. 1 mwitt zh   53 Jul  4 00:06 law_wlcg_tools_401d9b9057.sh -> /pool/condor/dir_1152273/law_wlcg_tools_401d9b9057.sh
+lrwxrwxrwx. 1 mwitt zh   55 Jul  4 00:06 remote_bootstrap_d07e50ba95.sh -> /pool/condor/dir_1152273/remote_bootstrap_d07e50ba95.sh
+drwxr-xr-x. 2 mwitt zh   10 Jul  4 00:06 tmp
+lrwxrwxrwx. 1 mwitt zh   50 Jul  4 00:06 x509up_u151790_a8f12fd1f5 -> /pool/condor/dir_1152273/x509up_u151790_a8f12fd1f5
+
+-- setup -------------------------------------------------------------------------------------------
+
+-- bootstrap file
+run bootstrap file 'remote_bootstrap_d07e50ba95.sh'
+
+souring wlcg tools ...
+done sourcing wlcg tools
+
+fetching software bundle ...
+Copying 203951329 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleSoftware/software.2.tgz => file:///pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/conda/software.tgz
+law_wlcg_get_file: fetched 'software.2.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleSoftware'
+done fetching software bundle
+
+fetching repository bundle ...
+Copying 2845840 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.79df006e2dbe6dc145984f02c50d6868d1db9559.4.tgz => file:///pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/repo.tgz
+law_wlcg_get_file: fetched 'CPinHToTauTau.79df006e2dbe6dc145984f02c50d6868d1db9559.4.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleRepo'
+done fetching repository bundle
+
+source repository setup ...
+
+  ┏┏┓┃╻┏┏┳┓┏┓
+  ┗┗┛┃┗┛╹┗┗╹┗
+    ┏┃
+    ╋┃┏┓┓┏┏
+    ┛┃┗┛┗┻┛
+
+detected remote job environment
+initialized conda with micromamba interface and python 3.9
+looking for bash sandbox bundle for venv cf
+found bundle cf, index 0, pattern cf_5de7213c.c7b6b282e2.[^.]+.tgz, uri root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox
+Copying 11995725 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox/cf_5de7213c.c7b6b282e2.3.tgz => file:///pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/venvs/cf_5de7213c/bundle.tgz
+law_wlcg_get_file: fetched 'cf_5de7213c.c7b6b282e2.3.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox'
+
+CPinHToTauTau analysis successfully setup
+done sourcing repository setup
+
+-- bootstrap command
+bootstrap command empty, skip
+
+-- detect law
+found law at /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/law/law
+
+-- setup dashboard
+dashboard file empty, skip
+
+-- environment variables
+PATH           : /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/venvs/cf_5de7213c/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/law/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin/cms:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/conda/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/law/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin/cms:/afs/cern.ch/cms/caf/scripts:/cvmfs/cms.cern.ch/common:/usr/sue/bin:/usr/share/Modules/bin:/usr/condabin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin
+PYTHONPATH     : /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/cmsdb:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/law:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/order:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/venvs/cf_5de7213c/lib/python3.9/site-packages:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/bin:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/law:/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/repo/modules/columnflow/modules/order::/pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/conda/lib/python3.9/site-packages
+LD_LIBRARY_PATH: 
+CPATH          : 
+
+-- hook law_hook_job_running -----------------------------------------------------------------------
+
+function 'law_hook_job_running' does not exist, skip
+
+-- run task branch 293 -----------------------------------------------------------------------------
+
+cmd: law run columnflow.tasks.calibration.CalibrateEvents --log-file=NO_STR --clear-logs=False --analysis=httcp.config.analysis_httcp.analysis_httcp --version=jet_veto_fix --config=run3_2022_preEE_mutau --shift=nominal --dataset=tt_sl --calibrator=main --check-finite-output=True --check-overlapping-inputs=False --cf.SelectEvents-workflow=htcondor --cf.SelectEvents-version=jet_veto_fix --cf.MergeReducedEvents-workflow=htcondor --cf.MergeReducedEvents-version=jet_veto_fix --cf.MergeSelectionStats-version=jet_veto_fix --cf.ProvideReducedEvents-version=jet_veto_fix --local-scheduler=True --branch=293  --workers=1
+
+-- dependency tree
+print task dependencies with max_depth 2
+
+0 > cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+│
+├──1 > cf.GetDatasetLFNs(analysis=httcp.config.analysis_httcp.analysis_httcp, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, replicas=5)
+│
+└──1 > cf.BundleExternalFiles(analysis=httcp.config.analysis_httcp.analysis_httcp, config=run3_2022_preEE_mutau, replicas=5)
+
+-- execute attempt 1
+04/07/2025 00:06:52.022164297 (CEST)
+INFO: luigi-interface - Informed scheduler that task   cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9   has status   PENDING
+INFO: Informed scheduler that task   cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9   has status   PENDING
+INFO: luigi-interface - Informed scheduler that task   cf.BundleExternalFiles_httcp_config_ana_run3_2022_preEE__5_60400b44c3   has status   DONE
+INFO: Informed scheduler that task   cf.BundleExternalFiles_httcp_config_ana_run3_2022_preEE__5_60400b44c3   has status   DONE
+INFO: luigi-interface - Informed scheduler that task   cf.GetDatasetLFNs_httcp_config_ana_run3_2022_preEE__tt_sl_895069423a   has status   DONE
+INFO: Informed scheduler that task   cf.GetDatasetLFNs_httcp_config_ana_run3_2022_preEE__tt_sl_895069423a   has status   DONE
+INFO: luigi-interface - Done scheduling tasks
+INFO: Done scheduling tasks
+INFO: luigi-interface - Running Worker with 1 processes
+INFO: Running Worker with 1 processes
+INFO: luigi-interface - [pid 695] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) running   cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: [pid 695] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) running   cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+looking for bash sandbox bundle for venv venv_columnar
+found bundle venv_columnar, index 1, pattern venv_columnar_4ef45674.2bae81e103.[^.]+.tgz, uri root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox
+Copying 216916659 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox/venv_columnar_4ef45674.2bae81e103.3.tgz => file:///pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd/cf_data/software/venvs/venv_columnar_4ef45674/bundle.tgz
+law_wlcg_get_file: fetched 'venv_columnar_4ef45674.2bae81e103.3.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox'
+
+
+=============================== entering sandbox ===============================
+task   : cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9
+sandbox: bash::$CF_BASE/sandboxes/venv_columnar.sh
+================================================================================
+
+
+INFO: luigi-interface - Done scheduling tasks
+INFO: Done scheduling tasks
+INFO: luigi-interface - Running Worker with 1 processes
+INFO: Running Worker with 1 processes
+INFO: luigi-interface - [pid 926] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) running   cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: [pid 926] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) running   cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+handling file 293
+INFO: columnflow.tasks.external - lfn /eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/TTtoLNu2Q_ext1/nano_62.root does exist at fs wlcg_fs_eos
+using fs wlcg_fs_eos, stat responded in 0.03 seconds
+lfn /eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/TTtoLNu2Q_ext1/nano_62.root, size is 1022.5 MB
+iterate through 410_559 events in 5 chunks ...
+handling chunk 0
+WARNING: columnflow.production.cms.seeds - optional route 'Photon.pt' not found in events chunk for seed calculation
+Performing Jet Energy Correction...
+Performing electron scaling and smearing correction...
+Electron scaling and smearing correction...SUCCEDED
+Performing tau energy scale correction...
+handling chunk 1
+Performing Jet Energy Correction...
+Performing electron scaling and smearing correction...
+Electron scaling and smearing correction...SUCCEDED
+Performing tau energy scale correction...
+handling chunk 2
+Performing Jet Energy Correction...
+Performing electron scaling and smearing correction...
+Electron scaling and smearing correction...SUCCEDED
+Performing tau energy scale correction...
+handling chunk 4
+Performing Jet Energy Correction...
+Performing electron scaling and smearing correction...
+Electron scaling and smearing correction...SUCCEDED
+Performing tau energy scale correction...
+handling chunk 3
+Performing Jet Energy Correction...
+Performing electron scaling and smearing correction...
+Electron scaling and smearing correction...SUCCEDED
+Performing tau energy scale correction...
+done (took 36.85 seconds)
+event processing in loop body took 21.9 seconds
+merging 5 parquet files ...
+done (took 2.56 seconds)
+merged file size: 146.3 MB
+INFO: luigi-interface - [pid 926] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) done      cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: [pid 926] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) done      cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: luigi-interface - This progress looks :) because there were no failed tasks or missing dependencies
+INFO: This progress looks :) because there were no failed tasks or missing dependencies
+
+=============================== leaving sandbox ================================
+task   : cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9
+sandbox: bash::$CF_BASE/sandboxes/venv_columnar.sh
+================================================================================
+
+INFO: luigi-interface - [pid 695] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) done      cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: [pid 695] Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) done      cf.CalibrateEvents(effective_workflow=local, branch=293, analysis=httcp.config.analysis_httcp.analysis_httcp, version=jet_veto_fix, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=tt_sl, calibrator=main)
+INFO: luigi-interface - Informed scheduler that task   cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9   has status   DONE
+INFO: Informed scheduler that task   cf.CalibrateEvents_httcp_config_ana_293__e811ce83e9   has status   DONE
+INFO: luigi-interface - Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) was stopped. Shutting down Keep-Alive thread
+INFO: Worker Worker(salt=3803461099, workers=1, host=b9g03p6806.cern.ch, username=mwitt, pid=695) was stopped. Shutting down Keep-Alive thread
+INFO: luigi-interface - 
+===== Luigi Execution Summary =====
+
+Scheduled 3 tasks of which:
+* 2 complete ones were encountered:
+    - 1 cf.BundleExternalFiles(...)
+    - 1 cf.GetDatasetLFNs(...)
+* 1 ran successfully:
+    - 1 cf.CalibrateEvents(...)
+
+This progress looks :) because there were no failed tasks or missing dependencies
+
+===== Luigi Execution Summary =====
+
+INFO: 
+===== Luigi Execution Summary =====
+
+Scheduled 3 tasks of which:
+* 2 complete ones were encountered:
+    - 1 cf.BundleExternalFiles(...)
+    - 1 cf.GetDatasetLFNs(...)
+* 1 ran successfully:
+    - 1 cf.CalibrateEvents(...)
+
+This progress looks :) because there were no failed tasks or missing dependencies
+
+===== Luigi Execution Summary =====
+
+task exit code: 0
+04/07/2025 00:08:35.225397303 (CEST)
+
+-- hook law_hook_job_finished ----------------------------------------------------------------------
+
+function 'law_hook_job_finished' does not exist, skip
+
+-- stageout ----------------------------------------------------------------------------------------
+
+-- stageout file
+stageout file empty, skip
+
+-- stageout command
+stageout command empty, skip
+
+-- cleanup -----------------------------------------------------------------------------------------
+
+-- files before cleanup
+> ls -a /pool/condor/dir_1152273/job_Wnt3ZvHwS2Qd ($LAW_JOB_HOME)
+total 12
+drwx------.  6 mwitt zh 4096 Jul  4 00:06 .
+drwx------.  6 mwitt zh 4096 Jul  4 00:06 ..
+drwxr-xr-x.  3 mwitt zh   30 Jul  4 00:06 cf_data
+drwxrwxrwx.  2 mwitt zh   10 Jul  4 00:08 cf_wlcg_cache
+lrwxrwxrwx.  1 mwitt zh   55 Jul  4 00:06 htcondor_wrapper_dae8a7390a.sh -> /pool/condor/dir_1152273/htcondor_wrapper_dae8a7390a.sh
+lrwxrwxrwx.  1 mwitt zh   53 Jul  4 00:06 law_wlcg_tools_401d9b9057.sh -> /pool/condor/dir_1152273/law_wlcg_tools_401d9b9057.sh
+lrwxrwxrwx.  1 mwitt zh   55 Jul  4 00:06 remote_bootstrap_d07e50ba95.sh -> /pool/condor/dir_1152273/remote_bootstrap_d07e50ba95.sh
+drwxr-xr-x. 12 mwitt zh 4096 Jul  4 00:06 repo
+drwxr-xr-x.  3 mwitt zh   41 Jul  4 00:08 tmp
+lrwxrwxrwx.  1 mwitt zh   50 Jul  4 00:06 x509up_u151790_a8f12fd1f5 -> /pool/condor/dir_1152273/x509up_u151790_a8f12fd1f5
+
+-- files after cleanup
+> ls -a /pool/condor/dir_1152273 ($LAW_JOB_INIT_DIR)
+total 740
+drwx------.  5 mwitt  zh       4096 Jul  4 00:08 .
+drwxr-xr-x. 32 condor condor   4096 Jul  4 00:06 ..
+-rwx------.  1 mwitt  zh         48 Jul  4 00:06 .chirp.config
+-rwxr-xr-x.  1 mwitt  zh     625391 Jul  4 00:06 htcondor_wrapper_dae8a7390a.sh
+-rw-r--r--.  1 condor condor   7147 Jul  4 00:06 .job.ad
+-rwxr-xr-x.  1 mwitt  zh      20226 Jul  4 00:06 law_job_d08599bc08.sh
+-rw-r--r--.  1 mwitt  zh      10667 Jul  4 00:06 law_wlcg_tools_401d9b9057.sh
+-rw-r--r--.  1 condor condor   8079 Jul  4 00:06 .machine.ad
+-rw-------.  1 mwitt  zh       8337 Jul  4 00:07 mwitt.cc
+-rwxr-xr-x.  1 mwitt  zh      12079 Jul  4 00:06 remote_bootstrap_d07e50ba95.sh
+drwx------.  2 mwitt  zh          6 Jul  4 00:06 srv
+-rw-r--r--.  1 mwitt  zh      21086 Jul  4 00:08 stdall_293To294.txt
+drwx------.  2 mwitt  zh         28 Jul  4 00:06 tmp
+-rw-r--r--.  1 mwitt  zh       7998 Jul  4 00:06 .update.ad
+drwx------.  3 mwitt  zh         25 Jul  4 00:06 var
+-rw-------.  1 mwitt  zh      10405 Jul  4 00:06 x509up_u151790_a8f12fd1f5
+
+-- end ---------------------------------------------------------------------------------------------
+
+start time    : 04/07/2025 00:06:17.336719073 (CEST)
+end time      : 04/07/2025 00:08:37.265838676 (CEST)
+job exit code : 0
+
+
+================================================================================
+=== End of law job
+================================================================================
+

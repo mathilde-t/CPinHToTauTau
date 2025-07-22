@@ -14,7 +14,7 @@ args=(
         ### SIGNAL REGION  CATEGORIES ###
         #################################
 
-        #'cat_mutau_sr' 
+        #'cat_mutau_sr'
         #`',cat_mutau_sr__nj0_dm0,cat_mutau_sr__nj1_dm0,cat_mutau_sr__nj2_dm0,'`
         # #DM1
         # `'cat_mutau_sr__nj0_dm1,cat_mutau_sr__nj1_dm1,cat_mutau_sr__nj2_dm1,'`
@@ -102,17 +102,19 @@ args=(
         
         --cf.MergeSelectionStats-version $version
         --cf.ProvideReducedEvents-version $version
-        --version ff_exp_and_p2_tau_eta2p3
+        --version ff_exp_and_p2_tau_eta2p3_MTT_MW
         --variables $variables
-        --file-types pdf,png
+        --file-types pdf
        # Currently there are three methods that are implemented as hist hooks:
        # 1. ff_method: general fake factor method that requires ff weights to be present at the events tree
        # 2. ff_method_dr_closure_test: Calclulate fake contribution and apply it to the dr_num regions for the closure tests
        # 3. good_old_abcd: estimates QCD contribution by taking events from same sign region and transfer factors from inv. lep iso
          
-        --hist-hooks good_old_abcd #ff_method_dr_closure_test
-        --general-settings "cms-label=pw,yscale=log"
-        --process-settings "h_ggf_htt,unstack,scale=stack,color=#0000FF"
+        #--hist-hooks good_old_abcd #ff_method_dr_closure_test
+        #--general-settings "cms-label=pw,yscale=log"
+        --general-settings "cms-label=pw"
+        #--process-settings "h_ggf_htt_cpo,unstack,scale=stack,color=#28348e:h_ggf_htt_mm,unstack,scale=stack,color=#2b663c:h_ggf_htt_sm,unstack,scale=stack,color=#d62839"
+        --process-settings "h_ggf_htt_cpo,color=#28348e:h_ggf_htt_mm,color=#2b663c:h_ggf_htt_sm,color=#d62839"
         "${@:2}"
     )
 echo law run cf.PlotVariables1D "${args[@]}"

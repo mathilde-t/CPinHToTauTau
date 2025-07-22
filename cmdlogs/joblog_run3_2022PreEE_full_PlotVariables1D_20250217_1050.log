@@ -1,0 +1,20 @@
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/WWZ_4F)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/ST_t_channel_top_4f_InclusiveDecays)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/GluGluHTo2Tau_UncorrelatedDecay_CPodd_Filtered_ProdAndDecay)
+EE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/TTtoLNu2Q_ext1)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/TTto2L2Nu)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/TTto2L2Nu_ext1)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/DYto2L_M_50_madgraphMLM)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/DYto2L_M_50_madgraphMLM_ext1)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/ST_s_channel_top_4f_leptonDecays)
+Creating custom get_dataset_lfns for run3_2022_preEE_nano_cp_tau_v14
+lfn basedir:WLCGDirectoryTarget(fs=wlcg_fs_eoscms_redirector, path=/eos/cms/store/group/phys_higgs/HLepRare/skim_2024_v2/Run3_2022/WminusHToTauTau_UncorrelatedDecay_Filtered)

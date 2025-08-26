@@ -28,8 +28,8 @@ set_ak_column_i32 = functools.partial(set_ak_column, value_type=np.int32)
     produces={
         f"bdt_raw_score_{the_output}"
         for the_output in ["gtau", "higgs", "fake"]
-    } | {"bdt_cat"}
-    # sandbox=dev_sandbox("bash::$HBT_BASE/sandboxes/venv_columnar_tf.sh"),
+    } | {"bdt_cat"},
+    sandbox=dev_sandbox("bash::$HTTCP_BASE/sandboxes/venv_columnar_xgb.sh"),
 )
 def hcp_bdt_score(
     self: Producer,

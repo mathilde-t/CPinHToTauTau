@@ -215,6 +215,11 @@ def add_categories(config: od.Config,
                                                  parent_categories=base_cats,
                                                  child_category_map=bdt_cats_map)
     sel_hig_cats = [the_cat for the_cat in splitted_by_bdt if '__hig' in the_cat]
+
+    #split cat0+cat1+cat2
+    splitted_by_dm = create_child_categories(config,
+                                              parent_categories=sel_hig_cats,
+                                              child_category_map=tau_decays_map)
     
     splitted_by_hig_cats = create_child_categories(config,
                                                  parent_categories=sel_hig_cats,
@@ -228,4 +233,3 @@ def add_categories(config: od.Config,
     for the_name in splitted_by_hig_cats:
         the_cat = config.get_category(the_name)
         config.remove_category(the_cat)
-    

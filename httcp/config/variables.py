@@ -779,7 +779,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"{ch_str}_{lep}_mass",
                 expression=f"hcand_{ch_str}.{lep}.mass",
                 null_value=EMPTY_FLOAT,
-                binning=(30, 0, 3),
+                binning=(60, 0, 3),
                 unit="GeV",
                 x_title=f"{lep_str} mass",
             )
@@ -944,7 +944,7 @@ def add_dilepton_features(cfg: od.Config) -> None:
                 name=f"hcand_{ch_str}_fastMTT_{lep}_mass",
                 expression=f"hcand_{ch_str}.fastMTT.{lep}.mass",
                 null_value=EMPTY_FLOAT,
-                binning=(50, 0.01, 3.0),
+                binning=(60, 0.0, 3.0),
                 unit="GeV",
                 x_title=f"{lep} " + r"$m^{fastMTT}$",
             )

@@ -125,7 +125,7 @@ def apply_fastMTT(
         # Prepare the reconstructed tau leptons into new hcand columns
         lep0 = ak.zip(
             {
-                'px': p4_h1_reg.x,
+                'px': p4_h1_reg.x, #px,py,pz are only produced in this fastMTT implementation for resolution studies
                 'py': p4_h1_reg.y,
                 'pz': p4_h1_reg.z,
                 'pt': p4_h1_reg.pt,

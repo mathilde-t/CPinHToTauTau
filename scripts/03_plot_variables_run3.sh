@@ -110,7 +110,7 @@ args=(
         
         --cf.MergeSelectionStats-version $version
         --cf.ProvideReducedEvents-version $version
-        --version 25_july_test_new_cats_MTT_4Mev
+        --version 26_aout_MTT_ggF_VBF
         --variables $variables_mutau
         #'mutau_mvis,mutau_pt_vis,mutau_pt_vis,mutau_mt_ll,'`
         #`'mutau_mt0,mutau_mt1,mutau_mt_tot,mutau_delta_eta,mutau_delta_r,'`
@@ -128,9 +128,10 @@ args=(
        # 2. ff_method_dr_closure_test: Calclulate fake contribution and apply it to the dr_num regions for the closure tests
        # 3. good_old_abcd: estimates QCD contribution by taking events from same sign region and transfer factors from inv. lep iso
          
-        #--hist-hooks good_old_abcd #ff_method_dr_closure_test
+        --hist-hooks good_old_abcd #ff_method_dr_closure_test
         --general-settings "cms-label=pw"
-        --process-settings "h_ggf_htt_cpo,unstack,scale=stack,color=#28348e:h_ggf_htt_mm,unstack,scale=stack,color=#2b663c:h_ggf_htt_sm,unstack,scale=stack,color=#d62839"
+        --process-settings "h_ggf_htt_cpo,unstack,scale=stack,color=#28348e:h_ggf_htt_mm,unstack,scale=stack,color=#2b663c:h_ggf_htt_sm,unstack,scale=stack,color=#d62839:h_vbf_htt_cpo,unstack,scale=stack,color=#1f77b4:h_vbf_htt_mm,unstack,scale=stack,color=#ff7f0e:h_vbf_htt_sm,unstack,scale=stack,color=#2ca02c"
+
         "${@:2}"
     )
 echo law run cf.PlotVariables1D "${args[@]}"

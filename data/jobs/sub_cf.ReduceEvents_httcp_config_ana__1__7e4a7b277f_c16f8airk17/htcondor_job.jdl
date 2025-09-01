@@ -1,0 +1,18 @@
+universe = vanilla
+executable = htcondor_wrapper_b6ccd22079.sh
+log = /dev/null
+should_transfer_files = YES
+transfer_input_files = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.ReduceEvents_httcp_config_ana__1__7e4a7b277f_c16f8airk17/law_job_60abdeb487.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.ReduceEvents_httcp_config_ana__1__7e4a7b277f_c16f8airk17/htcondor_wrapper_b6ccd22079.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.ReduceEvents_httcp_config_ana__1__7e4a7b277f_c16f8airk17/remote_bootstrap_11d1b65a98.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.ReduceEvents_httcp_config_ana__1__7e4a7b277f_c16f8airk17/x509up_u151790_a8f12fd1f5,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.ReduceEvents_httcp_config_ana__1__7e4a7b277f_c16f8airk17/law_wlcg_tools_c14cae0aff.sh
+transfer_output_files = stdall$(law_job_postfix).txt
+when_to_transfer_output = ON_EXIT
+transfer_output_remaps = "stdall$(law_job_postfix).txt = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.ReduceEvents/run3_2022_preEE_mutau_limited/st_twchannel_t_dl/nominal/calib__main/sel__main/framework_sync/stdall$(law_job_postfix).txt"
+notification = Never
+initialdir = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.ReduceEvents/run3_2022_preEE_mutau_limited/st_twchannel_t_dl/nominal/calib__main/sel__main/framework_sync
+batch_name = cf.ReduceEvents_run3_2022_preEE_mutau_limited_st_twchannel_t_dl
+MY.WantOS = el9
++MaxRuntime = 7199
++RequestRuntime = 7199
+environment = "LAW_HTCONDOR_JOB_CLUSTER=$(Cluster) LAW_HTCONDOR_JOB_PROCESS=$(Process)"
+queue law_job_postfix, arguments from (
+    _0To1, _0To1 stdall$(law_job_postfix).txt
+)

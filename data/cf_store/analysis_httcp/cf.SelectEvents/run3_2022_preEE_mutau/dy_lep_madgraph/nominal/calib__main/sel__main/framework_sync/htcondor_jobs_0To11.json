@@ -1,0 +1,139 @@
+{
+    "jobs": {
+        "1": {
+            "job_id": "13326267.0",
+            "branches": [
+                0
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_0To1.txt"
+            }
+        },
+        "2": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                1
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_1To2.txt"
+            }
+        },
+        "3": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                2
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_2To3.txt"
+            }
+        },
+        "4": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                3
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_3To4.txt"
+            }
+        },
+        "5": {
+            "job_id": "13326267.4",
+            "branches": [
+                4
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_4To5.txt"
+            }
+        },
+        "6": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                5
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_5To6.txt"
+            }
+        },
+        "7": {
+            "job_id": "13326267.6",
+            "branches": [
+                6
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_6To7.txt"
+            }
+        },
+        "8": {
+            "job_id": "13326267.7",
+            "branches": [
+                7
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_7To8.txt"
+            }
+        },
+        "9": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                8
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_8To9.txt"
+            }
+        },
+        "10": {
+            "job_id": "13326267.9",
+            "branches": [
+                9
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall_9To10.txt"
+            }
+        }
+    },
+    "unsubmitted_jobs": {},
+    "attempts": {
+        "7": 214,
+        "8": 212,
+        "9": 216,
+        "10": 217,
+        "1": 215,
+        "3": 212,
+        "4": 216,
+        "5": 218,
+        "6": 199,
+        "2": 218
+    },
+    "tasks_per_job": 1,
+    "dashboard_config": {}
+}

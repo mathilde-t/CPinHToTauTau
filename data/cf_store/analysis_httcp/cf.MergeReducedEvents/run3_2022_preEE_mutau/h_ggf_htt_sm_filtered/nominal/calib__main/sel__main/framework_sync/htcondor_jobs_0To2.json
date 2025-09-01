@@ -1,0 +1,35 @@
+{
+    "jobs": {
+        "1": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                0
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.MergeReducedEvents/run3_2022_preEE_mutau/h_ggf_htt_sm_filtered/nominal/calib__main/sel__main/framework_sync/stdall_0To1.txt"
+            }
+        },
+        "2": {
+            "job_id": "dummy_job_id",
+            "branches": [
+                1
+            ],
+            "status": "finished",
+            "code": 0,
+            "error": null,
+            "extra": {
+                "log": "/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.MergeReducedEvents/run3_2022_preEE_mutau/h_ggf_htt_sm_filtered/nominal/calib__main/sel__main/framework_sync/stdall_1To2.txt"
+            }
+        }
+    },
+    "unsubmitted_jobs": {},
+    "attempts": {
+        "1": 3,
+        "2": 3
+    },
+    "tasks_per_job": 1,
+    "dashboard_config": {}
+}

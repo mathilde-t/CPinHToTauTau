@@ -1,0 +1,335 @@
+---
+running htcondor_wrapper_b6ccd22079.sh for job number 2
+render law_job_60abdeb487.sh
+render remote_bootstrap_11d1b65a98.sh
+
+================================================================================
+=== Start of law job
+================================================================================
+
+law remote job script
+=====================
+01/09/2025 12:01:08.249248190 (CEST)
+
+-- environment -------------------------------------------------------------------------------------
+
+-- host infos
+> uname -a
+Linux b9p17p0722.cern.ch 5.14.0-570.17.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Tue May 13 06:41:18 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+> hostnamectl status
+ Static hostname: b9p17p0722.cern.ch
+       Icon name: computer-server
+         Chassis: server 🖳
+      Machine ID: 357e1195623c46ae8e3021c83dc873a3
+         Boot ID: bfc2128de38f4892a95d643f44dc79f8
+Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+     CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+          Kernel: Linux 5.14.0-570.17.1.el9_6.x86_64
+    Architecture: x86-64
+Firmware Version: SE5C620.86B.02.01.0012.070720200218
+
+-- job infos
+shell    : /bin/bash
+hostname : b9p17p0722.cern.ch
+python   : missing
+python3  : Python 3.9.21 from /usr/bin/python3
+init dir : /pool/condor/dir_2901602
+job home : /pool/condor/dir_2901602/job_XY8B3g8u6HwI
+tmp dir  : /pool/condor/dir_2901602/job_XY8B3g8u6HwI/tmp
+user home: /afs/cern.ch/user/m/mwitt
+pwd      : /pool/condor/dir_2901602
+script   : law_job_60abdeb487.sh
+args     : columnflow.tasks.reduction MergeReducedEvents LS1sb2ctZmlsZT1OT19TVFIgLS1jbGVhci1sb2dzPUZhbHNlIC0tYW5hbHlzaXM9aHR0Y3AuY29uZmlnLmFuYWx5c2lzX2h0dGNwLmFuYWx5c2lzX2h0dGNwIC0tdmVyc2lvbj1mcmFtZXdvcmtfc3luYyAtLWNvbmZpZz1ydW4zXzIwMjJfcHJlRUVfbXV0YXUgLS1zaGlmdD1ub21pbmFsIC0tZGF0YXNldD1kYXRhX211X0MgLS1jYWxpYnJhdG9ycz1tYWluIC0tc2VsZWN0b3I9bWFpbiAtLXNlbGVjdG9yLXN0ZXBzPScnIC0ta2VlcC1yZWR1Y2VkLWV2ZW50cz1UcnVlIC0tY2YuQ2FsaWJyYXRlRXZlbnRzLXdvcmtmbG93PWh0Y29uZG9yIC0tY2YuQ2FsaWJyYXRlRXZlbnRzLXZlcnNpb249ZnJhbWV3b3JrX3N5bmMgLS1jZi5TZWxlY3RFdmVudHMtd29ya2Zsb3c9aHRjb25kb3IgLS1jZi5TZWxlY3RFdmVudHMtdmVyc2lvbj1mcmFtZXdvcmtfc3luYyAtLWNmLlJlZHVjZUV2ZW50cy13b3JrZmxvdz1odGNvbmRvciAtLWNmLlJlZHVjZUV2ZW50cy12ZXJzaW9uPWZyYW1ld29ya19zeW5jIC0tY2YuTWVyZ2VTZWxlY3Rpb25TdGF0cy12ZXJzaW9uPWZyYW1ld29ya19zeW5jIC0tY2YuUHJvdmlkZVJlZHVjZWRFdmVudHMtdmVyc2lvbj1mcmFtZXdvcmtfc3luYyAtLWxvY2FsLXNjaGVkdWxlcj1UcnVl MQ== 1 no LQ==
+
+-- task infos
+task module   : columnflow.tasks.reduction
+task family   : MergeReducedEvents
+task params   : --log-file=NO_STR --clear-logs=False --analysis=httcp.config.analysis_httcp.analysis_httcp --version=framework_sync --config=run3_2022_preEE_mutau --shift=nominal --dataset=data_mu_C --calibrators=main --selector=main --selector-steps='' --keep-reduced-events=True --cf.CalibrateEvents-workflow=htcondor --cf.CalibrateEvents-version=framework_sync --cf.SelectEvents-workflow=htcondor --cf.SelectEvents-version=framework_sync --cf.ReduceEvents-workflow=htcondor --cf.ReduceEvents-version=framework_sync --cf.MergeSelectionStats-version=framework_sync --cf.ProvideReducedEvents-version=framework_sync --local-scheduler=True
+branches      : 1
+job workers   : 1
+auto retry    : no
+dashboard data: -
+
+-- files in LAW_JOB_INIT_DIR
+> pwd
+/pool/condor/dir_2901602
+> ls -la
+total 120
+drwx------.  6 mwitt  zh      4096 Sep  1 12:01 .
+drwxr-xr-x. 50 condor condor  4096 Sep  1 12:01 ..
+-rwx------.  1 mwitt  zh        48 Sep  1 12:01 .chirp.config
+-rwxr-xr-x.  1 mwitt  zh     11921 Sep  1 12:01 htcondor_wrapper_b6ccd22079.sh
+-rw-r--r--.  1 condor condor  8020 Sep  1 12:01 .job.ad
+drwx------.  3 mwitt  zh        25 Sep  1 12:01 job_XY8B3g8u6HwI
+-rwxr-xr-x.  1 mwitt  zh     20226 Sep  1 12:01 law_job_60abdeb487.sh
+-rw-r--r--.  1 mwitt  zh     10667 Sep  1 12:01 law_wlcg_tools_c14cae0aff.sh
+-rw-r--r--.  1 condor condor  8590 Sep  1 12:01 .machine.ad
+-rw-------.  1 mwitt  zh      3053 Sep  1 12:01 mwitt.cc
+-rwxr-xr-x.  1 mwitt  zh     12005 Sep  1 12:01 remote_bootstrap_11d1b65a98.sh
+drwx------.  2 mwitt  zh         6 Sep  1 12:01 srv
+-rw-r--r--.  1 mwitt  zh      3286 Sep  1 12:01 stdall_1To2.txt
+drwx------.  2 mwitt  zh         6 Sep  1 12:01 tmp
+-rw-r--r--.  1 mwitt  zh      8221 Sep  1 12:01 .update.ad
+drwx------.  3 mwitt  zh        25 Sep  1 12:01 var
+-rw-------.  1 mwitt  zh     10368 Sep  1 12:01 x509up_u151790_a8f12fd1f5
+
+-- link input files
+link /pool/condor/dir_2901602/htcondor_wrapper_b6ccd22079.sh
+link /pool/condor/dir_2901602/remote_bootstrap_11d1b65a98.sh
+link /pool/condor/dir_2901602/x509up_u151790_a8f12fd1f5
+link /pool/condor/dir_2901602/law_wlcg_tools_c14cae0aff.sh
+
+-- files in LAW_JOB_HOME
+> pwd
+/pool/condor/dir_2901602/job_XY8B3g8u6HwI
+> ls -la
+total 4
+drwx------. 3 mwitt zh  186 Sep  1 12:01 .
+drwx------. 6 mwitt zh 4096 Sep  1 12:01 ..
+lrwxrwxrwx. 1 mwitt zh   55 Sep  1 12:01 htcondor_wrapper_b6ccd22079.sh -> /pool/condor/dir_2901602/htcondor_wrapper_b6ccd22079.sh
+lrwxrwxrwx. 1 mwitt zh   53 Sep  1 12:01 law_wlcg_tools_c14cae0aff.sh -> /pool/condor/dir_2901602/law_wlcg_tools_c14cae0aff.sh
+lrwxrwxrwx. 1 mwitt zh   55 Sep  1 12:01 remote_bootstrap_11d1b65a98.sh -> /pool/condor/dir_2901602/remote_bootstrap_11d1b65a98.sh
+drwxr-xr-x. 2 mwitt zh   10 Sep  1 12:01 tmp
+lrwxrwxrwx. 1 mwitt zh   50 Sep  1 12:01 x509up_u151790_a8f12fd1f5 -> /pool/condor/dir_2901602/x509up_u151790_a8f12fd1f5
+
+-- setup -------------------------------------------------------------------------------------------
+
+-- bootstrap file
+run bootstrap file 'remote_bootstrap_11d1b65a98.sh'
+
+souring wlcg tools ...
+done sourcing wlcg tools
+
+fetching software bundle ...
+Copying 204085169 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleSoftware/software.0.tgz => file:///pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/conda/software.tgz
+law_wlcg_get_file: fetched 'software.0.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleSoftware'
+done fetching software bundle
+
+fetching repository bundle ...
+Copying 2877255 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleRepo/CPinHToTauTau.664a6458f883debd413fab47ba695966bcd7c551.0.tgz => file:///pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/repo.tgz
+law_wlcg_get_file: fetched 'CPinHToTauTau.664a6458f883debd413fab47ba695966bcd7c551.0.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleRepo'
+done fetching repository bundle
+
+source repository setup ...
+
+  ┏┏┓┃╻┏┏┳┓┏┓
+  ┗┗┛┃┗┛╹┗┗╹┗
+    ┏┃
+    ╋┃┏┓┓┏┏
+    ┛┃┗┛┗┻┛
+
+detected remote job environment
+initialized conda with micromamba interface and python 3.9
+looking for bash sandbox bundle for venv cf
+found bundle cf, index 0, pattern cf_5de7213c.900365724e.[^.]+.tgz, uri root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox
+Copying 11929583 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox/cf_5de7213c.900365724e.3.tgz => file:///pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/venvs/cf_5de7213c/bundle.tgz
+law_wlcg_get_file: fetched 'cf_5de7213c.900365724e.3.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox'
+
+CPinHToTauTau analysis successfully setup
+done sourcing repository setup
+
+-- bootstrap command
+bootstrap command empty, skip
+
+-- detect law
+found law at /pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/law/law
+
+-- setup dashboard
+dashboard file empty, skip
+
+-- environment variables
+PATH           : /pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/venvs/cf_5de7213c/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/law/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin/cms:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/conda/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/law/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin/cms:/afs/cern.ch/cms/caf/scripts:/cvmfs/cms.cern.ch/common:/usr/sue/bin:/usr/share/Modules/bin:/usr/condabin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin
+PYTHONPATH     : /pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/cmsdb:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/law:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/order:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/venvs/cf_5de7213c/lib/python3.9/site-packages:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/bin:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/law:/pool/condor/dir_2901602/job_XY8B3g8u6HwI/repo/modules/columnflow/modules/order::/pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/conda/lib/python3.9/site-packages
+LD_LIBRARY_PATH: 
+CPATH          : 
+
+-- hook law_hook_job_running -----------------------------------------------------------------------
+
+function 'law_hook_job_running' does not exist, skip
+
+-- run task branch 1 -------------------------------------------------------------------------------
+
+cmd: law run columnflow.tasks.reduction.MergeReducedEvents --log-file=NO_STR --clear-logs=False --analysis=httcp.config.analysis_httcp.analysis_httcp --version=framework_sync --config=run3_2022_preEE_mutau --shift=nominal --dataset=data_mu_C --calibrators=main --selector=main --selector-steps='' --keep-reduced-events=True --cf.CalibrateEvents-workflow=htcondor --cf.CalibrateEvents-version=framework_sync --cf.SelectEvents-workflow=htcondor --cf.SelectEvents-version=framework_sync --cf.ReduceEvents-workflow=htcondor --cf.ReduceEvents-version=framework_sync --cf.MergeSelectionStats-version=framework_sync --cf.ProvideReducedEvents-version=framework_sync --local-scheduler=True --branch=1  --workers=1
+
+-- dependency tree
+fatal: not a git repository (or any parent up to mount point /)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+/pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/conda/bin/shasum: line 2: /home/conda/feedstock_root/build_artifacts/perl_1703310062586/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placeh/bin/perl: No such file or directory
+git: 'submodule' is not a git command. See 'git --help'.
+print task dependencies with max_depth 2
+
+0 > cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+│
+├──1 > cf.MergeReductionStats(effective_workflow=local, branch=0, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main, n_inputs=10)
+│  │
+│  └──2 > cf.ReduceEvents(effective_workflow=htcondor, branch=-1, branches=0:10, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main, workflow=htcondor)
+│
+└──1 > cf.ReduceEvents(effective_workflow=htcondor, branch=-1, branches=30:60, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main, workflow=htcondor)
+   │
+   ├──2 > cf.GetDatasetLFNs(analysis=httcp.config.analysis_httcp.analysis_httcp, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, replicas=5)
+   │
+   ├──2 > cf.CalibrateEvents(effective_workflow=htcondor, branch=-1, branches=30:60, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrator=main, workflow=htcondor)
+   │
+   ├──2 > cf.SelectEvents(effective_workflow=htcondor, branch=-1, branches=30:60, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main, workflow=htcondor)
+   │
+   ├──2 > cf.BundleRepo(include_files=, custom_checksum=NO_STR, analysis=httcp.config.analysis_httcp.analysis_httcp, replicas=5)
+   │
+   ├──2 > cf.BundleSoftware(analysis=httcp.config.analysis_httcp.analysis_httcp, replicas=5)
+   │
+   ├──2 > cf.BundleBashSandbox(analysis=httcp.config.analysis_httcp.analysis_httcp, sandbox_file=$CF_BASE/sandboxes/cf.sh, replicas=5)
+   │
+   ├──2 > cf.BundleBashSandbox(analysis=httcp.config.analysis_httcp.analysis_httcp, sandbox_file=$CF_BASE/sandboxes/venv_columnar.sh, replicas=5)
+   │
+   └──2 > cf.BundleBashSandbox(analysis=httcp.config.analysis_httcp.analysis_httcp, sandbox_file=$HTTCP_BASE/sandboxes/venv_columnar_xgb.sh, replicas=5)
+
+-- execute attempt 1
+01/09/2025 12:01:55.222282484 (CEST)
+INFO: luigi-interface - Informed scheduler that task   cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6   has status   PENDING
+INFO: Informed scheduler that task   cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6   has status   PENDING
+INFO: luigi-interface - Informed scheduler that task   cf.ReduceEvents_httcp_config_ana__1_30_60_1431321ea6   has status   DONE
+INFO: Informed scheduler that task   cf.ReduceEvents_httcp_config_ana__1_30_60_1431321ea6   has status   DONE
+INFO: luigi-interface - Informed scheduler that task   cf.MergeReductionStats_httcp_config_ana_0__1fb660c754   has status   DONE
+INFO: Informed scheduler that task   cf.MergeReductionStats_httcp_config_ana_0__1fb660c754   has status   DONE
+INFO: luigi-interface - Done scheduling tasks
+INFO: Done scheduling tasks
+INFO: luigi-interface - Running Worker with 1 processes
+INFO: Running Worker with 1 processes
+INFO: luigi-interface - [pid 785] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) running   cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: [pid 785] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) running   cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+looking for bash sandbox bundle for venv venv_columnar
+found bundle venv_columnar, index 1, pattern venv_columnar_4ef45674.826b620598.[^.]+.tgz, uri root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox
+Copying 218956772 bytes root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox/venv_columnar_4ef45674.826b620598.1.tgz => file:///pool/condor/dir_2901602/job_XY8B3g8u6HwI/cf_data/software/venvs/venv_columnar_4ef45674/bundle.tgz
+law_wlcg_get_file: fetched 'venv_columnar_4ef45674.826b620598.1.tgz' from 'root://eosuser.cern.ch//eos/project/i/iphctau/public/mwitt/CPinHToTauTauOutput/hambourg/cf_store/analysis_httcp/cf.BundleBashSandbox'
+
+
+=============================== entering sandbox ===============================
+task   : cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6
+sandbox: bash::$CF_BASE/sandboxes/venv_columnar.sh
+================================================================================
+
+
+INFO: luigi-interface - Done scheduling tasks
+INFO: Done scheduling tasks
+INFO: luigi-interface - Running Worker with 1 processes
+INFO: Running Worker with 1 processes
+INFO: luigi-interface - [pid 1049] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) running   cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: [pid 1049] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) running   cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+fetching inputs ...
+fetch file 1 / 30
+fetch file 5 / 30
+fetch file 10 / 30
+fetch file 15 / 30
+fetch file 20 / 30
+fetch file 25 / 30
+fetch file 30 / 30
+done (took 4.39 seconds)
+merging 30 parquet files ...
+done (took 30.14 seconds)
+merged file size: 253.5 MB
+INFO: luigi-interface - [pid 1049] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) done      cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: [pid 1049] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) done      cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: luigi-interface - This progress looks :) because there were no failed tasks or missing dependencies
+INFO: This progress looks :) because there were no failed tasks or missing dependencies
+
+=============================== leaving sandbox ================================
+task   : cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6
+sandbox: bash::$CF_BASE/sandboxes/venv_columnar.sh
+================================================================================
+
+INFO: luigi-interface - [pid 785] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) done      cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: [pid 785] Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) done      cf.MergeReducedEvents(effective_workflow=local, branch=1, analysis=httcp.config.analysis_httcp.analysis_httcp, version=framework_sync, config=run3_2022_preEE_mutau, shift=nominal, local_shift=nominal, dataset=data_mu_C, calibrators=main, selector=main)
+INFO: luigi-interface - Informed scheduler that task   cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6   has status   DONE
+INFO: Informed scheduler that task   cf.MergeReducedEvents_httcp_config_ana_1__5660c04bc6   has status   DONE
+INFO: luigi-interface - Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) was stopped. Shutting down Keep-Alive thread
+INFO: Worker Worker(salt=9105191957, workers=1, host=b9p17p0722.cern.ch, username=mwitt, pid=785) was stopped. Shutting down Keep-Alive thread
+INFO: luigi-interface - 
+===== Luigi Execution Summary =====
+
+Scheduled 3 tasks of which:
+* 2 complete ones were encountered:
+    - 1 cf.MergeReductionStats(...)
+    - 1 cf.ReduceEvents(...)
+* 1 ran successfully:
+    - 1 cf.MergeReducedEvents(...)
+
+This progress looks :) because there were no failed tasks or missing dependencies
+
+===== Luigi Execution Summary =====
+
+INFO: 
+===== Luigi Execution Summary =====
+
+Scheduled 3 tasks of which:
+* 2 complete ones were encountered:
+    - 1 cf.MergeReductionStats(...)
+    - 1 cf.ReduceEvents(...)
+* 1 ran successfully:
+    - 1 cf.MergeReducedEvents(...)
+
+This progress looks :) because there were no failed tasks or missing dependencies
+
+===== Luigi Execution Summary =====
+
+task exit code: 0
+01/09/2025 12:04:04.667455020 (CEST)
+
+-- hook law_hook_job_finished ----------------------------------------------------------------------
+
+function 'law_hook_job_finished' does not exist, skip
+
+-- stageout ----------------------------------------------------------------------------------------
+
+-- stageout file
+stageout file empty, skip
+
+-- stageout command
+stageout command empty, skip
+
+-- cleanup -----------------------------------------------------------------------------------------
+
+-- files before cleanup
+> ls -a /pool/condor/dir_2901602/job_XY8B3g8u6HwI ($LAW_JOB_HOME)
+total 12
+drwx------.  6 mwitt zh 4096 Sep  1 12:01 .
+drwx------.  6 mwitt zh 4096 Sep  1 12:01 ..
+drwxr-xr-x.  3 mwitt zh   30 Sep  1 12:01 cf_data
+drwxrwxrwx.  2 mwitt zh   10 Sep  1 12:04 cf_wlcg_cache
+lrwxrwxrwx.  1 mwitt zh   55 Sep  1 12:01 htcondor_wrapper_b6ccd22079.sh -> /pool/condor/dir_2901602/htcondor_wrapper_b6ccd22079.sh
+lrwxrwxrwx.  1 mwitt zh   53 Sep  1 12:01 law_wlcg_tools_c14cae0aff.sh -> /pool/condor/dir_2901602/law_wlcg_tools_c14cae0aff.sh
+lrwxrwxrwx.  1 mwitt zh   55 Sep  1 12:01 remote_bootstrap_11d1b65a98.sh -> /pool/condor/dir_2901602/remote_bootstrap_11d1b65a98.sh
+drwxr-xr-x. 11 mwitt zh 4096 Sep  1 12:01 repo
+drwxr-xr-x.  2 mwitt zh   10 Sep  1 12:04 tmp
+lrwxrwxrwx.  1 mwitt zh   50 Sep  1 12:01 x509up_u151790_a8f12fd1f5 -> /pool/condor/dir_2901602/x509up_u151790_a8f12fd1f5
+
+-- files after cleanup
+> ls -a /pool/condor/dir_2901602 ($LAW_JOB_INIT_DIR)
+total 148
+drwx------.  5 mwitt  zh      4096 Sep  1 12:04 .
+drwxr-xr-x. 53 condor condor  4096 Sep  1 12:04 ..
+-rwx------.  1 mwitt  zh        48 Sep  1 12:01 .chirp.config
+-rwxr-xr-x.  1 mwitt  zh     11921 Sep  1 12:01 htcondor_wrapper_b6ccd22079.sh
+-rw-r--r--.  1 condor condor  8020 Sep  1 12:01 .job.ad
+-rwxr-xr-x.  1 mwitt  zh     20226 Sep  1 12:01 law_job_60abdeb487.sh
+-rw-r--r--.  1 mwitt  zh     10667 Sep  1 12:01 law_wlcg_tools_c14cae0aff.sh
+-rw-r--r--.  1 condor condor  8590 Sep  1 12:01 .machine.ad
+-rw-------.  1 mwitt  zh      8283 Sep  1 12:01 mwitt.cc
+-rwxr-xr-x.  1 mwitt  zh     12005 Sep  1 12:01 remote_bootstrap_11d1b65a98.sh
+drwx------.  2 mwitt  zh         6 Sep  1 12:01 srv
+-rw-r--r--.  1 mwitt  zh     22706 Sep  1 12:04 stdall_1To2.txt
+drwx------.  2 mwitt  zh        28 Sep  1 12:01 tmp
+-rw-r--r--.  1 mwitt  zh      8221 Sep  1 12:01 .update.ad
+drwx------.  3 mwitt  zh        25 Sep  1 12:01 var
+-rw-------.  1 mwitt  zh     10368 Sep  1 12:01 x509up_u151790_a8f12fd1f5
+
+-- end ---------------------------------------------------------------------------------------------
+
+start time    : 01/09/2025 12:01:08.249248190 (CEST)
+end time      : 01/09/2025 12:04:06.386030473 (CEST)
+job exit code : 0
+
+
+================================================================================
+=== End of law job
+================================================================================
+

@@ -1,0 +1,79 @@
+universe = vanilla
+executable = htcondor_wrapper_b6ccd22079_12.sh
+log = /dev/null
+should_transfer_files = YES
+transfer_input_files = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.SelectEvents_httcp_config_ana__1__ab6d4a5fb0_758do8x06eb/law_job_60abdeb487.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.SelectEvents_httcp_config_ana__1__ab6d4a5fb0_758do8x06eb/htcondor_wrapper_b6ccd22079_12.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.SelectEvents_httcp_config_ana__1__ab6d4a5fb0_758do8x06eb/remote_bootstrap_11d1b65a98.sh,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.SelectEvents_httcp_config_ana__1__ab6d4a5fb0_758do8x06eb/x509up_u151790_a8f12fd1f5,/afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/jobs/sub_cf.SelectEvents_httcp_config_ana__1__ab6d4a5fb0_758do8x06eb/law_wlcg_tools_c14cae0aff.sh
+transfer_output_files = stdall$(law_job_postfix).txt
+when_to_transfer_output = ON_EXIT
+transfer_output_remaps = "stdall$(law_job_postfix).txt = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync/stdall$(law_job_postfix).txt"
+notification = Never
+initialdir = /afs/cern.ch/user/m/mwitt/mastrhh/CPinHToTauTau/data/cf_store/analysis_httcp/cf.SelectEvents/run3_2022_preEE_mutau/dy_lep_madgraph/nominal/calib__main/sel__main/framework_sync
+batch_name = cf.SelectEvents_run3_2022_preEE_mutau_dy_lep_madgraph
+MY.WantOS = el9
++MaxRuntime = 7199
++RequestRuntime = 7199
+environment = "LAW_HTCONDOR_JOB_CLUSTER=$(Cluster) LAW_HTCONDOR_JOB_PROCESS=$(Process)"
+queue law_job_postfix, arguments from (
+    _6To7, _6To7 stdall$(law_job_postfix).txt
+    _9To10, _9To10 stdall$(law_job_postfix).txt
+    _10To11, _10To11 stdall$(law_job_postfix).txt
+    _13To14, _13To14 stdall$(law_job_postfix).txt
+    _15To16, _15To16 stdall$(law_job_postfix).txt
+    _20To21, _20To21 stdall$(law_job_postfix).txt
+    _21To22, _21To22 stdall$(law_job_postfix).txt
+    _22To23, _22To23 stdall$(law_job_postfix).txt
+    _23To24, _23To24 stdall$(law_job_postfix).txt
+    _24To25, _24To25 stdall$(law_job_postfix).txt
+    _25To26, _25To26 stdall$(law_job_postfix).txt
+    _28To29, _28To29 stdall$(law_job_postfix).txt
+    _29To30, _29To30 stdall$(law_job_postfix).txt
+    _32To33, _32To33 stdall$(law_job_postfix).txt
+    _34To35, _34To35 stdall$(law_job_postfix).txt
+    _36To37, _36To37 stdall$(law_job_postfix).txt
+    _39To40, _39To40 stdall$(law_job_postfix).txt
+    _40To41, _40To41 stdall$(law_job_postfix).txt
+    _41To42, _41To42 stdall$(law_job_postfix).txt
+    _43To44, _43To44 stdall$(law_job_postfix).txt
+    _44To45, _44To45 stdall$(law_job_postfix).txt
+    _45To46, _45To46 stdall$(law_job_postfix).txt
+    _46To47, _46To47 stdall$(law_job_postfix).txt
+    _48To49, _48To49 stdall$(law_job_postfix).txt
+    _49To50, _49To50 stdall$(law_job_postfix).txt
+    _50To51, _50To51 stdall$(law_job_postfix).txt
+    _51To52, _51To52 stdall$(law_job_postfix).txt
+    _52To53, _52To53 stdall$(law_job_postfix).txt
+    _53To54, _53To54 stdall$(law_job_postfix).txt
+    _57To58, _57To58 stdall$(law_job_postfix).txt
+    _64To65, _64To65 stdall$(law_job_postfix).txt
+    _65To66, _65To66 stdall$(law_job_postfix).txt
+    _66To67, _66To67 stdall$(law_job_postfix).txt
+    _69To70, _69To70 stdall$(law_job_postfix).txt
+    _73To74, _73To74 stdall$(law_job_postfix).txt
+    _74To75, _74To75 stdall$(law_job_postfix).txt
+    _75To76, _75To76 stdall$(law_job_postfix).txt
+    _77To78, _77To78 stdall$(law_job_postfix).txt
+    _81To82, _81To82 stdall$(law_job_postfix).txt
+    _86To87, _86To87 stdall$(law_job_postfix).txt
+    _94To95, _94To95 stdall$(law_job_postfix).txt
+    _95To96, _95To96 stdall$(law_job_postfix).txt
+    _98To99, _98To99 stdall$(law_job_postfix).txt
+    _99To100, _99To100 stdall$(law_job_postfix).txt
+    _101To102, _101To102 stdall$(law_job_postfix).txt
+    _102To103, _102To103 stdall$(law_job_postfix).txt
+    _107To108, _107To108 stdall$(law_job_postfix).txt
+    _110To111, _110To111 stdall$(law_job_postfix).txt
+    _111To112, _111To112 stdall$(law_job_postfix).txt
+    _112To113, _112To113 stdall$(law_job_postfix).txt
+    _113To114, _113To114 stdall$(law_job_postfix).txt
+    _115To116, _115To116 stdall$(law_job_postfix).txt
+    _117To118, _117To118 stdall$(law_job_postfix).txt
+    _119To120, _119To120 stdall$(law_job_postfix).txt
+    _121To122, _121To122 stdall$(law_job_postfix).txt
+    _124To125, _124To125 stdall$(law_job_postfix).txt
+    _125To126, _125To126 stdall$(law_job_postfix).txt
+    _127To128, _127To128 stdall$(law_job_postfix).txt
+    _128To129, _128To129 stdall$(law_job_postfix).txt
+    _129To130, _129To130 stdall$(law_job_postfix).txt
+    _134To135, _134To135 stdall$(law_job_postfix).txt
+    _136To137, _136To137 stdall$(law_job_postfix).txt
+)

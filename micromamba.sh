@@ -1,0 +1,1 @@
+-bash: /afs/cern.ch/user/m/mwitt/public/CPinHToTauTau/data/software/conda/bin/micromamba: cannot execute binary file: Exec format error

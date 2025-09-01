@@ -786,6 +786,7 @@ def add_run3(ana: od.Analysis,
     # (used in the muon producer)
     # --------------------------------------------------------------------------------------------- #
 
+    cfg.x.muon_id_wp = 'Medium' #normalement Tight
     cfg.x.muon_sf = DotDict.wrap({ 
                                   
         'ID': {'corrector': "NUM_MediumID_DEN_TrackerMuons",
@@ -794,7 +795,7 @@ def add_run3(ana: od.Analysis,
         'iso': {'corrector': "NUM_TightPFIso_DEN_MediumID",
                 'year': f"{year}_{pog_tag}"},
         
-        'trig': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
+        'trig': {'corrector': f"NUM_IsoMu24_DEN_CutBasedId{cfg.x.muon_id_wp}_and_PFIsoMedium",
                  'year': f"{year}_{pog_tag}"},
         
         'trig_data_eff': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_MCeff",
@@ -803,7 +804,7 @@ def add_run3(ana: od.Analysis,
         'trig_mc_eff': {'corrector': "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_DATAeff",
                  'year': f"{year}_{pog_tag}"},
         
-        'xtrig': {'corrector': "NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight",
+        'xtrig': {'corrector': f"NUM_IsoMu20_DEN_CutBasedId{cfg.x.muon_id_wp}_and_PFIsoMedium",
                   'year': f"{year}_{pog_tag}"},
         
         'MC_eff_mutau': {'corrector': "NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight_MCeff"},

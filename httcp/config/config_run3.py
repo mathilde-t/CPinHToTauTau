@@ -786,7 +786,7 @@ def add_run3(ana: od.Analysis,
     # (used in the muon producer)
     # --------------------------------------------------------------------------------------------- #
 
-    cfg.x.muon_id_wp = 'Medium' #normalement Tight
+    cfg.x.muon_id_wp = 'Tight' #normalement Tight
     cfg.x.muon_sf = DotDict.wrap({ 
                                   
         'ID': {'corrector': "NUM_MediumID_DEN_TrackerMuons",

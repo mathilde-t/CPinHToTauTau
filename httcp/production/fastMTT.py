@@ -79,7 +79,7 @@ def fastMTT(
 
 
     # Steering Parameters for the FastMTT algorithm
-    verbosity = True
+    verbosity = False # True = prints fastMTT infos in terminal
     delta = 1.0/1.15 # regularization parameter delta
     reg_order = 6.0  # regularization parameter order
     mX = 125.10 # Higgs mass

@@ -1,0 +1,19 @@
+# Ignorer tous les fichiers .txt dans sync/
+sync/*.txt
+
+# Tout le dossier cf_store
+data/cf_store/
+
+# Ignorer tout le contenu de data/jobs/
+data/jobs/
+
+# Ignorer tous les fichiers pyc et cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers temporaires
+*.swp
+*.swo
+tmp

@@ -523,6 +523,114 @@ def add_tau_prods(
         },
     )
 
+## rewrtie the 2 functions above for their generator counterparts
+def assign_gentau_mass_charge(
+        self: Selector,
+        events: ak.Array,
+        **kwargs
+) -> ak.Array:
+
+    # https://pdg.lbl.gov/2023/listings/particle_properties.html
+
+    part_dict = DotDict.wrap({
+        "pion_pm": {'mass': 0.13957039,  # GeV
+                    'pdg_id': 211},
+        "pion_0": {'mass': 0.1349768,  # GeV
+                   'pdg_id': 111},
+        "gamma": {'mass': 0.0,  # GeV
+                  'pdg_id': 22},
+        "kaon_pm": {'mass': 0.493677,  # GeV
+                    'pdg_id': 321},
+        "ele_pm": {'mass': 0.00051099895,  # GeV
+                   'pdg_id': 11},
+        "muon_pm": {'mass': 0.1056583755,  # GeV
+                    'pdg_id': 13},
+    })
+    mass = ak.zeros_like(ak.local_index(
+        events.GenTauProd.pdgId), dtype=np.float32) #TODO est-ce que GenTauProd.pdgID existe ?
+    charge = ak.zeros_like(ak.local_index( #TODO the same here
+        events.GenTauProd.pdgId), dtype=np.int32)
+    for part in part_dict:
+
+        prod_id = events.GenTauProd.pdgId #TODO the same here ...
+        mass = ak.where(np.abs(prod_id) == part_dict[part].pdg_id,
+                        part_dict[part].mass,
+                        mass)
+        if '_pm' in part:
+            charge = ak.where(np.abs(prod_id) == part_dict[part].pdg_id,
+                              np.sign(prod_id),
+                              charge)
+
+    events = set_ak_column_f32(events, "GenTauProd.mass", mass)
+    events = set_ak_column_i32(events, "GenTauProd.charge", charge)
+    return events
+
+@producer(
+    uses={
+        "GenTauProd.*",
+        assign_gentau_mass_charge,
+    },
+    produces={
+        "gentau_decay_prods_*",
+        assign_gentau_mass_charge,
+    },
+    exposed=False,
+)
+def add_gentau_prods(
+        self: Producer,
+        events: ak.Array,
+        **kwargs
+) -> tuple[ak.Array, SelectionResult]:
+
+    events = self[assign_gentau_mass_charge](events)
+    channels = self.config_inst.channels.names()
+    ch_objects = self.config_inst.x.ch_objects
+    mask = ak.zeros_like(events.event, dtype=np.bool_)
+
+    for ch_str in channels:
+        hcand = events.gen_lep
+        gentau_decay_prods_dict = {}
+
+        for lep_str in hcand.fields:
+            if ch_objects[ch_str][lep_str] == 'Tau':
+                gentau = hcand[lep_str]
+                gentauprods = events.GenTauProd
+
+                tau_idx = gentau.genPartIdxMotherG #TODO is this right ???
+                gentauprods_mask = gentauprods.tauIdx #TODO does this exist ?
+                idx_pairs = ak.cartesian(
+                    [tau_idx, gentauprods.tauIdx], axis=1, nested=True)
+                tau_idx_b, tau_prod_idx_b = ak.unzip(idx_pairs)
+                tau2prod_match_mask = ak.fill_none(
+                    tau_idx_b == tau_prod_idx_b, False)
+                matched_tau_prods = gentauprods[ak.flatten(
+                    tau2prod_match_mask, axis=2)]
+                # DM0
+                gentau = ak.firsts(gentau)
+                mask = mask | ak.fill_none(
+                    gentau.decayMode == 0, False) & has_one_pion(matched_tau_prods)#TODO: release this mask, make n_pions >=1
+                # DM1
+                mask = mask | ak.fill_none(gentau.decayMode == 1, False) & has_one_pion(
+                    matched_tau_prods) & has_photons(matched_tau_prods)#TODO: release this mask, make n_pions >=1
+                # DM10
+                mask = mask | ak.fill_none(
+                    gentau.decayMode == 10, False) & has_three_pions(matched_tau_prods)#TODO: release this mask, make n_pions >=3
+                # DM11
+                mask = mask | ak.fill_none(gentau.decayMode == 11, False) & has_three_pions(
+                    matched_tau_prods) & has_photons(matched_tau_prods)#TODO: release this mask, make n_pions >=3
+                events = set_ak_column(
+                    events, f'gentau_decay_prods_{ch_str}_{lep_str}',  matched_tau_prods)
+            else:
+                pass
+            
+            from IPython import embed; embed()
+
+    return events, SelectionResult(
+        steps={
+            "gen_decay_prods_are_ok": mask,
+        },
+    )
+
 
 def egamma_mask(tauprod): return (
     (np.abs(tauprod.pdgId) == 11) + (tauprod.pdgId == 22))
@@ -533,10 +641,10 @@ def pion_mask(tauprod): return np.abs(tauprod.pdgId) == 211
 
 @producer(
     uses={
-        "tau_decay_prods_*",
+        "tau_decay_prods_*", "gentau_decay_prods_*",
     },
     produces={
-        "pion_E_split",
+        "pion_E_split", "gentau_pion_E_split",
     },
     exposed=False,
 )
@@ -562,7 +670,27 @@ def pion_energy_split(
                             EMPTY_FLOAT)
     pion_E_split = ak.fill_none(pion_E_split, EMPTY_FLOAT)
     events = set_ak_column_f32(events, "pion_E_split", pion_E_split)
+
+    # Now for the gen taus
+    gentauprods = events[f'gentau_decay_prods_{channel}_lep1']
+    gen_charged_pion_mask = pion_mask(gentauprods)
+    gen_em_mask = egamma_mask(gentauprods)
+    gen_charged_pion = ak.firsts(get_lep_p4(gentauprods[gen_charged_pion_mask]), axis=1)
+    gen_neutral_pion = get_lep_p4(gentauprods[gen_em_mask]).sum()
+
+    mask = (ak.num(gen_charged_pion_mask, axis=1) > 0) & (
+        ak.num(gen_em_mask, axis=1) > 0)
+    mask = mask & (gen_charged_pion.E > 0) & (gen_neutral_pion.E > 0)
+
+    gen_pion_E_split = ak.where(mask,
+                            np.abs(gen_charged_pion.E - gen_neutral_pion.E) /
+                            (gen_charged_pion.E + gen_neutral_pion.E),
+                            EMPTY_FLOAT)
+    gen_pion_E_split = ak.fill_none(gen_pion_E_split, EMPTY_FLOAT)
+    events = set_ak_column_f32(events, "gen_pion_E_split", gen_pion_E_split)
+
     return events
+
 
 
 @producer(

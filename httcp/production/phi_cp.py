@@ -10,7 +10,7 @@ from columnflow.production import Producer, producer
 from columnflow.util import maybe_import
 from columnflow.columnar_util import EMPTY_FLOAT, Route, set_ak_column
 from columnflow.columnar_util import optional_column as optional
-from httcp.util import get_lep_p4, get_ip_p4
+from httcp.util import get_lep_p4, get_ip_p4, get_gen_ip_p4
 
 from httcp.production.PolarimetricA1 import PolarimetricA1
 
@@ -189,31 +189,50 @@ def rotate_to_gj_max(tau_vis, tau_mtt) -> ak.Array:
     mask_theta_gj = theta_gj > theta_gj_max
 
     rot_tau_mtt = ak.where(mask_theta_gj, rotated_tau_mtt, tau_mtt_p4)
+    rot_theta_gj = ak.where(mask_theta_gj, theta_gj_max, theta_gj)
 
-    return rot_tau_mtt
+    # note : theta_gj et rot_theta_gj sont des Awkward Arrays imbriqués (N_events, 1)
+
+    return rot_tau_mtt, theta_gj, rot_theta_gj, theta_gj_max
 
 
 def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
 
     results = []
 
-    tau     = events.hcand_mutau.lep1 
-    tau_MTT     = events.hcand_mutau.fastMTT.lep1 #used only in mu_a1_pv
-    tauprod = events.tau_decay_prods_mutau_lep1
-    muon    = events.hcand_mutau.lep0    
+    tau_reco     = events.hcand_mutau.lep1 
+    tau_MTT      = events.hcand_mutau.fastMTT.lep1 #used only in mu_a1_pv
+    tau_gen      = events.gen_lep.lep1
 
-    muon_Gen = events.gen_lep.lep0
-    tau_Gen = events.gen_lep.lep1
+    tauprod_reco = events.tau_decay_prods_mutau_lep1
+    tauprod_gen   = events.gentau_decay_prods_mutau_lep1
+    
+    muon_reco    = events.hcand_mutau.lep0    
+    muon_gen     = events.gen_lep.lep0
 
-    for muon_like, tau_like, tauprod_like in [
-        (muon, tau, tauprod),
-        (muon_Gen, tau_Gen, tauprod),
+    for muon, tau, tau_MTT, tauprod, level in [
+        (muon_reco, tau_reco, tau_MTT, tauprod_reco, "reco"),
+        (muon_reco, tau_gen, tau_gen, tauprod_reco, "gen"), # TODO muon_gen, tauprod_gen doesn't work yet
         ]:
 
+        # initialise theta_gj and rotated theta_gj
+        theta_gj = ak.zeros_like(tau.pt) * EMPTY_FLOAT
+        rot_theta_gj = ak.zeros_like(tau.pt) * EMPTY_FLOAT
+        theta_gj_max = ak.zeros_like(tau.pt) * EMPTY_FLOAT
+
         p1 = p2 = get_lep_p4(muon)
-        r1 = r2 = get_ip_p4(muon)
-        ch1 = muon.charge
-        ip2 = get_ip_p4(tau)
+        #r1 = r2 = get_ip_p4(muon)
+        ch1 = muon.charge #TODO check if this is correct for gen muons
+        #ip2 = get_ip_p4(tau)
+
+        if level == "reco":
+            r1 = r2 = get_ip_p4(muon)
+            ip2 = get_ip_p4(tau)
+        elif level == "gen":
+            r1 = r2 = get_gen_ip_p4(muon)
+            ip2 = get_gen_ip_p4(tau)
+
+        from IPython import embed; embed()
     
         if pair_decay_ch == "mu_pi":
             charged_pions = ak.drop_none(ak.mask(tauprod,pion_mask(tauprod)))
@@ -291,7 +310,7 @@ def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
             ss_pi1 = ak.drop_none(ak.mask(get_lep_p4(ss_pions[:,  :1]),mask_3pr))
             ss_pi2 = ak.drop_none(ak.mask(get_lep_p4(ss_pions[:, 1:2]),mask_3pr))
 
-            tau_p4 = rotate_to_gj_max(tau, tau_MTT)
+            tau_p4, theta_gj, rot_theta_gj, theta_gj_max = rotate_to_gj_max(tau, tau_MTT)
 
             # Drop events with empty inputs before boosting
             valid_mask = ((ak.num(os_pi) == 1) & (ak.num(tau_p4) == 1) &
@@ -333,13 +352,15 @@ def prepare_acop_vecs(events: ak.Array, pair_decay_ch):
             do_phase_shift = ((p2.energy - r2.energy)/(p2.energy + r2.energy)) < 0
 
         vecs_p4 = {'p1': p1, 'p2': p2, 'r1': r1, 'r2': r2, 'ip2': ip2}
-        results.append((vecs_p4, do_phase_shift, ch1))
+        results.append((vecs_p4, do_phase_shift, ch1, theta_gj, rot_theta_gj, theta_gj_max))
 
-    (vecs_p4_reco, do_phase_shift_reco, ch1_reco), \
-    (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen) = results
+    # unpack reco and gen results
+    (vecs_p4_reco, do_phase_shift_reco, ch1_reco, theta_gj_reco, rot_theta_gj_reco, theta_gj_max_reco), \
+    (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen, theta_gj_gen, rot_theta_gj_gen, theta_gj_max_gen) = results
 
-    return (vecs_p4_reco, do_phase_shift_reco, ch1_reco), \
-           (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen)
+    return (vecs_p4_reco, do_phase_shift_reco, ch1_reco, theta_gj_reco, rot_theta_gj_reco, theta_gj_max_reco), \
+           (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen, theta_gj_gen, rot_theta_gj_gen, theta_gj_max_gen)
+
 
 def make_boost(vecs_p4):
     # Create a dictionary to store boosted variables (they are defined with upper case names)
@@ -406,12 +427,33 @@ channels = ['mu_pi','mu_rho','mu_a1_1pr','mu_a1_3pr','mu_a1_3pr_pv']
 
 @producer(
     uses={
-        "hcand_*","tau_decay_prods_*"},
+        "hcand_*","tau_decay_prods_*","gentau_decay_prods_*"},
+    # produces={
+    #     col
+    #     for the_ch in channels
+    #     for col in (
+    #         f"phi_cp_{the_ch}",
+    #         f"phi_cp_{the_ch}_gen",
+    #         f"theta_gj_{the_ch}",
+    #         f"theta_gj_{the_ch}_gen",
+    #         f"rot_theta_gj_{the_ch}",
+    #         f"rot_theta_gj_{the_ch}_gen",
+    #         f"theta_gj_max_{the_ch}",
+    #         f"theta_gj_max_{the_ch}_gen",)
+    # } 
     produces={
         col
         for the_ch in channels
         for col in (f"phi_cp_{the_ch}", f"phi_cp_{the_ch}_gen")
-    } 
+    } | {
+        # uniquement pour mu_a1_3pr_pv
+        "theta_gj_mu_a1_3pr_pv",
+        "rot_theta_gj_mu_a1_3pr_pv",
+        "theta_gj_mu_a1_3pr_pv_gen",
+        "rot_theta_gj_mu_a1_3pr_pv_gen",
+        "theta_gj_max_mu_a1_3pr_pv",
+        "theta_gj_max_mu_a1_3pr_pv_gen",
+    }
     # | {
     #     optional(f"phi_cp_{the_ch}_reg1") for the_ch in channels
     # } | {
@@ -431,8 +473,8 @@ def phi_cp(
         print(f"Calculating reco and gen phi_cp for {the_ch}")
 
         # --- recovers both reco and gen ---
-        (vecs_p4_reco, do_phase_shift_reco, ch1_reco), \
-        (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen) = prepare_acop_vecs(events, pair_decay_ch=the_ch)
+        (vecs_p4_reco, do_phase_shift_reco, ch1_reco, theta_gj_reco, rot_theta_gj_reco, theta_gj_max_reco), \
+        (vecs_p4_gen,  do_phase_shift_gen,  ch1_gen, theta_gj_gen, rot_theta_gj_gen, theta_gj_max_gen) = prepare_acop_vecs(events, pair_decay_ch=the_ch)
 
         # reco
         zmf_vecs_p4_reco = make_boost(vecs_p4_reco)
@@ -447,6 +489,36 @@ def phi_cp(
         phi_cp_gen = ak.fill_none(ak.firsts(phi_cp_gen, axis=1), EMPTY_FLOAT)
         events = set_ak_column_f32(events, f"phi_cp_{the_ch}_gen", phi_cp_gen)
 
+        # store for plotting theta_gj and rotated theta_gj for the mu_a1_3pr_pv channel
+
+        theta_gj_reco_flat = ak.flatten(theta_gj_reco, axis=1)
+        rot_theta_gj_reco_flat = ak.flatten(rot_theta_gj_reco, axis=1)
+        theta_gj_gen_flat = ak.flatten(theta_gj_gen, axis=1)
+        rot_theta_gj_gen_flat = ak.flatten(rot_theta_gj_gen, axis=1)
+        theta_gj_max_reco_flat = ak.flatten(theta_gj_max_reco, axis=1)
+        theta_gj_max_gen_flat = ak.flatten(theta_gj_max_gen, axis=1)
+
+        theta_gj_reco      = ak.fill_none(theta_gj_reco_flat, EMPTY_FLOAT)
+        rot_theta_gj_reco  = ak.fill_none(rot_theta_gj_reco_flat, EMPTY_FLOAT)
+        theta_gj_gen       = ak.fill_none(theta_gj_gen_flat,  EMPTY_FLOAT)
+        rot_theta_gj_gen   = ak.fill_none(rot_theta_gj_gen_flat,  EMPTY_FLOAT)
+        theta_gj_max_reco  = ak.fill_none(theta_gj_max_reco_flat, EMPTY_FLOAT)
+        theta_gj_max_gen   = ak.fill_none(theta_gj_max_gen_flat,  EMPTY_FLOAT)
+
+        #events = set_ak_column(events, f"theta_gj_{the_ch}", theta_gj_reco)
+        #events = set_ak_column(events, f"rot_theta_gj_{the_ch}", rot_theta_gj_reco)
+        #events = set_ak_column(events, f"theta_gj_{the_ch}_gen", theta_gj_gen)
+        #events = set_ak_column(events, f"rot_theta_gj_{the_ch}_gen", rot_theta_gj_gen)
+        #events = set_ak_column(events, f"theta_gj_max_{the_ch}", theta_gj_max_reco)
+        #events = set_ak_column(events, f"theta_gj_max_{the_ch}_gen", theta_gj_max_gen)
+
+        if the_ch == "mu_a1_3pr_pv":
+            events = set_ak_column(events, f"theta_gj_mu_a1_3pr_pv", theta_gj_reco)
+            events = set_ak_column(events, f"rot_theta_gj_mu_a1_3pr_pv", rot_theta_gj_reco)
+            events = set_ak_column(events, f"theta_gj_mu_a1_3pr_pv_gen", theta_gj_gen)
+            events = set_ak_column(events, f"rot_theta_gj_mu_a1_3pr_pv_gen", rot_theta_gj_gen)
+            events = set_ak_column(events, f"theta_gj_max_mu_a1_3pr_pv", theta_gj_max_reco)
+            events = set_ak_column(events, f"theta_gj_max_mu_a1_3pr_pv_gen", theta_gj_max_gen)
 
         #alpha = np.ones_like(events.event)*EMPTY_FLOAT
         # alpha_per_ch = produce_alpha(vecs_p4)

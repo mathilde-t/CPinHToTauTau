@@ -541,7 +541,7 @@ def phi_cp_variables(cfg: od.Config) -> None:
     binning=(n_bins_phi_cp, 0, 2*np.pi),
     x_title=rf"$\varphi_{{CP}} (rad)",
     )
-    for the_ch in ['mu_pi', 'mu_rho', "mu_a1_3pr", 'mu_a1_3pr_dp', 'mu_a1_3pr_pv', "mu_a1_3pr_gen", 'mu_a1_3pr_dp_gen', 'mu_a1_3pr_pv_gen']:
+    for the_ch in ['mu_pi', 'mu_rho', "mu_a1_3pr", 'mu_a1_3pr_dp', 'mu_a1_3pr_pv']:
         spitted_str = the_ch.split('_')
         if 'a1' in the_ch: 
             title_str = "\\" + spitted_str[0] + fr" a_1, {spitted_str[2]}"
@@ -554,6 +554,13 @@ def phi_cp_variables(cfg: od.Config) -> None:
             binning=(n_bins_phi_cp, 0, 2*np.pi),
             x_title=rf"$\varphi_{{CP}} [{title_str}]$ (rad)",
         )
+        cfg.add_variable(
+            name=f"phi_cp_{the_ch}_gen",
+            expression=f"phi_cp_{the_ch}_gen",
+            null_value=EMPTY_FLOAT,
+            binning=(n_bins_phi_cp, 0, 2*np.pi),
+            x_title=rf"gen $\varphi_{{CP}} [{title_str}]$ (rad)",
+        )
         for (the_cat,n_bins) in [('cat_0',9),('cat_1',5),('cat_2',3)]:
             cfg.add_variable(
                 name=f"phi_cp_{the_ch}_{the_cat}",
@@ -561,7 +568,15 @@ def phi_cp_variables(cfg: od.Config) -> None:
                 null_value=EMPTY_FLOAT,
                 binning=(n_bins, 0, 2*np.pi),
                 x_title=rf"$\varphi_{{CP}} [{title_str}]$ (rad)",
-            )
+        )
+        for (the_cat,n_bins) in [('cat_0',9),('cat_1',5),('cat_2',3)]:
+            cfg.add_variable(
+                name=f"phi_cp_{the_ch}_{the_cat}_gen",
+                expression=f"phi_cp_{the_ch}_{the_cat}_gen",
+                null_value=EMPTY_FLOAT,
+                binning=(n_bins, 0, 2*np.pi),
+                x_title=rf"gen $\varphi_{{CP}} [{title_str}]$ (rad)",
+        )
         # cfg.add_variable(
         #     name=f"phi_cp_{the_ch}_reg1",
         #     expression=f"phi_cp_{the_ch}_reg1",

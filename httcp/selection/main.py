@@ -31,7 +31,7 @@ from httcp.selection.match_trigobj import match_trigobj
 from httcp.selection.lepton_veto import double_lepton_veto, extra_lepton_veto
 from httcp.selection.higgscand import new_higgscand, mask_nans
 
-from httcp.production.aux_columns import channel_id, create_jetID_masks, jet_veto, add_tau_prods
+from httcp.production.aux_columns import channel_id, create_jetID_masks, jet_veto, add_tau_prods, add_gentau_prods
 from httcp.selection.jets import jet_veto_map
 from httcp.selection.met_filters_aux import met_filters_aux
 np = maybe_import("numpy")
@@ -64,6 +64,7 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         add_tau_prods,
+        add_gentau_prods,
         mask_nans,
         jet_veto_map,
         create_jetID_masks,
@@ -90,6 +91,7 @@ coffea = maybe_import("coffea")
         increment_stats,
         new_higgscand,
         add_tau_prods,
+        add_gentau_prods,
         mask_nans,
         jet_veto_map,
         create_jetID_masks,
@@ -202,7 +204,7 @@ def main(
                                                                 veto_muon_indices)
     results += extra_lepton_veto_results
 
-    # Add tau decya products to the correspondent hcand_(channel) arrays
+    # Add tau decay products to the correspondent hcand_(channel) arrays
     events, tau_prods_res = self[add_tau_prods](events)
     results += tau_prods_res
     #Check arrays for np.nan values and mask them

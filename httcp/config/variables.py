@@ -605,6 +605,48 @@ def phi_cp_variables(cfg: od.Config) -> None:
         #     binning=(6, 0, np.pi/2),
         #     x_title=rf"$ \alpha [{title_str}] $(rad)",
         # )
+        cfg.add_variable(
+            name=f"theta_gj_{the_ch}",
+            expression=f"theta_gj_{the_ch}",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, 0, np.pi),
+            x_title=rf"$\theta_{{GJ}} [{title_str}]$ (rad)",
+        )
+        cfg.add_variable(
+            name=f"theta_gj_{the_ch}_gen",
+            expression=f"theta_gj_{the_ch}_gen",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, 0, np.pi),
+            x_title=rf"gen $\theta_{{GJ}} [{title_str}]$ (rad)",
+        )
+        cfg.add_variable(
+            name=f"rot_theta_gj_{the_ch}",
+            expression=f"rot_theta_gj_{the_ch}",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, -1.7, 0.2),
+            x_title=rf"rotated $\theta_{{GJ}} [{title_str}]$ (rad)",
+        )
+        cfg.add_variable(
+            name=f"rot_theta_gj_{the_ch}_gen",
+            expression=f"rot_theta_gj_{the_ch}_gen",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, -1.7, 0.2),
+            x_title=rf"gen rotated $\theta_{{GJ}} [{title_str}]$ (rad)",
+        )
+        cfg.add_variable(
+            name=f"theta_gj_max_{the_ch}",
+            expression=f"theta_gj_max_{the_ch}",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, -1.7, 0.2),
+            x_title=rf"$\theta_{{GJ}}^{{max}} [{title_str}]$ (rad)",
+        )
+        cfg.add_variable(
+            name=f"theta_gj_max_{the_ch}_gen",
+            expression=f"theta_gj_max_{the_ch}_gen",
+            null_value=EMPTY_FLOAT,
+            binning=(4*n_bins_phi_cp, -1.7, 0.2),
+            x_title=rf"gen $\theta_{{GJ}}^{{max}} [{title_str}]$ (rad)",
+        )
 
 def add_dilepton_features(cfg: od.Config) -> None:
     channels = cfg.channels.names()
